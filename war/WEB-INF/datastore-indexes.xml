@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<datastore-indexes
-  autoGenerate="true">
-    <datastore-index kind="Activity" ancestor="false">
-        <property name="actorId" direction="asc" />
-        <property name="id" direction="asc" />
-    </datastore-index>
-    <datastore-index kind="PlusOner" ancestor="false">
-        <property name="actorId" direction="asc" />
-        <property name="id" direction="asc" />
-    </datastore-index>
+<datastore-indexes autoGenerate="true">
+	<datastore-index kind="Activity" ancestor="false">
+		<property name="actorId" direction="asc" />
+		<property name="id" direction="asc" />
+		<property name="numOfPlusOners" direction="asc" />
+	</datastore-index>
 </datastore-indexes>
+

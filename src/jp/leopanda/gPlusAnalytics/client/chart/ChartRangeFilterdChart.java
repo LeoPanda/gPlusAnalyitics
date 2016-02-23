@@ -24,7 +24,7 @@ public abstract class ChartRangeFilterdChart<O extends Options>
 	protected int RANGE_WIDTH; // レンジフィルターのデフォルト幅
 	protected ChartRangeFilterUi filterUi;// レンジフィルターチャートのUIオプション
 	protected ChartRangeFilterStateRange stateRange; // レンジフィルターのレンジ幅定義体
-
+	
 	/**
 	 * コンストラクタ
 	 * 
@@ -33,6 +33,7 @@ public abstract class ChartRangeFilterdChart<O extends Options>
 	 */
 	public ChartRangeFilterdChart(ChartType chartType, ChartOnMenu enums) {
 		super(chartType, ControlType.CHART_RANGE_FILTER, enums);
+
 	}
 	/**
 	 * レンジフィルターの初期設定
@@ -40,8 +41,8 @@ public abstract class ChartRangeFilterdChart<O extends Options>
 	@Override
 	protected void setRangeFilter() {
 		filterOptions = getfilterOptions();
-		filterOptions.setUi(getFilterUi());
 		filterUi = getFilterUi();
+		filterOptions.setUi(filterUi);
 		filterState = getFilterState();
 		filterState.setRange(setStateRange(MAX_RANGE-RANGE_WIDTH,MAX_RANGE));
 	}
@@ -69,5 +70,28 @@ public abstract class ChartRangeFilterdChart<O extends Options>
 		return stateRange;
 	}
 
-
+	/**
+	 * レンジフィルターオプションの作成
+	 * 
+	 * @return
+	 */
+	@Override
+	protected ChartRangeFilterOptions getfilterOptions(){
+		if(filterOptions == null){
+			filterOptions = ChartRangeFilterOptions.create();
+		}
+		return filterOptions;
+	}
+	/**
+	 * レンジフィルターステートの作成
+	 * 
+	 * @return	
+	 */
+	@Override
+	protected ChartRangeFilterState getFilterState(){
+		if(filterState == null){
+			filterState = ChartRangeFilterState.create();
+		}
+		return filterState;
+	}
 }

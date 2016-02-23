@@ -92,25 +92,14 @@ public abstract class FilterdChart<O extends Options, CO extends ControlOptions<
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	protected CO getfilterOptions() {
-		if (filterOptions == null) {
-			filterOptions = (CO) CO.createObject().cast();
-		}
-		return filterOptions;
-	}
+	abstract CO getfilterOptions(); 
 	/**
 	 * レンジフィルターステートの作成
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	protected CS getFilterState() {
-		if (filterState == null) {
-			filterState = (CS) CS.createObject().cast();
-		}
-		return filterState;
-	}
+	abstract CS getFilterState();
+	
 	/**
 	 * レンジフィルターの設定 getFilterOptions あるいは getFilterlStateを呼び出し
 	 * レンジフィルターに必要なオプションとステートを設定する。

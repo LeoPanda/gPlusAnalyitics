@@ -1,25 +1,12 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
-import java.util.Date;
 import java.util.List;
 
 public abstract class PlusItemList<T extends PlusItem> implements PlusListCommon<T> {
-	public String kind;
-	public String title;
-	public Date updated;
 	public String nextPageToken;
   /*
    * getter 
    */
-  public String getKind() {
-    return kind;
-  }
-  public String getTitle() {
-    return title;
-  }
-  public Date getUpdated(){
-	  return updated;
-  }
   public String getNextPageToken() {
     return nextPageToken;
   }

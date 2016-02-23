@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
@@ -35,11 +37,16 @@ import com.googlecode.gwt.charts.client.options.VAxis;
 public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChartOptions> {
 	private Map<Integer, String> activityUrls = new HashMap<Integer, String>();
 	private Bar columnBar; //カラムのバー設定
+	Logger logger = Logger.getLogger("ActivityColumnChart");
+
 	/**
 	 * コンストラクタ
 	 */
 	public ActivityColumnChart(ChartOnMenu enums) {
 		super(ChartType.COLUMN,enums);
+		logger.log(Level.INFO,"ActivityColumnChart.constractor:");
+		columnBar = Bar.create();
+		columnBar.setGroupWidth("98%");
 	}
 	/* 
 	 * チャートの生成
@@ -47,6 +54,7 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
 	 */
 	@Override
 	protected ChartWrapper<ColumnChartOptions> getChart(ChartType chartType) {
+		logger.log(Level.INFO,"ActivityColumnChart.getChart.start");
 		chart = super.getChart(chartType);
 		chart.addSelectHandler(new SelectHandler() {
 			@Override
@@ -59,6 +67,7 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
 						WindowOption.ItemDetail.getValue());
 			}
 		});
+		logger.log(Level.INFO,"ActivityColumnChart.getChart.end");
 		return chart;
 	}
 	/* 
@@ -67,6 +76,8 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
 	 */
 	@Override
 	protected ColumnChartOptions getChartOptions() {
+		logger.log(Level.INFO,"ActivityColumnChart.getChartOptions.start");
+
 		chartOptions =  super.getChartOptions();
 		chartOptions.setTitle(chartTitle);
 		chartOptions.setLegend(Legend.create(LegendPosition.TOP));
@@ -75,11 +86,10 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
 		chartOptions.setHAxis(haxis);
 		chartOptions.setVAxes(VAxis.create("+1数"));
 		//バーの設定
-		columnBar = Bar.create();
-		columnBar.setGroupWidth("98%");
 		chartOptions.setBar(columnBar);
 		//積み上げカラムに設定
 		chartOptions.setIsStacked(true);
+		logger.log(Level.INFO,"ActivityColumnChart.getChartOptions.end");
 		return chartOptions;
 
 	}
@@ -89,6 +99,7 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
 	 */
 	@Override
 	protected void setRangeFilter() {
+		logger.log(Level.INFO,"ActivityColumnChart.setRangeFilter.start");
 		MAX_RANGE = Global.getActivityItems().size();
 		MINI_RANGE_WIDTH = 2;
 		RANGE_WIDTH = 5;
@@ -103,6 +114,7 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
 		filterChartOptions.setIsStacked(true);
 		//フィルターチャートのカラムバーをチャートと同一に設定
 		filterChartOptions.setBar(columnBar);
+		logger.log(Level.INFO,"ActivityColumnChart.setRangeFilter.end");
 	}
 	/**
 	 * グラフに表示するデータをセットする
@@ -110,6 +122,7 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
 	 * @return
 	 */
 	DataTable getDataTable() {
+		logger.log(Level.INFO,"ActivityColumnChart.getDataTable.start");
 		List<PlusActivity> activities = Global.getActivityItems();
 		Collections.sort(activities, new Comparator<PlusActivity>() {
 			@Override
@@ -138,6 +151,7 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
 			dataTable.setValue(row, 4, activity.getHighLookers());
 			row += 1;
 		}
+		logger.log(Level.INFO,"ActivityColumnChart.getDataTable.end");
 		return dataTable;
 	}
 

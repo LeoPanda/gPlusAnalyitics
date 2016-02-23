@@ -5,10 +5,14 @@ import jp.leopanda.common.client.LoginBarListener;
 import jp.leopanda.common.client.GoogleLoginBar.InfoEvent;
 import jp.leopanda.common.client.GoogleLoginBar.ScopeName;
 import jp.leopanda.gPlusAnalytics.client.Global;
+import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
 import jp.leopanda.gPlusAnalytics.client.panel.MenuPanel;
+import jp.leopanda.gPlusAnalytics.dataObject.ResultPack;
+import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**
@@ -28,13 +32,13 @@ public class GPlusAnalytics implements EntryPoint {
 		loginBar = new GoogleLoginBar(Global.getApiClientid(),
 				GoogleLoginBar.addScope(ScopeName.PLUSME)
 						+ GoogleLoginBar.addScope(ScopeName.PLUSLOGIN));
-		loginBar.addListerner(new LoginControl());
+		loginBar.addListerner(new AfterLogin());
 		RootPanel.get(googleLoginBarName).add(loginBar);
 	}
 	/**
-	 * Googleログインバー　イベントハンドラ
+	 * Googleログイン後の処理
 	 */
-	private class LoginControl implements LoginBarListener {
+	private class AfterLogin implements LoginBarListener {
 		@Override
 		// ログオフされた
 		public void onLoggedOff(InfoEvent event) {
@@ -46,9 +50,26 @@ public class GPlusAnalytics implements EntryPoint {
 			Global.setAuthToken(loginBar.getToken());
 			Global.setgoogeUserId(loginBar.getGoogleInnerId());
 			outerPanel = new HorizontalPanel();
-			outerPanel.add(new MenuPanel());
+			outerPanel.add(new Label("データロード中..."));
 			RootPanel.get(outerPanelName).add(outerPanel);
-
+			new RpcGate<ResultPack>(CallFunction.GET_ITEM,
+					Global.getGoogleUserId(), new AfterDataLoad()) {
+			}.request();
 		}
+	}
+	/**
+	 * データロード後の処理
+	 * @author LeoPanda
+	 *
+	 */
+	private class AfterDataLoad implements RpcGateListener<ResultPack> {
+		@Override
+		public void onCallback(ResultPack result) {
+			Global.setActivityItems(result.activities);
+			Global.setPlusOners(result.plusOners);
+			outerPanel.clear();
+			outerPanel.add(new MenuPanel());
+		}
+
 	}
 }

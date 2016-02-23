@@ -57,8 +57,8 @@ public class NumOfPlusOnePieChart extends SimpleChart<PieChartOptions> {
 			lowMiddle += activity.getLowMiddleLookers();
 			highMiddle += activity.getHighMiddleLookers();
 			high += activity.getHighLookers();
-			totalPlusOne += (first + lowMiddle + highMiddle + high);
 		}
+		totalPlusOne = (first + lowMiddle + highMiddle + high);
 		DataTable dataTable = DataTable.create();
 		dataTable.addColumn(ColumnType.STRING, "+1分布");
 		dataTable.addColumn(ColumnType.NUMBER, "ユーザー数");

@@ -17,7 +17,6 @@ public abstract class ColumnChartRangeFilterdChart<O extends Options>
 		extends
 			ChartRangeFilterdChart<O> {
 	protected ComboChartOptions filterChartOptions; // レンジフィルターのチャートオプション
-
 	/**
 	 * カラムチャートをレンジフィルタとして搭載したチャート
 	 * 

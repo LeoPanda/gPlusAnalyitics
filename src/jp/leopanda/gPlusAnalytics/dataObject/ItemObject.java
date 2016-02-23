@@ -1,12 +1,11 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
-
-public class ItemObject implements IsSerializable {
+public class ItemObject implements Serializable {
+	private static final long serialVersionUID = 1L;
 	public String content;
 	public Users plusoners;
 	public List<Attachment> attachments;
@@ -21,6 +20,9 @@ public class ItemObject implements IsSerializable {
 		return plusoners;
 	}
 	public List<String> getAttachmentImageUrls(){
+		 if(attachments == null){
+			 return null;
+		 }
 		List<String> results = new ArrayList<String>();
 		for (Attachment attachment : attachments) {
 			results.add(attachment.getImageUrl());

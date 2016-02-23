@@ -1,7 +1,9 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
-import jp.leopanda.gPlusAnalytics.client.DataStoreMentenance;
-import jp.leopanda.gPlusAnalytics.interFace.DataMentenanceListener;
+import jp.leopanda.gPlusAnalytics.client.Global;
+import jp.leopanda.gPlusAnalytics.client.RpcGate;
+import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
+import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -21,33 +23,13 @@ public class MaintenancePanel extends VerticalPanel {
 
 	Button updateButton = new Button("データストア更新");
 	Button clearDataButton = new Button("データクリア");
-	Button forceUpdateButton = new Button("強制更新");
+	Button initialButton = new Button("データストア初期ロード");
 	VerticalPanel buttonPanel;
-	DataStoreMentenance mentenancer;
 
-	/**
-	 * クリック時呼び出しファンクション
-	 * 
-	 * @author LeoPanda
-	 *
-	 */
-	private enum Clicked {
-		UPDATE("データストアを更新します。"), CLEAR("データストアを消去します。"), FORCE_UPDATE(
-				"データストアを強制更新します。");
-
-		public String msg;
-
-		Clicked(String msg) {
-			this.msg = msg;
-		}
-	}
 	/**
 	 * コンストラクタ
 	 */
 	public MaintenancePanel() {
-		if (mentenancer == null) {
-			mentenancer = new DataStoreMentenance(new Callback());
-		}
 		this.add(getButtonPanel());
 	}
 	/**
@@ -60,7 +42,7 @@ public class MaintenancePanel extends VerticalPanel {
 			buttonPanel = new VerticalPanel();
 			buttonPanel.add(updateButton);
 			buttonPanel.add(new HTML("<br/>"));
-			buttonPanel.add(forceUpdateButton);
+			buttonPanel.add(initialButton);
 			buttonPanel.add(new HTML("<br/>"));
 			buttonPanel.add(clearDataButton);
 			addClickHandlers();
@@ -74,19 +56,19 @@ public class MaintenancePanel extends VerticalPanel {
 		updateButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				confirmClicked(Clicked.UPDATE);
+				confirmClicked(CallFunction.UPDATE);
 			}
 		});
 		clearDataButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				confirmClicked(Clicked.CLEAR);
+				confirmClicked(CallFunction.CLEAR);
 			}
 		});
-		forceUpdateButton.addClickHandler(new ClickHandler() {
+		initialButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				confirmClicked(Clicked.FORCE_UPDATE);
+				confirmClicked(CallFunction.INITIAL_LOAD);
 			}
 		});
 	}
@@ -95,36 +77,18 @@ public class MaintenancePanel extends VerticalPanel {
 	 * 
 	 * @param clicked
 	 */
-	private void confirmClicked(Clicked clicked) {
+	private void confirmClicked(CallFunction clicked) {
 		if (Window.confirm(clicked.msg + "よろしいですか？")) {
-			setPanelToOngoing();
-			goClickedFunction(clicked);
-		}
-	}
-	/**
-	 * クリックされた指示を実行する
-	 * 
-	 * @param clicked
-	 */
-	private void goClickedFunction(Clicked clicked) {
-		switch (clicked) {
-			case UPDATE :
-				mentenancer.updateDataStore(false);
-				break;
-			case FORCE_UPDATE :
-				mentenancer.updateDataStore(true);
-				break;
-			case CLEAR :
-				mentenancer.clearDataStore();
-				break;
-			default :
-				break;
+			setPanelToOnGoing();
+			new RpcGate<String>(clicked, Global.getGoogleUserId(),
+					new Callback()) {
+			}.request();
 		}
 	}
 	/**
 	 * 　パネルをデータ更新中に変更
 	 */
-	private void setPanelToOngoing() {
+	private void setPanelToOnGoing() {
 		this.clear();
 		this.add(new Label("データストア更新中・・・"));
 	}
@@ -134,10 +98,10 @@ public class MaintenancePanel extends VerticalPanel {
 	 * @author LeoPanda
 	 *
 	 */
-	private class Callback implements DataMentenanceListener {
+	private class Callback implements RpcGateListener<String> {
 		@Override
 		public void onCallback(String result) {
-			Window.alert("更新指示が出されました。データストアの更新が完了するにはしばらく時間がかかる場合があります。ブラウザをリロードすると更新が反映されます。");
+			Window.alert("データストアの更新が完了するまでもうしばらく時間がかかる場合があります。更新データを表示するにはブラウザをリロードしてください。");
 			MaintenancePanel.this.clear();
 			MaintenancePanel.this.add(buttonPanel);
 		}

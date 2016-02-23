@@ -1,9 +1,10 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
-public class Attachment implements IsSerializable {
+public class Attachment implements Serializable {
+	private static final long serialVersionUID = 1L;
 	public AttachmentImage image;
 	public Attachment() {
 		this.image = new AttachmentImage();

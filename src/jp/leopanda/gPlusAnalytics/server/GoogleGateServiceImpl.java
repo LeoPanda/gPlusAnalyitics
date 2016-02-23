@@ -1,11 +1,9 @@
 package jp.leopanda.gPlusAnalytics.server;
 
-import java.util.List;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
-import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
+import jp.leopanda.gPlusAnalytics.dataObject.ResultPack;
 import jp.leopanda.gPlusAnalytics.dataStore.DataStoreHandler;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateService;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
@@ -21,7 +19,7 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet
 	private static final long serialVersionUID = 1L;
 
 	GoogleApiService googleApi = new GoogleApiService();
-	DataStoreHandler dataHandler = new DataStoreHandler();
+	DataStoreHandler dataHandler = new DataStoreHandler(googleApi);
 	/**
 	 * データストアの内容を最新状態に更新する
 	 * @param userId
@@ -29,32 +27,8 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet
 	 * @return
 	 * @throws HostGateException
 	 */
-	public String updateDataStore(String userId,String oAuthToken,boolean forceUpdate) throws HostGateException{
-		dataHandler.setForceUpdate(forceUpdate);
-		return dataHandler.updateBrandNew(userId, oAuthToken, googleApi);
-	}
-	/**
-	 * データストアからアクテビティの一覧を取得する
-	 * 
-	 * @param userId
-	 * @param oAuthToken
-	 * @return
-	 * @throws HostGateException
-	 */
-	public List<PlusActivity> getActivities(String userId, String oAuthToken)
-			throws HostGateException {
-		return dataHandler.getActivityHanler().getActivities(userId);
-	}
-	/**
-	 * データストアからユーザのアクテビティに＋１したすべてのユーザの一覧を取得する
-	 * @param userId
-	 * @param oAuthToken
-	 * @return
-	 * @throws HostGateException
-	 */
-	public List<PlusPeople> getPlusOners(String userId, String oAuthToken)
-			throws HostGateException {
-		return dataHandler.getPlusOnerHanler().getPlusOners(userId);
+	public String updateDataStore(String userId,String oAuthToken) throws HostGateException{
+		return dataHandler.updateBrandNew(userId, oAuthToken);
 	}
 	/**
 	 * データストアをクリアする
@@ -62,6 +36,25 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet
 	 */
 	public String clearDataStore(String userid){
 		dataHandler.clearDataStore(userid);
-		return "done";
+		return null;
+	}
+	/**
+	 * データストアの初期ロード
+	 * @param userId
+	 * @param oAuthToken
+	 * @return
+	 * @throws HostGateException
+	 */
+	public String initialLoadToStore(String userId,String oAuthToken) throws HostGateException{
+		return dataHandler.initialLoadToStore(userId, oAuthToken);
+	}
+	/**
+	 * データストアからactivityとplusOnersを得る
+	 * @param userId
+	 * @return
+	 * @throws HostGateException
+	 */
+	public ResultPack getItems(String userId) throws HostGateException{
+		return dataHandler.getActivityHanler().getItems(userId);
 	}
 }

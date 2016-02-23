@@ -1,11 +1,11 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
+import java.io.Serializable;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
-public class PlusPeopleList extends PlusItemList<PlusPeople> implements IsSerializable{
-  public List<PlusPeople> items;
+public class PlusPeopleList extends PlusItemList<PlusPeople> implements Serializable{
+	private static final long serialVersionUID = 1L;
+public List<PlusPeople> items;
   public Integer totalItems;
   /*
    * getter 

@@ -1,9 +1,10 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
-public class Users implements IsSerializable {
+public class Users implements Serializable {
+	private static final long serialVersionUID = 1L;
 	public Integer totalItems;
 
 	public Integer getTotalItems() {

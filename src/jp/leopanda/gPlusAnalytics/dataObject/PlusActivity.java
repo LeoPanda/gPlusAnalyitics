@@ -1,11 +1,15 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class PlusActivity extends PlusItem implements IsSerializable {
+public class PlusActivity extends PlusItem implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public String kind;
 	public String title;
 	public String id;
@@ -17,10 +21,12 @@ public class PlusActivity extends PlusItem implements IsSerializable {
 	public ItemObject object;
 	public ItemAccess access;
 	
+	private List<String> plusOnerIds;
 	private int firstLookers = 0;
 	private int lowMiddleLookers = 0;
 	private int highMiddleLookers = 0;
 	private int highLookers = 0;
+	
 	
 	/**
 	 * 
@@ -81,6 +87,9 @@ public class PlusActivity extends PlusItem implements IsSerializable {
 
 	public int getHighLookers() {
 		return highLookers;
+	}
+	public List<String> getPlusOnerIds(){
+		return plusOnerIds;
 	}
 
 /*
@@ -146,5 +155,8 @@ public class PlusActivity extends PlusItem implements IsSerializable {
 
 	public void setHighLookers(int highLookers) {
 		this.highLookers = highLookers;
+	}
+	public void setPlusOnerIds(List<String> plusOnerIds){
+		this.plusOnerIds = plusOnerIds;
 	}
 }

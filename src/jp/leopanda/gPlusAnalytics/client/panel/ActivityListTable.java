@@ -60,14 +60,12 @@ public class ActivityListTable extends SimpleListTable<PlusActivity> {
 			@Override
 			public SafeHtml getValue(PlusActivity item) {
 				SafeHtmlBuilder builder = new SafeHtmlBuilder();
-				for (String imageUrl : item.getAttachmentImageUrls()) {
-					if (imageUrl != null) {
-						builder.appendHtmlConstant(
-								"<img height=\"80\" width =\"80\" src=\"")
-								.appendEscaped(imageUrl)
-								.appendHtmlConstant("\">")
-								.appendHtmlConstant("<br/>");
-					}
+				if (item.getAttachmentImageUrls() != null) {
+					String imageUrl = item.getAttachmentImageUrls().get(0);
+					builder.appendHtmlConstant(
+							"<img height=\"80\" width =\"80\" src=\"")
+							.appendEscaped(imageUrl).appendHtmlConstant("\">")
+							.appendHtmlConstant("<br/>");
 				}
 				return builder.toSafeHtml();
 			}
@@ -98,7 +96,6 @@ public class ActivityListTable extends SimpleListTable<PlusActivity> {
 		this.columSets.add(newColumnSet("+1", numOfPlusOneColumn, 30,
 				HasHorizontalAlignment.ALIGN_RIGHT));
 	}
-
 	/**
 	 * カラムのソート条件をセットする
 	 */
@@ -146,6 +143,7 @@ public class ActivityListTable extends SimpleListTable<PlusActivity> {
 			public void onSelectionChange(SelectionChangeEvent event) {
 				PlusActivity selected = selectionModel.getSelectedObject();
 				if (selected != null) {
+					// Window.alert(selected.getId());
 					Window.open(selected.getUrl(), "PlusActivity",
 							WindowOption.ItemDetail.getValue());
 				}

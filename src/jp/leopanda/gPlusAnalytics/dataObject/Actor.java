@@ -1,13 +1,14 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
 /**
  * @author LeoPanda
  *
  */
-public class Actor implements IsSerializable {
+public class Actor implements Serializable {
+	private static final long serialVersionUID = 1L;
 	public String id;
 	public String displayName;
 	public String url;

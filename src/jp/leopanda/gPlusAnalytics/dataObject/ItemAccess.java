@@ -1,13 +1,14 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
 /**
  * @author LeoPanda
  *
  */
-public class ItemAccess implements IsSerializable{
+public class ItemAccess implements Serializable{
+	private static final long serialVersionUID = 1L;
 	public String description;
 	public String getDescription() {
 		return description;

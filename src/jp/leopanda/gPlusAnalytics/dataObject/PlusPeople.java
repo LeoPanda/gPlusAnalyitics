@@ -1,12 +1,15 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
-public class PlusPeople extends PlusItem implements IsSerializable {
-	public String kind;
-	public String title;
+
+public class PlusPeople extends PlusItem implements Serializable {
+	private static final long serialVersionUID = 1L;
 	public String id;
 	public String url;
+	public String gender;
+	public String language;
+	
 	private int numOfPlusOne = 0;
 
 	public String displayName;
@@ -15,12 +18,6 @@ public class PlusPeople extends PlusItem implements IsSerializable {
 	/*
 	 * getter
 	 */
-	public String getKind() {
-		return kind;
-	}
-	public String getTitle() {
-		return title;
-	}
 	public String getId() {
 		return id;
 	}
@@ -37,15 +34,15 @@ public class PlusPeople extends PlusItem implements IsSerializable {
 	public String getImageUrl() {
 		return this.image.getUrl();
 	}
+	public String getGender() {
+		return gender;
+	}
+	public String getLanguage() {
+		return language;
+	}
 	/*
 	 * setter
 	 */
-	public void setKind(String kind) {
-		this.kind = kind;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -63,4 +60,11 @@ public class PlusPeople extends PlusItem implements IsSerializable {
 		this.image = new AttachmentImage();
 		this.image.url = url;
 	}
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
 }

@@ -1,24 +1,16 @@
 package jp.leopanda.gPlusAnalytics.dataStore;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
 
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
-import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 import jp.leopanda.gPlusAnalytics.server.GoogleApiService;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.Filter;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
 
-import java.util.Calendar;
+import java.util.logging.Logger;
 /**
  * データストア操作サービス
  * 
@@ -28,41 +20,43 @@ import java.util.Calendar;
 public class DataStoreHandler {
 
 	DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-
 	ActivityStoreHandler activityHandler = new ActivityStoreHandler(ds);
-	PlusOnerStoreHandler plusOnerHandler = new PlusOnerStoreHandler(ds);
-	
-	boolean forceUpdate = false;
-	/**
-	 * 更新条件を無視しAPIデータをすべて読みなおしてデータストアを強制的に更新させるように設定を変更する
-	 */
-	public void setForceUpdate(boolean forceUpdate){
-		this.forceUpdate = forceUpdate;
+	GoogleApiService googleApi;
+	public DataStoreHandler(GoogleApiService googleApi) {
+		this.googleApi = googleApi;
 	}
 
 	public ActivityStoreHandler getActivityHanler() {
 		return this.activityHandler;
 	}
-	public PlusOnerStoreHandler getPlusOnerHanler() {
-		return this.plusOnerHandler;
-	}
+	Logger logger = Logger.getLogger("DataHandler");
+
 	/**
-	 * データストア上にある最後のアクテビティの作成日を基準に それより５日前から現在までの最新のデータをAPIから読み込み
-	 * データストアの内容を更新する。
+	 * データの初期ロード
 	 * 
 	 * @param userId
 	 * @param oAuthToken
-	 * @param googleApi
+	 * @return
 	 * @throws HostGateException
+	 * @throws IOException
 	 */
-	public String updateBrandNew(String userId, String oAuthToken,
-			GoogleApiService googleApi) throws HostGateException {
-		List<PlusActivity> latestActivites = googleApi.getLatestActivity(
-				userId,
-				backDate(activityHandler.getLatestActivityPublished(), 5),
+	public String initialLoadToStore(String userId, String oAuthToken)
+			throws HostGateException {
+		if (activityHandler.getLatestActivityPublished(userId) != null) {
+			throw new HostGateException(
+					"データストアがすでに存在しています。初期化するためにはいったんデータストアを消去してください。");
+		}
+		List<PlusActivity> activities = googleApi.getPlusActivity(userId,
 				oAuthToken);
-		checkUpdates(userId, oAuthToken, googleApi, latestActivites);
-		return activityHandler.getLatestActivityPublished().toString();
+		for (PlusActivity activity : activities) {
+			if (activityFilter(activity)) {
+				continue;
+			}
+			activityHandler
+					.putActivity(activity, googleApi.getPlusOnersByActivity(
+							activity.getId(), oAuthToken), null);
+		}
+		return null;
 	}
 	/**
 	 * データストアをクリアする
@@ -71,95 +65,47 @@ public class DataStoreHandler {
 	 */
 	public void clearDataStore(String actorId) {
 		activityHandler.remove(actorId);
-		plusOnerHandler.remove(actorId);
 	}
+
 	/**
-	 * 日付を指定日分バックデートする
-	 * 
-	 * @param refDate
-	 * @param backDays
-	 * @return
-	 */
-	private Date backDate(Date refDate, int backdays) {
-		if (refDate == null) {
-			return null;
-		}
-		if(forceUpdate){
-			return null;
-		}
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(refDate);
-		cal.add(Calendar.DATE, (-1 * backdays));
-		return cal.getTime();
-	}
-	/**
-	 * ユーザーのアクテビティに変更があったかどうか走査する
+	 * G+APIとデータストアのactivityを比較し、データストアに無いデータを追加する。 +1数に差異がある場合はG+APIデータで置き換える
 	 * 
 	 * @param userId
 	 * @param oAuthToken
 	 * @param googleApi
-	 * @param latestActivites
 	 * @throws HostGateException
 	 */
-	private void checkUpdates(String userId, String oAuthToken,
-			GoogleApiService googleApi, List<PlusActivity> latestActivites)
+	public String updateBrandNew(String userId, String oAuthToken)
 			throws HostGateException {
-		for (PlusActivity newActivity : latestActivites) {
-			findUpdateEntities(newActivity, googleApi.getPlusOnersByActivity(
-					newActivity.getId(), oAuthToken));
-		};
-	}
-	/**
-	 * 新規のアクテビティあればデータストアへ追加する。 既存のアクテビティの＋１数が更新されていればデータストアを更新する。
-	 * 
-	 * 
-	 * @param newActivity
-	 * @param newPlusOners
-	 */
-	private void findUpdateEntities(PlusActivity newActivity,
-			List<PlusPeople> newPlusOners) {
-		Filter activityFilter = new FilterPredicate(Activity.id.val,
-				FilterOperator.EQUAL, newActivity.getId());
-		PreparedQuery pq = ds.prepare(new Query(Activity.KIND.val)
-				.setFilter(activityFilter));
-		Entity activityEntity = pq.asSingleEntity();
-
-		if (activityEntity == null) {
-			// データストアの新規追加
-			plusOnerHandler.updateNewPlusOners(newActivity.getActorId(),
-					new ArrayList<String>(), newPlusOners);
-			activityHandler.putActivity(newActivity, newPlusOners,
-					plusOnerHandler);
-		} else {
-			// +1数に変更があった時は更新する
-			Integer oldNumOfPlusOners = (int) (long) activityEntity
-					.getProperty(Activity.numOfPlusOners.val);
-			if (!oldNumOfPlusOners.equals(newActivity.getNumOfPlusOners())) {
-				doUpdate(newActivity, newPlusOners, activityEntity);
-			} else if(forceUpdate){
-				doUpdate(newActivity, newPlusOners, activityEntity);				
+		List<PlusActivity> activities = googleApi.getPlusActivity(userId,
+				oAuthToken);
+		ActivityCheckMap checkMap = activityHandler.getActivityCheckMap(userId);
+		for (PlusActivity activity : activities) {
+			if (activityFilter(activity)) {
+				continue;
+			}
+			Integer numOfPlusOne = checkMap.getNumOfPlusOne(activity.getId());
+			if (numOfPlusOne == null) {// データストアになければ新規作成
+				activityHandler.putActivity(activity, googleApi
+						.getPlusOnersByActivity(activity.getId(), oAuthToken),
+						null);
+			} else if (numOfPlusOne != activity.getNumOfPlusOners()) {// +1数が違えばアップデート
+				activityHandler.putActivity(activity, googleApi
+						.getPlusOnersByActivity(activity.getId(), oAuthToken),
+						checkMap.getEntityKey(activity.getId()));
 			}
 		}
+		return null;
 	}
 	/**
-	 * データストアの更新
+	 * 写真投稿以外のアクティビティを除外する
 	 * 
-	 * @param newActivity
-	 * @param newPlusOners
-	 * @param activityEntity
+	 * @param activity
+	 * @return
 	 */
-	private void doUpdate(PlusActivity newActivity,
-			List<PlusPeople> newPlusOners, Entity activityEntity) {
-		// 新規+1ersでデータストアの+1erエンティティを更新
-		String actorId = (String) activityEntity
-				.getProperty(Activity.actorId.val);
-		@SuppressWarnings("unchecked")
-		List<String> oldPlusOnerIds = (List<String>) activityEntity
-				.getProperty(Activity.plusOnerIds.val);
-		plusOnerHandler.updateNewPlusOners(actorId, oldPlusOnerIds,
-				newPlusOners);
-		// Activityエンティティの+1er分布情報を更新
-		ds.put(activityHandler.setDistributionInfo(newActivity, newPlusOners,
-				activityEntity, plusOnerHandler));
+	private boolean activityFilter(PlusActivity activity) {
+		return (activity.getAttachmentImageUrls() == null)
+				|| (activity.getAttachmentImageUrls().get(0) == null);
 	}
+
 }

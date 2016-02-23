@@ -20,6 +20,7 @@
   <!-- Other module inherits                                      -->
  <inherits name="jp.leopanda.common.CommonService" />
  <inherits name="com.googlecode.gwt.charts.Charts"/>
+ <!-- <inherits name="com.google.gwt.logging.Logging"/>  -->
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='jp.leopanda.gPlusAnalytics.client.GPlusAnalytics'/>

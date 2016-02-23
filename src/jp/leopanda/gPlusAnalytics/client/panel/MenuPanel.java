@@ -1,7 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
-import jp.leopanda.gPlusAnalytics.client.chart.ChartMenuPanel;
-
 import com.google.gwt.user.client.ui.TabPanel;
 
 /**
