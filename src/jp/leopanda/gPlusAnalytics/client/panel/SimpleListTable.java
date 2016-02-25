@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment.HorizontalAlignmentConstant;
@@ -18,14 +19,15 @@ import com.google.gwt.view.client.SingleSelectionModel;
  * @author LeoPanda
  *
  */
-public abstract class SimpleListTable<T> extends CellTable<T> {
-	private ListDataProvider<T> dataProvider; // テーブルへのデータプロバイダ
+public abstract class SimpleListTable<I> extends CellTable<I> {
+	protected ListDataProvider<I> dataProvider; // テーブルへのデータプロバイダ
 	protected List<ColumnSet> columSets = new ArrayList<ColumnSet>();
-	protected ListHandler<T> sortHandler; // カラムのソートハンドラ
-	protected final SingleSelectionModel<T> selectionModel = new SingleSelectionModel<T>();// 選択された行のデータ・モデルƒ
+	protected ListHandler<I> sortHandler; // カラムのソートハンドラ
+	protected final SingleSelectionModel<I> selectionModel = new SingleSelectionModel<I>();// 選択された行のデータ・モデル
 	protected SelectionChangeEvent.Handler selectionChangeHandler; // 選択ハンドラ
+	protected ColumnSortEvent.Handler sortEventHander;
 
-	public SimpleListTable(List<T> items) {
+	public SimpleListTable(List<I> items) {
 		// 初期化
 		initializeTable();
 		setSelectionChangeHandler();
@@ -40,35 +42,43 @@ public abstract class SimpleListTable<T> extends CellTable<T> {
 	 * テーブルのイニシャライズ
 	 */
 	private void initializeTable() {
-		this.dataProvider = new ListDataProvider<T>();
-		// this.columns = new HashMap<String, Column<T, ?>>();
+		this.dataProvider = new ListDataProvider<I>();
 		this.setKeyboardPagingPolicy(KeyboardPagingPolicy.CHANGE_PAGE);
 		this.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 		this.setSelectionModel(selectionModel);
-		sortHandler = new ListHandler<T>(dataProvider.getList());
+		sortHandler = new ListHandler<I>(dataProvider.getList()){
+			/*
+			 * ソートイベント発生時のイベントリスナーを外出し
+			 */
+			@Override
+			public void onColumnSort(ColumnSortEvent event) {
+				super.onColumnSort(event);
+				sortEventHander.onColumnSort(event);
+			}
+		};
 	}
 	/**
 	 * 受信したデータを表示する
 	 * 
 	 * @param itemList
 	 */
-	private void displayLines(List<T> itemList) {
+	private void displayLines(List<I> itemList) {
 		// テーブルにデータプロバイダを接続する
 		this.dataProvider.addDataDisplay(this);
 		// テーブルの表示幅を指定する
 		this.setWidth(getWidth());
-		for (ColumnSet Set : columSets) {
+		for (ColumnSet columSet : columSets) {
 			// カラムの表示位置と表示幅を指定する
-			Set.colum.setHorizontalAlignment(Set.alignment);
-			this.setColumnWidth(Set.colum, String.valueOf(Set.columWidth)
+			columSet.colum.setHorizontalAlignment(columSet.alignment);
+			this.setColumnWidth(columSet.colum, String.valueOf(columSet.columWidth)
 					+ "px");
 			// 表示カラムをテーブルに追加する
-			this.addColumn(Set.colum, Set.columName);
+			this.addColumn(columSet.colum, columSet.columName);
 		}
 		// データプロバイダに明細データをセットする
-		List<T> dataProviderList = dataProvider.getList();
-		for (T item : itemList) {
-			dataProviderList.add(item);
+		List<I> displayList = dataProvider.getList();
+		for (I item : itemList) {
+			displayList.add(item);
 		}
 		// カラムのソート条件をセットする
 		setSortHandler();
@@ -84,7 +94,7 @@ public abstract class SimpleListTable<T> extends CellTable<T> {
 	 * @param alignment
 	 * @return
 	 */
-	public ColumnSet newColumnSet(String columName, Column<T, ?> colum,
+	public ColumnSet newColumnSet(String columName, Column<I, ?> colum,
 			int columWidth, HorizontalAlignmentConstant alignment) {
 		alignment = (alignment == null)
 				? HasHorizontalAlignment.ALIGN_DEFAULT
@@ -98,8 +108,8 @@ public abstract class SimpleListTable<T> extends CellTable<T> {
 	 */
 	public String getWidth() {
 		int result = 0;
-		for (ColumnSet Set : columSets) {
-			result += Set.columWidth;
+		for (ColumnSet columSet : columSets) {
+			result += columSet.columWidth;
 		}
 		return String.valueOf(result) + "px";
 	}
@@ -126,10 +136,10 @@ public abstract class SimpleListTable<T> extends CellTable<T> {
 	 */
 	private class ColumnSet {
 		String columName;
-		Column<T, ?> colum;
+		Column<I, ?> colum;
 		int columWidth;
 		HorizontalAlignmentConstant alignment;
-		ColumnSet(String columName, Column<T, ?> colum, int columWidth,
+		ColumnSet(String columName, Column<I, ?> colum, int columWidth,
 				HorizontalAlignmentConstant alignment) {
 			this.columName = columName;
 			this.colum = colum;

@@ -66,5 +66,12 @@ public class PlusPeople extends PlusItem implements Serializable {
 	public void setLanguage(String language) {
 		this.language = language;
 	}
+	/* 
+	 * @see jp.leopanda.gPlusAnalytics.interFace.IsFilterable#getSourceFieldValue()
+	 */
+	@Override
+	public String getFilterSourceValue() {
+		return getDisplayName();
+	}
 
 }

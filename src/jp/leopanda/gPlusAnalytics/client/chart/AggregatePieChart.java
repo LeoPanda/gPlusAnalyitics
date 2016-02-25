@@ -11,6 +11,7 @@ import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.ColumnType;
 import com.googlecode.gwt.charts.client.DataTable;
+import com.googlecode.gwt.charts.client.SortColumn;
 import com.googlecode.gwt.charts.client.corechart.PieChartOptions;
 import com.googlecode.gwt.charts.client.options.Legend;
 import com.googlecode.gwt.charts.client.options.LegendPosition;
@@ -71,6 +72,10 @@ public abstract class AggregatePieChart<I extends PlusItem> extends SimpleChart<
 			String title = fieldNameMap.get(field) != null ? fieldNameMap.get(field) : field;
 			dataTable.addRow(title,aggregateMap.get(field));
 			}
+		//降順にソート
+		SortColumn sortColum = SortColumn.create(1);
+		sortColum.setDesc(true);
+		dataTable.sort(sortColum);
 		return dataTable;
 	}
 	/**

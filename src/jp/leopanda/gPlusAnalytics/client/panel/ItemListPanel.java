@@ -7,6 +7,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -18,20 +19,22 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  * @author LeoPanda
  *
  */
-public abstract class ItemListPanel<T1 extends PlusItem, T2 extends SimpleListTable<T1>>
+public abstract class ItemListPanel<I extends PlusItem, T extends SimpleListTable<I>>
 		extends
 			VerticalPanel {
 
-	private List<T1> itemList;
-	private SimpleListTable<T1> simpleItemTable;// 表示するアイテムデータのリスト
+	protected List<I> itemList;
+	protected SimpleListTable<I> itemTable;// 表示するアイテムデータのリスト
 	private Label titleLabel;// パネルのタイトル名を表示するラベル
 	private Label lineCountLabel;// アイテムの総数を表示するラベル
 	private int pageSize = 0;// 表示するアイテムの行数
-	private int pageStart = 0;// 現在表示しているページ先頭行の位置
+	protected int pageStart = 0;// 現在表示しているページ先頭行の位置
 	private Button firstPageButton = new Button("<<");
 	private Button lastPageButton = new Button(">>");
 	private Button prevPageButton = new Button("<");
 	private Button nextPageButton = new Button(">");
+	// ページコントロール行ボタン間のスペース
+	protected HorizontalPanel centerSpaceOfPageControl = new HorizontalPanel();
 	/**
 	 * コンストラクタ
 	 * 
@@ -44,33 +47,34 @@ public abstract class ItemListPanel<T1 extends PlusItem, T2 extends SimpleListTa
 	 * @param itemTable
 	 *            一覧表示するテーブルオブジェクト SimpleListTabaleを継承するクラスのインスタンス
 	 */
-	public ItemListPanel(List<T1> itemList, String titleName, int pageSize,
-			T2 itemTable) {
-		this.simpleItemTable = itemTable;
+	public ItemListPanel(List<I> itemList, String titleName, int pageSize,
+			T itemTable) {
+		this.itemTable = itemTable;
 		this.pageSize = pageSize;
 		this.itemList = itemList;
 
 		// タイトル行の作成
 		HorizontalPanel headerLine = makeTitleLine(titleName);
 		this.add(headerLine);
-
 		// ページコントロール行の作成
 		HorizontalPanel pageControlLine = makePageControlLine();
 		this.add(pageControlLine);
 		// アイテム表示テーブルの追加
-		simpleItemTable.setPageSize(this.pageSize);
-		this.add(simpleItemTable);
+		itemTable.setPageSize(this.pageSize);
+		this.add(itemTable);
 		// 表示幅の設定
-		this.setWidth(simpleItemTable.getWidth());
+		this.setWidth(itemTable.getWidth());
+		// カラムソート時に先頭行をリセット
+		addSortEventHandler();
 	}
 	/**
-	 * タイトル行クラス
+	 * タイトル行クラスの作成
 	 * 
 	 * @return
 	 */
 	private HorizontalPanel makeTitleLine(String titleName) {
 		HorizontalPanel headerLine = new HorizontalPanel();
-		headerLine.setWidth(simpleItemTable.getWidth());
+		headerLine.setWidth(itemTable.getWidth());
 		titleLabel = new Label(titleName);
 		lineCountLabel = new Label("(" + String.valueOf(itemList.size()) + "件)");
 		titleLabel.addStyleName(CssStyle.TitleLabel.getValue());
@@ -80,18 +84,42 @@ public abstract class ItemListPanel<T1 extends PlusItem, T2 extends SimpleListTa
 		return headerLine;
 	}
 	/**
-	 * ページコントロール行クラス
+	 * ページコントロール行パネルの作成
 	 * 
 	 * @param size
 	 * @return
 	 */
 	private HorizontalPanel makePageControlLine() {
+		addButtonClickHandlers();
+		firstPageButton.addStyleName(CssStyle.PageButton.getValue());
+		prevPageButton.addStyleName(CssStyle.PageButton.getValue());
+		nextPageButton.addStyleName(CssStyle.PageButton.getValue());
+		lastPageButton.addStyleName(CssStyle.PageButton.getValue());
+		HorizontalPanel pageControlLine = new HorizontalPanel();
+		pageControlLine.setWidth(itemTable.getWidth());
+		HorizontalPanel leftSide = new HorizontalPanel();
+		HorizontalPanel rightSide = new HorizontalPanel();
+		leftSide.add(firstPageButton);
+		leftSide.add(prevPageButton);
+		rightSide.add(nextPageButton);
+		rightSide.add(lastPageButton);
+		pageControlLine.add(leftSide);
+		pageControlLine.setHorizontalAlignment(ALIGN_LEFT);
+		pageControlLine.add(centerSpaceOfPageControl);
+		pageControlLine.setHorizontalAlignment(ALIGN_RIGHT);
+		pageControlLine.add(rightSide);
+		return pageControlLine;
+	}
+	/**
+	 * 各ページコントロールボタンへクリックハンドラを追加する
+	 */
+	private void addButtonClickHandlers() {
 		// 先頭ページボタン
 		firstPageButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				pageStart = 0;
-				simpleItemTable.setPageStart(0);
+				itemTable.setPageStart(0);
 			}
 		});
 		// 最終ページボタン
@@ -99,7 +127,7 @@ public abstract class ItemListPanel<T1 extends PlusItem, T2 extends SimpleListTa
 			@Override
 			public void onClick(ClickEvent event) {
 				pageStart = itemList.size() - pageSize;
-				simpleItemTable.setPageStart(pageStart);
+				itemTable.setPageStart(pageStart);
 			}
 		});
 		// 前ページボタン
@@ -109,7 +137,7 @@ public abstract class ItemListPanel<T1 extends PlusItem, T2 extends SimpleListTa
 				pageStart -= pageSize;
 				pageStart = pageStart < 0 ? 0 : pageStart;
 
-				simpleItemTable.setPageStart(pageStart);
+				itemTable.setPageStart(pageStart);
 			}
 		});
 		// 次ページボタン
@@ -118,28 +146,23 @@ public abstract class ItemListPanel<T1 extends PlusItem, T2 extends SimpleListTa
 			public void onClick(ClickEvent event) {
 				pageStart += pageSize;
 				int lastPage = itemList.size();
-				pageStart = pageStart+1 > lastPage
+				pageStart = pageStart + 1 > lastPage
 						? pageStart - pageSize
 						: pageStart;
-				simpleItemTable.setPageStart(pageStart);
+				itemTable.setPageStart(pageStart);
 			}
 		});
-		firstPageButton.addStyleName(CssStyle.PageButton.getValue());
-		prevPageButton.addStyleName(CssStyle.PageButton.getValue());
-		nextPageButton.addStyleName(CssStyle.PageButton.getValue());
-		lastPageButton.addStyleName(CssStyle.PageButton.getValue());
-		HorizontalPanel pageControlLine = new HorizontalPanel();
-		pageControlLine.setWidth(simpleItemTable.getWidth());
-		HorizontalPanel leftSide = new HorizontalPanel();
-		HorizontalPanel rightSide = new HorizontalPanel();
-		leftSide.add(firstPageButton);
-		leftSide.add(prevPageButton);
-		rightSide.add(nextPageButton);
-		rightSide.add(lastPageButton);
-		pageControlLine.add(leftSide);
-		pageControlLine.setHorizontalAlignment(ALIGN_RIGHT);
-		pageControlLine.add(rightSide);
-		return pageControlLine;
 	}
-
+	/**
+	 * セルテーブルのソートイベント発生時にテーブルの表示先頭行をリセット
+	 */
+	private void addSortEventHandler() {
+		itemTable.sortEventHander = new ColumnSortEvent.Handler() {
+			@Override
+			public void onColumnSort(ColumnSortEvent event) {
+				pageStart = 0;
+				itemTable.setPageStart(0);
+			}
+		};
+	}
 }

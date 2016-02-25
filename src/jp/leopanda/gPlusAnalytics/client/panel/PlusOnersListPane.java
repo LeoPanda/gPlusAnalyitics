@@ -36,7 +36,7 @@ public class PlusOnersListPane extends VerticalPanel {
 	 */
 	private void addListTable(List<PlusPeople> items) {
 		this.clear();
-		this.add(new ItemListPanel<PlusPeople, PlusOnersListTable>(items,
+		this.add(new FilterableItemListPanel<PlusPeople, PlusOnersListTable>(items,
 				"+1ユーザー一覧", 10, new PlusOnersListTable(items)) {
 		});
 	}

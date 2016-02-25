@@ -132,8 +132,16 @@ public class ActivityStoreHandler {
 				return o2.getPublished().compareTo(o1.getPublished());
 			}
 		});
+		//+1ersを+1数降順にソート
+		List<PlusPeople> plusOners = plusOnerHandler.getPlusOners();
+		Collections.sort(plusOners,new Comparator<PlusPeople>(){
+			@Override
+			public int compare(PlusPeople o1, PlusPeople o2) {
+				return o2.getNumOfPlusOne() - o1.getNumOfPlusOne();
+			}
+		});
 		result.setActivities(activities);
-		result.setPlusOners(plusOnerHandler.getPlusOners());
+		result.setPlusOners(plusOners);
 		return result;
 	}
 	/**

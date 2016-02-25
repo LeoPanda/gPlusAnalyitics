@@ -159,4 +159,13 @@ public class PlusActivity extends PlusItem implements Serializable {
 	public void setPlusOnerIds(List<String> plusOnerIds){
 		this.plusOnerIds = plusOnerIds;
 	}
+
+	/* 
+	 * @see jp.leopanda.gPlusAnalytics.interFace.IsFilterable#getSourceFieldValue()
+	 */
+	@Override
+	public String getFilterSourceValue() {
+		// TODO 自動生成されたメソッド・スタブ
+		return getAccessDescription() + getTitle();
+	}
 }

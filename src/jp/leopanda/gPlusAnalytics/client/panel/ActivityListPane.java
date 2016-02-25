@@ -36,7 +36,7 @@ public class ActivityListPane extends VerticalPanel {
 	 */
 	private void addListTable(List<PlusActivity> items) {
 		this.clear();
-		this.add(new ItemListPanel<PlusActivity, ActivityListTable>(items,
+		this.add(new FilterableItemListPanel<PlusActivity, ActivityListTable>(items,
 				"アクティビティ一覧", 7, new ActivityListTable(items)) {
 		});
 	}
