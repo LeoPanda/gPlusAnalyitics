@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 import com.googlecode.gwt.charts.client.ChartPackage;
@@ -24,15 +24,15 @@ import com.googlecode.gwt.charts.client.options.LegendPosition;
 public abstract class AggregatePieChart<I extends PlusItem> extends SimpleChart<PieChartOptions> {
 	private List<I> items;
 	private Map<String, Integer> aggregateMap = new HashMap<String, Integer>();
-	protected Map<String,String> fieldNameMap = new HashMap<String, String>();
+	protected Map<String,String> fieldAliasMap = new HashMap<String, String>();
 	protected String columnTitle = "カラムタイトル";
 	protected String numberColumnTitle ="数値タイトル";
 	/**
 	 * コンストラクタ
 	 */
-	public AggregatePieChart(List<I> items,ChartOnMenu enums) {
-		super(ChartType.PIE,ChartPackage.CORECHART,enums);
-		setFieldNameMap();
+	public AggregatePieChart(List<I> items) {
+		super(ChartType.PIE,ChartPackage.CORECHART);
+		setFieldAliasMap();
 		this.items = items;
 	}
 	/**
@@ -43,7 +43,7 @@ public abstract class AggregatePieChart<I extends PlusItem> extends SimpleChart<
 	 */
 	protected PieChartOptions getChartOptions() {
 		super.getChartOptions();
-		chartOptions.setTitle(chartTitle);
+		chartOptions.setTitle(getChartTitle());
 		chartOptions.setLegend(Legend.create(LegendPosition.TOP));
 		return chartOptions;
 	}
@@ -69,7 +69,7 @@ public abstract class AggregatePieChart<I extends PlusItem> extends SimpleChart<
 		dataTable.addColumn(ColumnType.STRING, columnTitle);
 		dataTable.addColumn(ColumnType.NUMBER, numberColumnTitle);
 		for(String field:aggregateMap.keySet()){
-			String title = fieldNameMap.get(field) != null ? fieldNameMap.get(field) : field;
+			String title = fieldAliasMap.get(field) != null ? fieldAliasMap.get(field) : field;
 			dataTable.addRow(title,aggregateMap.get(field));
 			}
 		//降順にソート
@@ -85,9 +85,9 @@ public abstract class AggregatePieChart<I extends PlusItem> extends SimpleChart<
 	 */
 	abstract String getTargetField(I item);
 	/**
-	 * 集計フィールドの名称を変更したい場合は、ここでfieldNameMapを登録する
-	 * fieldNameMap(フィールドの実値,変更後の値)
+	 * 集計フィールドの表示名を変更したい場合は、ここでfieldAliasMapを登録する
+	 * fieldAliasMap(フィールドの実値,変更後の値)
 	 * 
 	 */
-	abstract void setFieldNameMap();
+	abstract void setFieldAliasMap();
 }

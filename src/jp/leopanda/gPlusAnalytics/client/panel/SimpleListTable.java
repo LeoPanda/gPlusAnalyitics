@@ -20,7 +20,7 @@ import com.google.gwt.view.client.SingleSelectionModel;
  *
  */
 public abstract class SimpleListTable<I> extends CellTable<I> {
-	protected ListDataProvider<I> dataProvider; // テーブルへのデータプロバイダ
+	private ListDataProvider<I> dataProvider; // テーブルへのデータプロバイダ
 	protected List<ColumnSet> columSets = new ArrayList<ColumnSet>();
 	protected ListHandler<I> sortHandler; // カラムのソートハンドラ
 	protected final SingleSelectionModel<I> selectionModel = new SingleSelectionModel<I>();// 選択された行のデータ・モデル
@@ -37,6 +37,13 @@ public abstract class SimpleListTable<I> extends CellTable<I> {
 		setColumns();
 		// 明細の表示
 		displayLines(items);
+	}
+	/**
+	 * 表示データのリストを取得する
+	 * @return
+	 */
+	public List<I> getDisplayList(){
+		return dataProvider.getList();
 	}
 	/**
 	 * テーブルのイニシャライズ

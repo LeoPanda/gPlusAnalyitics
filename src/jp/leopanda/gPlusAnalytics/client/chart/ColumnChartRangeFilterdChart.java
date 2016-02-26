@@ -1,6 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.chart;
 
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.corechart.ComboChartOptions;
@@ -23,8 +23,8 @@ public abstract class ColumnChartRangeFilterdChart<O extends Options>
 	 * @param chartType
 	 * @param enums
 	 */
-	public ColumnChartRangeFilterdChart(ChartType chartType, ChartOnMenu enums) {
-		super(chartType, enums);
+	public ColumnChartRangeFilterdChart(ChartType chartType) {
+		super(chartType);
 	}
 	/**
 	 * レンジフィルターの初期設定
@@ -43,7 +43,7 @@ public abstract class ColumnChartRangeFilterdChart<O extends Options>
 	private ComboChartOptions presetFilterChartOptions() {
 		if (filterChartOptions == null) {
 			filterChartOptions = ComboChartOptions.create();
-			filterChartOptions.setWidth(chartWidth);
+			filterChartOptions.setWidth(getChartWidth());
 			filterChartOptions.setSeriesType(SeriesType.BARS);
 		}
 		return filterChartOptions;

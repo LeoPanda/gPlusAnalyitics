@@ -4,7 +4,7 @@
 package jp.leopanda.gPlusAnalytics.client.chart;
 
 import jp.leopanda.gPlusAnalytics.client.Global;
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
 /**
@@ -20,8 +20,8 @@ public class LanguagePieChart extends AggregatePieChart<PlusPeople> {
 	 * 
 	 * @param enums
 	 */
-	public LanguagePieChart(ChartOnMenu enums) {
-		super(Global.getPlusOners(), enums);
+	public LanguagePieChart() {
+		super(Global.getPlusOners());
 
 	}
 
@@ -41,7 +41,7 @@ public class LanguagePieChart extends AggregatePieChart<PlusPeople> {
 	 * ()
 	 */
 	@Override
-	void setFieldNameMap() {
+	void setFieldAliasMap() {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}

@@ -47,11 +47,11 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleListTabl
 	 * @param itemTable
 	 *            一覧表示するテーブルオブジェクト SimpleListTabaleを継承するクラスのインスタンス
 	 */
-	public ItemListPanel(List<I> itemList, String titleName, int pageSize,
+	public ItemListPanel(List<I> items, String titleName, int pageSize,
 			T itemTable) {
 		this.itemTable = itemTable;
 		this.pageSize = pageSize;
-		this.itemList = itemList;
+		this.itemList = items;
 
 		// タイトル行の作成
 		HorizontalPanel headerLine = makeTitleLine(titleName);

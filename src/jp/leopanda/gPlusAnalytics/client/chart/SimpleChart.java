@@ -7,7 +7,7 @@ import com.googlecode.gwt.charts.client.ChartWrapper;
 import com.googlecode.gwt.charts.client.DataTable;
 import com.googlecode.gwt.charts.client.options.Options;
 
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 
 /**
  * @author LeoPanda
@@ -19,8 +19,8 @@ public abstract class SimpleChart<O extends Options> extends OnMenuPanel {
 	/**
 	 * コンストラクタ
 	 */
-	public SimpleChart(final ChartType chartType,ChartPackage chartPackage, ChartOnMenu enums) {
-		super(enums);
+	public SimpleChart(final ChartType chartType,ChartPackage chartPackage) {
+		super();
 		ChartLoader chartLoader = new ChartLoader(chartPackage);
 		chartLoader.loadApi(new Runnable() {
 			@Override
@@ -81,8 +81,8 @@ public abstract class SimpleChart<O extends Options> extends OnMenuPanel {
 	@SuppressWarnings("unchecked")
 	protected O getChartOptions(){
 		chartOptions = (O)O.create();
-		chartOptions.setHeight(chartHeight);
-		chartOptions.setWidth(chartWidth);
+		chartOptions.setHeight(getChartHeight());
+		chartOptions.setWidth(getChartWidth());
 		return chartOptions;
 	};
 	/**

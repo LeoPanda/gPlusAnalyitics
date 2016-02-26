@@ -71,7 +71,11 @@ public class PlusActivity extends PlusItem implements Serializable {
 		return this.object.getPlusoners().getTotalItems();
 	}
 	public String getAccessDescription() {
-		return this.access.getDescription();
+		String result = this.access.getDescription();
+		if (result.equals("Public")) {
+			result = "コレクション";
+		}
+		return result;
 	}
 	public int getFirstLookers() {
 		return firstLookers;

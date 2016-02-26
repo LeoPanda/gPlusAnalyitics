@@ -1,6 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.chart;
 
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartType;
@@ -33,9 +33,8 @@ public abstract class FilterdChart<O extends Options, CO extends ControlOptions<
 	 * @param chartPackage
 	 * @param enums
 	 */
-	public FilterdChart(ChartType chartType, ControlType controlTyle,
-			ChartOnMenu enums) {
-		super(chartType, ChartPackage.CONTROLS, enums);
+	public FilterdChart(ChartType chartType, ControlType controlTyle) {
+		super(chartType, ChartPackage.CONTROLS);
 		this.controlType = controlTyle;
 	}
 	@Override
@@ -92,14 +91,14 @@ public abstract class FilterdChart<O extends Options, CO extends ControlOptions<
 	 * 
 	 * @return
 	 */
-	abstract CO getfilterOptions(); 
+	abstract CO getfilterOptions();
 	/**
 	 * レンジフィルターステートの作成
 	 * 
 	 * @return
 	 */
 	abstract CS getFilterState();
-	
+
 	/**
 	 * レンジフィルターの設定 getFilterOptions あるいは getFilterlStateを呼び出し
 	 * レンジフィルターに必要なオプションとステートを設定する。

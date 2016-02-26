@@ -2,7 +2,7 @@ package jp.leopanda.gPlusAnalytics.client.chart;
 
 import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
 import com.google.gwt.i18n.client.NumberFormat;
@@ -25,8 +25,8 @@ public class PlusOnersPieChart extends SimpleChart<PieChartOptions> {
 	/**
 	 * コンストラクタ
 	 */
-	public PlusOnersPieChart(ChartOnMenu enums) {
-		super(ChartType.PIE, ChartPackage.CORECHART, enums);
+	public PlusOnersPieChart() {
+		super(ChartType.PIE, ChartPackage.CORECHART);
 	}
 	@Override
 	protected void afterDrawChart() {
@@ -41,7 +41,7 @@ public class PlusOnersPieChart extends SimpleChart<PieChartOptions> {
 	 */
 	protected PieChartOptions getChartOptions() {
 		super.getChartOptions();
-		chartOptions.setTitle(chartTitle);
+		chartOptions.setTitle(getChartTitle());
 		chartOptions.setLegend(Legend.create(LegendPosition.TOP));
 		return chartOptions;
 	}

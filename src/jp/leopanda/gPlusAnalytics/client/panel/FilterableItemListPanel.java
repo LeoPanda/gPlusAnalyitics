@@ -47,20 +47,16 @@ public abstract class FilterableItemListPanel<I extends PlusItem, T extends Simp
 	/**
 	 * フィルター実行
 	 * 
-	 * @param filterString
+	 * @param comparator
 	 */
-	private void doFilter(String filterString) {
-		List<I> displayList = itemTable.dataProvider.getList();
-		displayList.clear();
-		for (I item : itemList) {
-			if (filterString == null) {
-				displayList.add(item);
-			} else if (item.getFilterSourceValue().toLowerCase()
-					.contains(filterString.toLowerCase())) {
-				displayList.add(item);
+	private void doFilter(String comparator) {
+		new ItemFilter<I, String>(itemList) {
+			@Override
+			public boolean compare(I item, String comparator) {
+				return (item.getFilterSourceValue().toLowerCase()
+						.contains(comparator.toLowerCase()));
 			}
-		}
+		}.doFilter(comparator, itemTable);
 		pageStart = 0;
-		itemTable.setPageStart(0);
 	}
 }

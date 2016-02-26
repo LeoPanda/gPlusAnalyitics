@@ -2,7 +2,7 @@ package jp.leopanda.gPlusAnalytics.client.chart;
 
 import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 import com.google.gwt.i18n.client.NumberFormat;
@@ -25,8 +25,8 @@ public class NumOfPlusOnePieChart extends SimpleChart<PieChartOptions> {
 	/**
 	 * コンストラクタ
 	 */
-	public NumOfPlusOnePieChart(ChartOnMenu enums) {
-		super(ChartType.PIE,ChartPackage.CORECHART,enums);
+	public NumOfPlusOnePieChart() {
+		super(ChartType.PIE,ChartPackage.CORECHART);
 	}
 	protected void afterDrawChart() {
 		add(new Label("総+1数:"
@@ -40,7 +40,7 @@ public class NumOfPlusOnePieChart extends SimpleChart<PieChartOptions> {
 	 */
 	protected PieChartOptions getChartOptions() {
 		super.getChartOptions();
-		chartOptions.setTitle(chartTitle);
+		chartOptions.setTitle(getChartTitle());
 		chartOptions.setLegend(Legend.create(LegendPosition.TOP));
 		return chartOptions;
 	}

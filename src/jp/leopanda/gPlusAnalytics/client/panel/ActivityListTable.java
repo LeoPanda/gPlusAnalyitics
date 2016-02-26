@@ -75,9 +75,6 @@ public class ActivityListTable extends SimpleListTable<PlusActivity> {
 			@Override
 			public String getValue(PlusActivity item) {
 				String result = item.getAccessDescription();
-				if (result.equals("Public")) {
-					result = "コレクション";
-				}
 				return result;
 			}
 		};

@@ -1,6 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.chart;
 
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.controls.ControlType;
@@ -31,8 +31,8 @@ public abstract class ChartRangeFilterdChart<O extends Options>
 	 * @param chartType
 	 * @param enums
 	 */
-	public ChartRangeFilterdChart(ChartType chartType, ChartOnMenu enums) {
-		super(chartType, ControlType.CHART_RANGE_FILTER, enums);
+	public ChartRangeFilterdChart(ChartType chartType) {
+		super(chartType, ControlType.CHART_RANGE_FILTER);
 
 	}
 	/**

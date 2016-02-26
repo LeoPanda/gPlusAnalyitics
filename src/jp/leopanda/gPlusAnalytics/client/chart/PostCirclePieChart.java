@@ -5,7 +5,7 @@ package jp.leopanda.gPlusAnalytics.client.chart;
 
 
 import jp.leopanda.gPlusAnalytics.client.Global;
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
@@ -20,8 +20,8 @@ public class PostCirclePieChart extends AggregatePieChart<PlusActivity> {
 	 * @param items
 	 * @param enums
 	 */
-	public PostCirclePieChart(ChartOnMenu enums) {
-		super(Global.getActivityItems(), enums);
+	public PostCirclePieChart() {
+		super(Global.getActivityItems());
 	}
 
 	/*
@@ -40,8 +40,7 @@ public class PostCirclePieChart extends AggregatePieChart<PlusActivity> {
 	 * ()
 	 */
 	@Override
-	void setFieldNameMap() {
-		fieldNameMap.put("Public", "コレクション");
+	void setFieldAliasMap() {
 	}
 
 }

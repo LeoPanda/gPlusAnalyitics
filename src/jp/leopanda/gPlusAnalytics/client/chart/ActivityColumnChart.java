@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 import jp.leopanda.gPlusAnalytics.client.enums.WindowOption;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
@@ -42,8 +42,8 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
 	/**
 	 * コンストラクタ
 	 */
-	public ActivityColumnChart(ChartOnMenu enums) {
-		super(ChartType.COLUMN,enums);
+	public ActivityColumnChart() {
+		super(ChartType.COLUMN);
 		logger.log(Level.INFO,"ActivityColumnChart.constractor:");
 		columnBar = Bar.create();
 		columnBar.setGroupWidth("98%");
@@ -79,7 +79,7 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
 		logger.log(Level.INFO,"ActivityColumnChart.getChartOptions.start");
 
 		chartOptions =  super.getChartOptions();
-		chartOptions.setTitle(chartTitle);
+		chartOptions.setTitle(getChartTitle());
 		chartOptions.setLegend(Legend.create(LegendPosition.TOP));
 		HAxis haxis = HAxis.create("アクテビティ");
 		haxis.setTextPosition(TextPosition.NONE);

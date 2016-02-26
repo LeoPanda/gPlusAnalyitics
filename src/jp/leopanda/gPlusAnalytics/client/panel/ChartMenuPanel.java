@@ -9,9 +9,10 @@ import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.chart.ActivityCalendarChart;
 import jp.leopanda.gPlusAnalytics.client.chart.ActivityColumnChart;
 import jp.leopanda.gPlusAnalytics.client.chart.NumOfPlusOnePieChart;
+import jp.leopanda.gPlusAnalytics.client.chart.OnMenuPanel;
 import jp.leopanda.gPlusAnalytics.client.chart.PlusOnersPieChart;
 import jp.leopanda.gPlusAnalytics.client.chart.PostCirclePieChart;
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -33,8 +34,8 @@ public class ChartMenuPanel extends HorizontalPanel {
 	private VerticalPanel linkPanel;
 	private HorizontalPanel chartPanel;
 
-	private Map<ChartOnMenu, Widget> charts = new HashMap<ChartOnMenu, Widget>(); // チャートのインスタンス
-	private List<ChartOnMenu> onMenuChart = new ArrayList<ChartOnMenu>(); // 現在表示中のチャート
+	private Map<ChartInfo, OnMenuPanel> charts = new HashMap<ChartInfo, OnMenuPanel>(); // チャートのインスタンス
+	private List<ChartInfo> onMenuChart = new ArrayList<ChartInfo>(); // 現在表示中のチャート
 
 	private final int CHARTPANEL_MAXCOLUMNS = 2; // チャートパネルの最大カラム数
 	private int chartPanelColumns = 0; // チャートパネルの現在カラム数
@@ -55,9 +56,9 @@ public class ChartMenuPanel extends HorizontalPanel {
 	private VerticalPanel getLinkPanel() {
 		if (linkPanel == null) {
 			linkPanel = new VerticalPanel();
-			for (ChartOnMenu chart : ChartOnMenu.values()) {
+			for (ChartInfo chart : ChartInfo.values()) {
 				linkPanel.add(new HTML("<br/>"));
-				Anchor link = new Anchor(chart.name);
+				Anchor link = new Anchor(chart.title);
 				addClickHandler(link, chart);
 				linkPanel.add(link);
 			}
@@ -79,7 +80,7 @@ public class ChartMenuPanel extends HorizontalPanel {
 	/**
 	 * アンカークリックハンドラの追加
 	 */
-	private void addClickHandler(Anchor link, final ChartOnMenu chart) {
+	private void addClickHandler(Anchor link, final ChartInfo chartInfo) {
 		link.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -87,7 +88,7 @@ public class ChartMenuPanel extends HorizontalPanel {
 						|| Global.getPlusOners() == null) {
 					Window.alert("データの読み込みが終わるまでしばらくお待ち下さい。");
 				} else {
-					addCharrtToPanel(chart);
+					addCharrtToPanel(chartInfo);
 				}
 			}
 
@@ -97,73 +98,75 @@ public class ChartMenuPanel extends HorizontalPanel {
 	/**
 	 * チャートをパネルに追加する
 	 * 
-	 * @param chart
+	 * @param chartInfo
 	 */
-	private void addCharrtToPanel(ChartOnMenu chart) {
-		if (onMenuChart.contains(chart)) {
+	private void addCharrtToPanel(ChartInfo chartInfo) {
+		if (onMenuChart.contains(chartInfo)) {
 			return;
 		}
-		if (chartPanelColumns + chart.occupiedColum > CHARTPANEL_MAXCOLUMNS) {
+		if (chartPanelColumns + chartInfo.occupiedColum > CHARTPANEL_MAXCOLUMNS) {
 			onMenuChart.clear();
 			chartPanel.clear();
 			chartPanelColumns = 0;
 		}
-		onMenuChart.add(chart);
-		chartPanel.add(getChartInstance(chart));
-		chartPanelColumns += chart.occupiedColum;
+		onMenuChart.add(chartInfo);
+		chartPanel.add(getChartInstance(chartInfo));
+		chartPanelColumns += chartInfo.occupiedColum;
 	}
 	/**
 	 * チャートのインスタンスを取得する
 	 * 
-	 * @param chart
+	 * @param chartInfo
 	 * @return
 	 */
-	private Widget getChartInstance(ChartOnMenu chart) {
-		if (charts.get(chart) == null) {
-			charts.put(chart, getNewWidget(chart));
+	private OnMenuPanel getChartInstance(ChartInfo chartInfo) {
+		if (charts.get(chartInfo) == null) {
+			charts.put(chartInfo, getNewWidget(chartInfo));
 		}
-		return charts.get(chart);
+		return charts.get(chartInfo);
 	}
 	/**
 	 * チャートを生成する
 	 * 
-	 * @param chart
+	 * @param chartInfo
 	 * @return
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	private Widget getNewWidget(ChartOnMenu chart) {
-		Widget newChart = null;
-		switch (chart) {
+	private OnMenuPanel getNewWidget(ChartInfo chartInfo) {
+		OnMenuPanel newChart = null;
+		switch (chartInfo) {
 			case ACTIVIY_COLUMN :
-				newChart = new ActivityColumnChart(chart);
+				newChart = new ActivityColumnChart();
 				break;
 
 			case ACTIVITY_CALENDAR :
-				newChart = new ActivityCalendarChart(chart);
+				newChart = new ActivityCalendarChart();
 				break;
 
 			case NUM_OF_PLUSONE :
-				newChart = new NumOfPlusOnePieChart(chart);
+				newChart = new NumOfPlusOnePieChart();
 				break;
 
 			case PLUSONRES_PIE :
-				newChart = new PlusOnersPieChart(chart);
+				newChart = new PlusOnersPieChart();
 				break;
 
 			case POSTCIRCLE_PIE :
-				newChart = new PostCirclePieChart(chart);
+				newChart = new PostCirclePieChart();
 				break;
-
 //			case GENDER_PIE :
-//				newChart = new GenderPieChart(chart);
+//				newChart = new GenderPieChart();
 //				break;
 //
 //			case LANGUAGE_PIE :
-//				newChart = new LanguagePieChart(chart);
+//				newChart = new LanguagePieChart();
 //				break;
 
 			default :
 				break;
 		}
+		newChart.setMenuInfo(chartInfo);
 		return newChart;
 	}
 

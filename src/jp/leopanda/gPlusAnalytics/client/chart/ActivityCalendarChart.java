@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jp.leopanda.gPlusAnalytics.client.Global;
-import jp.leopanda.gPlusAnalytics.client.enums.ChartOnMenu;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
 import jp.leopanda.gPlusAnalytics.client.enums.WindowOption;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
@@ -29,8 +29,8 @@ public class ActivityCalendarChart extends SimpleChart<CalendarOptions> {
 	/**
 	 * コンストラクタ
 	 */
-	public ActivityCalendarChart(ChartOnMenu enums) {
-		super(ChartType.CALENDAR, ChartPackage.CALENDAR, enums);
+	public ActivityCalendarChart() {
+		super(ChartType.CALENDAR, ChartPackage.CALENDAR);
 	}
 	/**
 	 * グラフの作成
@@ -62,7 +62,7 @@ public class ActivityCalendarChart extends SimpleChart<CalendarOptions> {
 	 */
 	protected CalendarOptions getChartOptions() {
 		chartOptions = super.getChartOptions();
-		chartOptions.setTitle(chartTitle);
+		chartOptions.setTitle(getChartTitle());
 		chartOptions.setNoDataPattern("#DDD", "#A0A0A0");
 		return chartOptions;
 	}
