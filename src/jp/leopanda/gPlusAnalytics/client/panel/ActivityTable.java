@@ -21,11 +21,11 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
  * @author LeoPanda
  *
  */
-public class ActivityListTable extends SimpleListTable<PlusActivity> {
+public class ActivityTable extends SimpleCellTable<PlusActivity> {
 	/**
 	 * コンストラクタ
 	 */
-	public ActivityListTable(List<PlusActivity> items) {
+	public ActivityTable(List<PlusActivity> items) {
 		super(items);
 	}
 
@@ -140,7 +140,6 @@ public class ActivityListTable extends SimpleListTable<PlusActivity> {
 			public void onSelectionChange(SelectionChangeEvent event) {
 				PlusActivity selected = selectionModel.getSelectedObject();
 				if (selected != null) {
-					// Window.alert(selected.getId());
 					Window.open(selected.getUrl(), "PlusActivity",
 							WindowOption.ItemDetail.getValue());
 				}

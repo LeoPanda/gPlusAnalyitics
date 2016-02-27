@@ -11,7 +11,9 @@ public enum CssStyle {
 	LabelNormal("headerLabel"),
 	TitleLabel("titleLabel"),
 	CountLabel("countLabel"),
-	PageButton("pageButton");
+	PageButton("pageButton"),
+	FilterButton("filterButton"),
+	ResetButton("resetButton");
 	
 	private String styleName;
 	

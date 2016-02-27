@@ -14,27 +14,29 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
- * Google+ API　アイテムデータの一覧テーブルパネル
+ * Google+ API　アイテムデータの一覧表示パネル
  * 
  * @author LeoPanda
  *
  */
-public abstract class ItemListPanel<I extends PlusItem, T extends SimpleListTable<I>>
+public abstract class ItemListPanel<I extends PlusItem, T extends SimpleCellTable<I>>
 		extends
 			VerticalPanel {
 
-	protected List<I> itemList;
-	protected SimpleListTable<I> itemTable;// 表示するアイテムデータのリスト
-	private Label titleLabel;// パネルのタイトル名を表示するラベル
-	private Label lineCountLabel;// アイテムの総数を表示するラベル
+	protected List<I> itemList;//表示するアイテムデータ
+	protected SimpleCellTable<I> itemTable;// 表示するアイテムデータ用の表
+	private Label titleLabel = new Label();// パネルのタイトル名を表示するラベル
+	private String originalTitle;// 元のタイトル名
+	private Label lineCountLabel = new Label();// アイテムの総数を表示するラベル
 	private int pageSize = 0;// 表示するアイテムの行数
 	protected int pageStart = 0;// 現在表示しているページ先頭行の位置
-	private Button firstPageButton = new Button("<<");
-	private Button lastPageButton = new Button(">>");
-	private Button prevPageButton = new Button("<");
-	private Button nextPageButton = new Button(">");
-	// ページコントロール行ボタン間のスペース
-	protected HorizontalPanel centerSpaceOfPageControl = new HorizontalPanel();
+	private Button firstPageButton = new Button("◀◀");
+	private Button lastPageButton = new Button("▶▶");
+	private Button prevPageButton = new Button("◀");
+	private Button nextPageButton = new Button("▶");
+	// フリースペース
+	protected HorizontalPanel spaceOfafterTitle = new HorizontalPanel();//タイトルの後
+	protected HorizontalPanel spaceOfPageControl = new HorizontalPanel();//ページコントロールの間
 	/**
 	 * コンストラクタ
 	 * 
@@ -54,7 +56,8 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleListTabl
 		this.itemList = items;
 
 		// タイトル行の作成
-		HorizontalPanel headerLine = makeTitleLine(titleName);
+		this.originalTitle = titleName;
+		HorizontalPanel headerLine = makeTitleLine();
 		this.add(headerLine);
 		// ページコントロール行の作成
 		HorizontalPanel pageControlLine = makePageControlLine();
@@ -72,16 +75,39 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleListTabl
 	 * 
 	 * @return
 	 */
-	private HorizontalPanel makeTitleLine(String titleName) {
+	private HorizontalPanel makeTitleLine() {
 		HorizontalPanel headerLine = new HorizontalPanel();
 		headerLine.setWidth(itemTable.getWidth());
-		titleLabel = new Label(titleName);
-		lineCountLabel = new Label("(" + String.valueOf(itemList.size()) + "件)");
+		setOriginalTitle();
 		titleLabel.addStyleName(CssStyle.TitleLabel.getValue());
 		lineCountLabel.addStyleName(CssStyle.CountLabel.getValue());
 		headerLine.add(titleLabel);
+		headerLine.add(spaceOfafterTitle);
 		headerLine.add(lineCountLabel);
 		return headerLine;
+	}
+	/**
+	 * オリジナルのタイトルを表示する
+	 */
+	public void setOriginalTitle() {
+		titleLabel.setText(originalTitle);
+		setDisplayCounter();
+	}
+	/**
+	 * 代替のタイトルを表示する
+	 * 
+	 * @param title
+	 */
+	public void setAlternateTitle(String title) {
+		titleLabel.setText(title);
+		setDisplayCounter();
+	}
+	/**
+	 * 選択されたデータの合計行数を表示する
+	 */
+	public void setDisplayCounter(){
+		lineCountLabel.setText("("
+				+ String.valueOf(itemTable.getDisplayList().size()) + "件)");		
 	}
 	/**
 	 * ページコントロール行パネルの作成
@@ -105,7 +131,7 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleListTabl
 		rightSide.add(lastPageButton);
 		pageControlLine.add(leftSide);
 		pageControlLine.setHorizontalAlignment(ALIGN_LEFT);
-		pageControlLine.add(centerSpaceOfPageControl);
+		pageControlLine.add(spaceOfPageControl);
 		pageControlLine.setHorizontalAlignment(ALIGN_RIGHT);
 		pageControlLine.add(rightSide);
 		return pageControlLine;
@@ -126,7 +152,7 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleListTabl
 		lastPageButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				pageStart = itemList.size() - pageSize;
+				pageStart = itemTable.getDisplayList().size() - pageSize;
 				itemTable.setPageStart(pageStart);
 			}
 		});
@@ -145,7 +171,7 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleListTabl
 			@Override
 			public void onClick(ClickEvent event) {
 				pageStart += pageSize;
-				int lastPage = itemList.size();
+				int lastPage = itemTable.getDisplayList().size();
 				pageStart = pageStart + 1 > lastPage
 						? pageStart - pageSize
 						: pageStart;

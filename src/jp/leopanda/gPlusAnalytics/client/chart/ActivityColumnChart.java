@@ -101,8 +101,8 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
 	protected void setRangeFilter() {
 		logger.log(Level.INFO,"ActivityColumnChart.setRangeFilter.start");
 		MAX_RANGE = Global.getActivityItems().size();
-		MINI_RANGE_WIDTH = 2;
-		RANGE_WIDTH = 5;
+		MINI_RANGE_WIDTH = 5;
+		RANGE_WIDTH = 10;
 		super.setRangeFilter();
 		//日付でフィルター
 		filterOptions.setFilterColumnIndex(0); 

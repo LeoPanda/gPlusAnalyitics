@@ -27,7 +27,7 @@ public abstract class ItemFilter<I extends PlusItem, C> {
 	 * @param itemTable
 	 *            	表示データを変更したいセルテーブル
 	 */
-	public void doFilter(C comparator, SimpleListTable<I> itemTable ) {
+	public void doFilter(C comparator, SimpleCellTable<I> itemTable ) {
 		List<I> displayList = itemTable.getDisplayList();
 		displayList.clear();
 		for (I item : originalItems) {

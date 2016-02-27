@@ -19,7 +19,7 @@ import com.google.gwt.view.client.SingleSelectionModel;
  * @author LeoPanda
  *
  */
-public abstract class SimpleListTable<I> extends CellTable<I> {
+public abstract class SimpleCellTable<I> extends CellTable<I> {
 	private ListDataProvider<I> dataProvider; // テーブルへのデータプロバイダ
 	protected List<ColumnSet> columSets = new ArrayList<ColumnSet>();
 	protected ListHandler<I> sortHandler; // カラムのソートハンドラ
@@ -27,7 +27,7 @@ public abstract class SimpleListTable<I> extends CellTable<I> {
 	protected SelectionChangeEvent.Handler selectionChangeHandler; // 選択ハンドラ
 	protected ColumnSortEvent.Handler sortEventHander;
 
-	public SimpleListTable(List<I> items) {
+	public SimpleCellTable(List<I> items) {
 		// 初期化
 		initializeTable();
 		setSelectionChangeHandler();

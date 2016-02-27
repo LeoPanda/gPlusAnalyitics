@@ -10,28 +10,6 @@ h1 {
   text-align: center;
 }
 
-.sendButton {
-  display: block;
-  font-size: 16pt;
-}
-
-/** Most GWT widgets already have a style name defined */
-.gwt-DialogBox {
-  width: 400px;
-}
-
-.dialogVPanel {
-  margin: 5px;
-}
-
-.serverResponseLabelError {
-  color: red;
-}
-
-/** Set ids using widget.getElement().setId("idOfElement") */
-#closeButton {
-  margin: 15px 6px 6px;
-}
 /** css style for login panel | start   */
 .login-banner {
 	background-color: #2D2D2D;
@@ -70,4 +48,34 @@ h1 {
 .countLabel {
     font-weight: bold;
     padding: 5px;
+}
+/** num of plusone filter button */
+button{
+	-moz-border-radius:42px;
+	-webkit-border-radius:42px;
+	border-radius:42px;
+	border:0px solid #dcdcdc;
+	padding:6px 9px;
+	text-decoration:none;
+	background:-moz-linear-gradient( center top, #ededed 17%, #dfdfdf 88% );
+	background:-ms-linear-gradient( top, #ededed 17%, #dfdfdf 88% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(17%, #ededed), color-stop(88%, #dfdfdf) );
+	background-color:#ededed;
+	color:#777777;
+	display:inline-block;
+}button:hover {
+	background:-moz-linear-gradient( center top, #dfdfdf 17%, #ededed 88% );
+	background:-ms-linear-gradient( top, #dfdfdf 17%, #ededed 88% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(17%, #dfdfdf), color-stop(88%, #ededed) );
+	background-color:#dfdfdf;
+}button:active {
+	position:relative;
+	top:1px;
+}
+.filterButton button{
+	font-size:16px;
+	font-family:Arial;
+	font-weight:normal;
 }
