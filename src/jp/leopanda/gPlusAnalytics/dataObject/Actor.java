@@ -8,9 +8,9 @@ import java.io.Serializable;
  *
  */
 public class Actor implements Serializable {
-	private static final long serialVersionUID = 1L;
-	public String id;
-	public String displayName;
-	public String url;
-	
+  private static final long serialVersionUID = 1L;
+  public String id;
+  public String displayName;
+  public String url;
+
 }

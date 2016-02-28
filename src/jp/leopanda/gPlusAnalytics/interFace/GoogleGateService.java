@@ -8,9 +8,12 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("GoogleGateService")
 public interface GoogleGateService extends RemoteService {
-	ResultPack getItems(String userId) throws HostGateException;
-	String initialLoadToStore(String userId,String oAuthToken) throws HostGateException;
-	String updateDataStore(String userId, String oAuthToken) throws HostGateException;
-	String clearDataStore(String userId) throws HostGateException;
+  ResultPack getItems(String userId) throws HostGateException;
+
+  String initialLoadToStore(String userId, String oauthToken) throws HostGateException;
+
+  String updateDataStore(String userId, String oauthToken) throws HostGateException;
+
+  String clearDataStore(String userId) throws HostGateException;
 
 }

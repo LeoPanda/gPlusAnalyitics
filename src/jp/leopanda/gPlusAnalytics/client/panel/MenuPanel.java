@@ -4,19 +4,20 @@ import com.google.gwt.user.client.ui.TabPanel;
 
 /**
  * メインメニュー
+ * 
  * @author LeoPanda
  *
  */
-public class MenuPanel extends TabPanel{
+public class MenuPanel extends TabPanel {
 
-	/**
-	 * コンストラクタ
-	 */
-	public MenuPanel() {
-		this.add(new TableLaunchPanel(),"tables");
-		this.add(new ChartMenuPanel(),"chart");
-		this.add(new MaintenancePanel(),"maintenance");
-		this.selectTab(0);
-	}
+  /**
+   * コンストラクタ
+   */
+  public MenuPanel() {
+    this.add(new TableLaunchPanel(), "tables");
+    this.add(new ChartMenuPanel(), "chart");
+    this.add(new MaintenancePanel(), "maintenance");
+    this.selectTab(0);
+  }
 
 }

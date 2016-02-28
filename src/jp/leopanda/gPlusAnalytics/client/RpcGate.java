@@ -18,95 +18,99 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  *
  */
 public class RpcGate<R> {
-	CallFunction function; // 呼び出す機能の種類
-	R resultClass; // 戻り値のクラス
-	// メソッド用パラメータ
-	private String userId;
-	// RPC 非同期通信用のインターフェース
-	private GoogleGateServiceAsync googleAsync = GWT
-			.create(GoogleGateService.class);
-	// イベントリスナー
-	private RpcGateListener<R> listener;
-	/*
-	 * コンストラクタ
-	 */
-	public RpcGate(CallFunction function, String userId,
-			RpcGateListener<R> listener) {
-		this.function = function;
-		this.listener = listener;
-		this.userId = userId;
-	}
+  CallFunction function; // 呼び出す機能の種類
+  R resultClass; // 戻り値のクラス
+  // メソッド用パラメータ
+  private String userId;
+  // RPC 非同期通信用のインターフェース
+  private GoogleGateServiceAsync googleAsync = GWT.create(GoogleGateService.class);
+  // イベントリスナー
+  private RpcGateListener<R> listener;
 
-	/*
-	 * PRC API 呼び出し要求
-	 */
-	@SuppressWarnings("unchecked")
-	public void request() {
-		GenAsync<R> genAsync = new GenAsync<R>();
-		genAsync.addListener((RpcGateListener<R>) this.listener);
-		switch (function) {
-			case GET_ITEM : {
-				googleAsync.getItems(userId,
-						(AsyncCallback<ResultPack>) genAsync.callback_);
-			}
-				break;
-			case INITIAL_LOAD : {
-				googleAsync.initialLoadToStore(userId, Global.getAuthToken(),
-						(AsyncCallback<String>) genAsync.callback_);
+  /**
+   * コンストラクタ
+   * @param function　呼び出すRPC機能
+   * @param userId    Google ユーザーID
+   * @param listener  完了通知処理記述用リスナー
+   */
+  public RpcGate(CallFunction function, String userId, RpcGateListener<R> listener) {
+    this.function = function;
+    this.listener = listener;
+    this.userId = userId;
+  }
 
-			}
-				break;
-			case UPDATE : {
-				googleAsync.updateDataStore(userId, Global.getAuthToken(),
-						(AsyncCallback<String>) genAsync.callback_);
+  /**
+   * RPC呼び出し要求
+   */
+  @SuppressWarnings("unchecked")
+  public void request() {
+    GenAsync<R> genAsync = new GenAsync<R>();
+    genAsync.addListener((RpcGateListener<R>) this.listener);
+    switch (function) {
+      case GET_ITEM: {
+        googleAsync.getItems(userId, (AsyncCallback<ResultPack>) genAsync.callbackR);
+      }
+        break;
+      case INITIAL_LOAD: {
+        googleAsync.initialLoadToStore(userId, Global.getAuthToken(),
+            (AsyncCallback<String>) genAsync.callbackR);
 
-			}
-				break;
-			case CLEAR : {
-				googleAsync.clearDataStore(userId,
-						(AsyncCallback<String>) genAsync.callback_);
+      }
+        break;
+      case UPDATE: {
+        googleAsync.updateDataStore(userId, Global.getAuthToken(),
+            (AsyncCallback<String>) genAsync.callbackR);
 
-			}
-				break;
+      }
+        break;
+      case CLEAR: {
+        googleAsync.clearDataStore(userId, (AsyncCallback<String>) genAsync.callbackR);
 
-			default :
-				break;
-		}
-	}
-	/*
-	 * googleAsync 戻り値の総称化クラス
-	 */
-	private class GenAsync<R_> {
-		AsyncCallback<R_> callback_;
-		RpcGateListener<R_> listener_;
-		public void addListener(RpcGateListener<R_> listener) {
-			this.listener_ = listener;
-		}
-		public GenAsync() {
-			callback_ = new AsyncCallback<R_>() {
-				@Override
-				// Callback取得成功
-				public void onSuccess(R_ result) {
-					listener_.onCallback(result);
-				}
-				@Override
-				// 取得失敗
-				public void onFailure(Throwable caught) {
-					asyncErrorHandler(caught);
-				}
-			};
-		}
-	}
-	/**
-	 * 取得エラー時処理
-	 * 
-	 * @param caught
-	 */
-	private void asyncErrorHandler(Throwable caught) {
-		if (caught instanceof HostGateException) {
-			Window.alert("RPCエラー:" + ((HostGateException) caught).getStatus());
-		} else {
-			Window.alert("RPCエラー:" + caught.toString());
-		}
-	}
+      }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  /*
+   * googleAsync 戻り値の総称化クラス
+   */
+  private class GenAsync<R1> {
+    AsyncCallback<R1> callbackR;
+    RpcGateListener<R1> listenerR;
+
+    public void addListener(RpcGateListener<R1> listener) {
+      this.listenerR = listener;
+    }
+
+    public GenAsync() {
+      callbackR = new AsyncCallback<R1>() {
+        @Override
+        // Callback取得成功
+        public void onSuccess(R1 result) {
+          listenerR.onCallback(result);
+        }
+
+        @Override
+        // 取得失敗
+        public void onFailure(Throwable caught) {
+          asyncErrorHandler(caught);
+        }
+      };
+    }
+  }
+
+  /**
+   * エラー時の処理ハンドラ
+   * @param caught　スローオブジェクト
+   */
+  private void asyncErrorHandler(Throwable caught) {
+    if (caught instanceof HostGateException) {
+      Window.alert("RPCエラー:" + ((HostGateException) caught).getStatus());
+    } else {
+      Window.alert("RPCエラー:" + caught.toString());
+    }
+  }
 }

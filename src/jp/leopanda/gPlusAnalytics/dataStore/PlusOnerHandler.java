@@ -8,48 +8,50 @@ import java.util.Map;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
 /**
- * PlusOnersのハンドリングを行う
+ * +1ersアイテムオブジェクトのハンドリングを行う
+ * 
  * @author LeoPanda
  *
  */
 public class PlusOnerHandler {
-	/**
-	 * Activityに＋１したユーザーを集計する
-	 * 
-	 * @param plusOners
-	 */
-	Map<String, PlusPeople> plusOnersMap = new HashMap<String, PlusPeople>();
-	Map<String, Integer> numOfPlusOneMap = new HashMap<String, Integer>();
-	
-	public Map<String, Integer> getNumOfPlusOneMap(){
-		return numOfPlusOneMap;
-	}
+  //ID,アイテムオブジェクトの+1ersメモリーマップ
+  Map<String, PlusPeople> plusOnersMap = new HashMap<String, PlusPeople>();
+  //ID,+1数の+1ersメモリーマップ
+  Map<String, Integer> numOfPlusOneMap = new HashMap<String, Integer>();
 
-	public void aggregatePlusOnes(List<PlusPeople> plusOners) {
-		for (PlusPeople plusOner : plusOners) {
-			String plusOneId = plusOner.getId();
-			if (plusOnersMap.get(plusOneId) == null) {
-				plusOnersMap.put(plusOneId, plusOner);
-				numOfPlusOneMap.put(plusOneId, 1);
-			} else {
-				int numOfPlusOne = numOfPlusOneMap.get(plusOneId);
-				numOfPlusOneMap.put(plusOneId,
-						numOfPlusOne + 1);
-			}
-		}
-	}
-	/**
-	 * Activityに＋１したユーザーをを抽出する
-	 * 
-	 * @return
-	 */
-	public List<PlusPeople> getPlusOners() {
-		List<PlusPeople> results = new ArrayList<PlusPeople>();
-		for (PlusPeople plusOner : plusOnersMap.values()) {
-			plusOner.setNumOfPlusOne(numOfPlusOneMap.get(plusOner.getId()));
-			results.add(plusOner);
-		}
-		return results;
-	}
+  public Map<String, Integer> getNumOfPlusOneMap() {
+    return numOfPlusOneMap;
+  }
+
+  /**
+   * アクティビティ毎に散らばる+1ersをメモリーマップ上に集計する
+   * @param plusOners 集計前の+1ersアイテムオブジェクトリスト
+   */
+  public void aggregatePlusOnes(List<PlusPeople> plusOners) {
+    for (PlusPeople plusOner : plusOners) {
+      String plusOneId = plusOner.getId();
+      if (plusOnersMap.get(plusOneId) == null) {
+        plusOnersMap.put(plusOneId, plusOner);
+        numOfPlusOneMap.put(plusOneId, 1);
+      } else {
+        int numOfPlusOne = numOfPlusOneMap.get(plusOneId);
+        numOfPlusOneMap.put(plusOneId, numOfPlusOne + 1);
+      }
+    }
+  }
+
+  /**
+   * ID毎に+1数を集計された+1ersのアイテムオブジェクトリストを取得する
+   * 
+   * @return +1ersのアイテムオブジェクトリスト
+   */
+  public List<PlusPeople> getPlusOners() {
+    List<PlusPeople> results = new ArrayList<PlusPeople>();
+    for (PlusPeople plusOner : plusOnersMap.values()) {
+      plusOner.setNumOfPlusOne(numOfPlusOneMap.get(plusOner.getId()));
+      results.add(plusOner);
+    }
+    return results;
+  }
 
 }

@@ -28,8 +28,10 @@
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
   <source path='client.chart'/>
+  <source path='client.chart.abstracts'/>
   <source path='client.enums'/>
   <source path='client.panel'/>
+  <source path='client.panel.abstracts'/>
   <source path='dataObject'/>
   <source path='interFace'/>
 

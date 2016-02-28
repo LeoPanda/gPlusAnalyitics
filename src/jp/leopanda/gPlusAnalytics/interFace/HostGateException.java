@@ -5,15 +5,16 @@ import java.lang.Exception;
 
 @SuppressWarnings("serial")
 public class HostGateException extends Exception implements Serializable {
-	public HostGateException(){
-	}
-	private String statusCode;
-	public HostGateException(String statusCode) {
-	    this.statusCode = statusCode;
-	}
+  public HostGateException() {}
 
-	public String getStatus() {
-	    return this.statusCode;
-	}
+  private String statusCode;
+
+  public HostGateException(String statusCode) {
+    this.statusCode = statusCode;
+  }
+
+  public String getStatus() {
+    return this.statusCode;
+  }
 
 }
