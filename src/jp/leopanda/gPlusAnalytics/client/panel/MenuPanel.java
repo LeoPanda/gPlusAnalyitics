@@ -1,5 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
+import jp.leopanda.gPlusAnalytics.interFace.TableEventListener;
+
 import com.google.gwt.user.client.ui.TabPanel;
 
 /**
@@ -9,14 +11,28 @@ import com.google.gwt.user.client.ui.TabPanel;
  *
  */
 public class MenuPanel extends TabPanel {
+  private TableLaunchPanel tablePanel;
+  private ChartMenuPanel chartPanel;
+  private MaintenancePanel mentePanel;
 
   /**
    * コンストラクタ
    */
   public MenuPanel() {
-    this.add(new TableLaunchPanel(), "tables");
-    this.add(new ChartMenuPanel(), "chart");
-    this.add(new MaintenancePanel(), "maintenance");
+    tablePanel = new TableLaunchPanel();
+    chartPanel =
+        new ChartMenuPanel(tablePanel.getActivityDisplayItems(),
+            tablePanel.getPlusOnerDisplayItems());
+    mentePanel = new MaintenancePanel();
+    tablePanel.addEventListener(new TableEventListener() {
+      @Override
+      public void onFilter(String filterLog) {
+        chartPanel.reloadChartDataTables(filterLog);
+      }
+    });
+    this.add(tablePanel, "tables");
+    this.add(chartPanel, "chart");
+    this.add(mentePanel, "maintenance");
     this.selectTab(0);
   }
 

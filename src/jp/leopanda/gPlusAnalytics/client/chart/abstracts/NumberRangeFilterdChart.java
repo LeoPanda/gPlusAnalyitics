@@ -1,6 +1,8 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
 
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
+
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.controls.ControlType;
 import com.googlecode.gwt.charts.client.controls.filter.NumberRangeFilterOptions;
@@ -13,8 +15,8 @@ import com.googlecode.gwt.charts.client.options.Options;
  * @author LeoPanda
  *
  */
-public abstract class NumberRangeFilterdChart<O extends Options> extends
-    FilterdChart<O, NumberRangeFilterOptions, NumberRangeFilterState> {
+public abstract class NumberRangeFilterdChart<I extends PlusItem,O extends Options> extends
+    FilterdChart<I,O, NumberRangeFilterOptions, NumberRangeFilterState> {
 
   /**
    * コンストラクタ

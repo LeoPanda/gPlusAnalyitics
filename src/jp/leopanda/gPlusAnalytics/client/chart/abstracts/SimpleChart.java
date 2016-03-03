@@ -1,5 +1,9 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
+import java.util.List;
+
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
+
 import com.googlecode.gwt.charts.client.ChartLoader;
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartType;
@@ -11,25 +15,36 @@ import com.googlecode.gwt.charts.client.options.Options;
  * @author LeoPanda
  *
  */
-public abstract class SimpleChart<O extends Options> extends ChartOnMenu {
+public abstract class SimpleChart<I extends PlusItem, O extends Options> extends ChartOnMenu<I> {
   protected ChartWrapper<O> chart;
   protected O chartOptions;
+  protected DataTable dataTable;
+  private ChartType chartType;
+  private ChartLoader chartLoader;
 
   /**
    * コンストラクタ
    */
-  public SimpleChart(final ChartType chartType, ChartPackage chartPackage) {
+  public SimpleChart(ChartType chartType, ChartPackage chartPackage) {
     super();
-    ChartLoader chartLoader = new ChartLoader(chartPackage);
+    this.chartType = chartType;
+    this.chartLoader = new ChartLoader(chartPackage);
+  }
+
+  /**
+   * チャートを描画する
+   */
+  @Override
+  public void draw(List<I> sourceItems) {
+    super.draw(sourceItems);
     chartLoader.loadApi(new Runnable() {
       @Override
       public void run() {
         beforeDrawChart();
         addChartToPanel(chartType);
-        draw();
+        drawCore();
         afterDrawChart();
       }
-
     });
   }
 
@@ -61,7 +76,7 @@ public abstract class SimpleChart<O extends Options> extends ChartOnMenu {
   /**
    * チャート描画処理
    */
-  protected void draw() {
+  protected void drawCore() {
     // グラフの設定
     chart.setOptions(getChartOptions());
     // グラフ描画
@@ -92,6 +107,29 @@ public abstract class SimpleChart<O extends Options> extends ChartOnMenu {
    * 
    * @return データテーブル
    */
-  protected abstract  DataTable getDataTable();
+  protected DataTable getDataTable() {
+    if (dataTable == null) {
+      dataTable = DataTable.create();
+    }
+    return dataTable;
+  };
+
+  /*
+   * チャートを再描画する
+   */
+  @Override
+  public void reDraw() {
+    clearDataTable();
+    chart.removeAllHandlers();
+    draw(sourceItems);
+  }
+
+  /**
+   * データテーブルをクリアする
+   */
+  protected void clearDataTable() {
+    dataTable.removeRows(0, dataTable.getNumberOfRows());
+    dataTable.removeColumns(0, dataTable.getNumberOfColumns());
+  }
 
 }

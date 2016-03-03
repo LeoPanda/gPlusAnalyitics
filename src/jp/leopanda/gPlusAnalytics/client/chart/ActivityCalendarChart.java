@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.SimpleChart;
 import jp.leopanda.gPlusAnalytics.client.enums.WindowOption;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
@@ -25,7 +24,7 @@ import com.googlecode.gwt.charts.client.event.SelectHandler;
  * @author LeoPanda
  *
  */
-public class ActivityCalendarChart extends SimpleChart<CalendarOptions> {
+public class ActivityCalendarChart extends SimpleChart<PlusActivity,CalendarOptions> {
   private Map<Date, String> activityUrls = new HashMap<Date, String>();
 
   /**
@@ -69,11 +68,12 @@ public class ActivityCalendarChart extends SimpleChart<CalendarOptions> {
    * グラフに表示するデータをセットする
    * 
    */
+  @Override
   protected DataTable getDataTable() {
-    DataTable dataTable = DataTable.create();
+    dataTable = super.getDataTable();
     dataTable.addColumn(ColumnType.DATE, "投稿日");
     dataTable.addColumn(ColumnType.NUMBER, "+1数");
-    for (PlusActivity activity : Global.getActivityItems()) {
+    for (PlusActivity activity : sourceItems) {
       dataTable.addRow(activity.getPublished(), activity.getNumOfPlusOners());
       activityUrls.put(activity.getPublished(), activity.getUrl());
     }

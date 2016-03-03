@@ -9,5 +9,9 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
  *
  */
 public interface ItemEventListener<I extends PlusItem> {
+  /**
+   *　イベントが発生した
+   * @param item イベント発生時の対象アイテム
+   */
   public void onEvent(I item);
 }

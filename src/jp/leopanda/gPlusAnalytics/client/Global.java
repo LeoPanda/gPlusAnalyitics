@@ -12,9 +12,9 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
  *
  */
 public class Global {
-  //Google apps client ID
+  // Google apps client ID
   private static final String apiClientId = "1075891745451.apps.googleusercontent.com";
-  
+
   private static String oAuthToken = null; // Google OAuth2 Token
   private static String googleUserId = null; // google+ ユーザーID
   private static final int milliSecondInADay = 24 * 60 * 60 * 1000; // milliseconds in a day.
@@ -69,5 +69,4 @@ public class Global {
   public static void setPlusOners(List<PlusPeople> items) {
     Global.plusOners = items;
   }
-
 }

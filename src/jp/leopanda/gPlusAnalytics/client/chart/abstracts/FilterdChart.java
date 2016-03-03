@@ -1,6 +1,8 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
 
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
+
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.controls.ControlOptions;
@@ -16,9 +18,8 @@ import com.googlecode.gwt.charts.client.options.Options;
  * @author LeoPanda
  *
  */
-public abstract class FilterdChart
-    <O extends Options, C extends ControlOptions<?>, S extends ControlState>
-    extends SimpleChart<O> {
+public abstract class FilterdChart<I extends PlusItem, O extends Options, C extends ControlOptions<?>, S extends ControlState>
+    extends SimpleChart<I, O> {
   private Dashboard dashboard;
   private ControlWrapper<C, S> rangeFilter;
   protected C filterOptions;
@@ -26,7 +27,8 @@ public abstract class FilterdChart
   private ControlType controlType;
 
   /**
-   * コンストラクタ ChartPackage.CONTROLS使用時にはChartype.CALENDARは使用できません。
+   * コンストラクタ <br/>
+   * ChartPackage.CONTROLS使用時にはChartype.CALENDARは使用できません。
    * 
    * @param chartType チャートタイプ
    * @param controlTyle チャートコントロールタイプ
@@ -47,7 +49,7 @@ public abstract class FilterdChart
    * チャートを描画する
    */
   @Override
-  protected void draw() {
+  protected void drawCore() {
     // レンジフィルターの設定
     setRangeFilter();
     if (filterState != null) {
@@ -100,7 +102,9 @@ public abstract class FilterdChart
   protected abstract S getFilterState();
 
   /**
-   * レンジフィルターの設定 getFilterOptions あるいは getFilterlStateを呼び出し レンジフィルターに必要なオプションとステートを設定する。
+   * レンジフィルターの設定 <br/>
+   * getFilterOptions あるいは getFilterlStateを呼び出し<br/>
+   * レンジフィルターに必要なオプションとステートを設定する。
    */
   protected abstract void setRangeFilter();
 

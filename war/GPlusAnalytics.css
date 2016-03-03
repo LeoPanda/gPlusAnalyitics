@@ -79,3 +79,12 @@ button{
 	font-family:Arial;
 	font-weight:normal;
 }
+.filterLabel {
+    padding: 3px 15px;
+    text-align: left;
+    color: #8C9CD0;
+    text-shadow: #ddf 1px 1px 0;
+    overflow: hidden;
+    /* font-weight: bolder; */
+    font-size: larger;
+}

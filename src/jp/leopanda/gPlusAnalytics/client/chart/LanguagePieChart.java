@@ -1,6 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.chart;
 
-import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.AggregatePieChart;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
@@ -17,7 +16,7 @@ public class LanguagePieChart extends AggregatePieChart<PlusPeople> {
    * 
    */
   public LanguagePieChart() {
-    super(Global.getPlusOners());
+    super();
 
   }
 

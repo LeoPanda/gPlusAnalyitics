@@ -34,7 +34,7 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleCellTabl
   private Button prevPageButton = new Button("◀");
   private Button nextPageButton = new Button("▶");
   // フリースペース
-  protected HorizontalPanel spaceOfafterTitle = new HorizontalPanel();// タイトルの後
+  protected HorizontalPanel spaceOfafterTitle = new HorizontalPanel();// タイトル行の後
   protected HorizontalPanel spaceOfPageControl = new HorizontalPanel();// ページコントロールの間
 
   /**
@@ -54,6 +54,7 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleCellTabl
     this.originalTitle = titleName;
     HorizontalPanel headerLine = makeTitleLine();
     this.add(headerLine);
+    this.add(spaceOfafterTitle);
     // ページコントロール行の作成
     HorizontalPanel pageControlLine = makePageControlLine();
     this.add(pageControlLine);
@@ -77,7 +78,6 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleCellTabl
     titleLabel.addStyleName(CssStyle.LABEL_TITLE.getName());
     lineCountLabel.addStyleName(CssStyle.LABEL_COUNT.getName());
     headerLine.add(titleLabel);
-    headerLine.add(spaceOfafterTitle);
     headerLine.add(lineCountLabel);
     return headerLine;
   }

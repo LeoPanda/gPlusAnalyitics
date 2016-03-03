@@ -1,5 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
@@ -14,15 +15,6 @@ public abstract class ItemFilter<I extends PlusItem, C> {
   List<I> originalItems; // フィルター実行前のオリジナルデータ
 
   /**
-   * コンストラクタ
-   * 
-   * @param originalItems フィルタ実行前のオリジナルデータ
-   */
-  public ItemFilter(List<I> originalItems) {
-    this.originalItems = originalItems;
-  }
-
-  /**
    * フィルタを実行してセルテーブルの表示データを変更する
    * 
    * @param comparator 　フィルタ比較オブジェクト
@@ -30,6 +22,7 @@ public abstract class ItemFilter<I extends PlusItem, C> {
    */
   public void doFilter(C comparator, SimpleCellTable<I> itemTable) {
     List<I> displayList = itemTable.getDisplayList();
+    this.originalItems = new ArrayList<I>(displayList);
     displayList.clear();
     for (I item : originalItems) {
       if (comparator == null) {
@@ -39,6 +32,7 @@ public abstract class ItemFilter<I extends PlusItem, C> {
       }
     }
     itemTable.setPageStart(0);
+    this.originalItems.clear();
   }
 
   /**
