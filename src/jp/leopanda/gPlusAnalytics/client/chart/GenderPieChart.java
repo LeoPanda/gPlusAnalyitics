@@ -1,6 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.chart;
 
-import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.AggregatePieChart;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
@@ -15,7 +14,7 @@ public class GenderPieChart extends AggregatePieChart<PlusPeople> {
    * コンストラクタ
    */
   public GenderPieChart() {
-    super(Global.getPlusOners());
+    super();
 
   }
 

@@ -39,10 +39,10 @@ public class PlusOnersTable extends SimpleCellTable<PlusPeople> {
   ButtonColumn<PlusPeople> filterButton;
 
   boolean excludeSelectionChanged = false; // ボタンクリック時は行選択アクションから除外する
-  ItemEventListener<PlusPeople> clickEventListener;// ボタンクリックのイベントリスナー
+  ItemEventListener<PlusPeople> filterEventListener;// フィルター実行指示のイベントリスナー
 
-  public void addFilterButtonClickEventListener(ItemEventListener<PlusPeople> listener) {
-    clickEventListener = listener;
+  public void addFilterEventListener(ItemEventListener<PlusPeople> listener) {
+    filterEventListener = listener;
   }
 
   @Override
@@ -68,7 +68,7 @@ public class PlusOnersTable extends SimpleCellTable<PlusPeople> {
     filterButton = new ButtonColumn<PlusPeople>() {
       @Override
       public void addClickEvent(int index, PlusPeople item) {
-        clickEventListener.onEvent(item);
+        filterEventListener.onEvent(item);
         excludeSelectionChanged = true;
       }
 

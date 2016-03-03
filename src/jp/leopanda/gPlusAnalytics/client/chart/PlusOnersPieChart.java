@@ -1,6 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.chart;
 
-import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.SimpleChart;
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
@@ -21,7 +20,7 @@ import com.googlecode.gwt.charts.client.options.LegendPosition;
  * @author LeoPanda
  *
  */
-public class PlusOnersPieChart extends SimpleChart<PieChartOptions> {
+public class PlusOnersPieChart extends SimpleChart<PlusPeople,PieChartOptions> {
   private int totalPlusOners = 0;
 
   /**
@@ -56,7 +55,7 @@ public class PlusOnersPieChart extends SimpleChart<PieChartOptions> {
     int lowMiddle = 0;
     int highMiddle = 0;
     int high = 0;
-    for (PlusPeople plusOner : Global.getPlusOners()) {
+    for (PlusPeople plusOner : sourceItems) {
       totalPlusOners += 1;
       int plusOne = plusOner.getNumOfPlusOne();
       if (plusOne >= Distribution.HIGH_LOOKER.threshold) {
@@ -69,7 +68,7 @@ public class PlusOnersPieChart extends SimpleChart<PieChartOptions> {
         first += 1;
       }
     }
-    DataTable dataTable = DataTable.create();
+    dataTable = super.getDataTable();
     dataTable.addColumn(ColumnType.STRING, "+1分布");
     dataTable.addColumn(ColumnType.NUMBER, "ユーザー数");
     dataTable.addRow(Distribution.FIRST_LOOKER.name, first);
@@ -77,5 +76,14 @@ public class PlusOnersPieChart extends SimpleChart<PieChartOptions> {
     dataTable.addRow(Distribution.HIGH_MIDDLE_LOOKER.name, highMiddle);
     dataTable.addRow(Distribution.HIGH_LOOKER.name, high);
     return dataTable;
+  }
+  /* 
+   * 再描画する 
+   */
+  @Override
+  public void reDraw() {
+    remove(this.getWidgetCount()-1);
+    totalPlusOners = 0;
+    super.reDraw();
   }
 }

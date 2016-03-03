@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.ColumnChartRangeFilterdChart;
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.client.enums.WindowOption;
@@ -34,7 +33,7 @@ import com.googlecode.gwt.charts.client.options.VAxis;
  * @author LeoPanda
  *
  */
-public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChartOptions> {
+public class ActivityColumnChart extends ColumnChartRangeFilterdChart<PlusActivity,ColumnChartOptions> {
   private Map<Integer, String> activityUrls = new HashMap<Integer, String>();
   private Bar columnBar; // カラムのバー設定
   Logger logger = Logger.getLogger("ActivityColumnChart");
@@ -100,7 +99,7 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
   @Override
   protected void setRangeFilter() {
     logger.log(Level.INFO, "ActivityColumnChart.setRangeFilter.start");
-    setMaxRangeValue(Global.getActivityItems().size());
+    setMaxRangeValue(sourceItems.size());
     setMiniRangeWidth(5);
     setDefaultRangeWidth(10);
     super.setRangeFilter();
@@ -120,16 +119,17 @@ public class ActivityColumnChart extends ColumnChartRangeFilterdChart<ColumnChar
   /* 
    * グラフに表示するデータをセットする
    */
+  @Override
   protected DataTable getDataTable() {
     logger.log(Level.INFO, "ActivityColumnChart.getDataTable.start");
-    List<PlusActivity> activities = Global.getActivityItems();
+    List<PlusActivity> activities = sourceItems;
     Collections.sort(activities, new Comparator<PlusActivity>() {
       @Override
       public int compare(PlusActivity o1, PlusActivity o2) {
         return o1.getPublished().compareTo(o2.getPublished());
       }
     });
-    DataTable dataTable = DataTable.create();
+    dataTable = super.getDataTable();
     dataTable.addColumn(ColumnType.NUMBER, "No.");
     dataTable.addColumn(ColumnType.NUMBER, Distribution.FIRST_LOOKER.name);
     dataTable.addColumn(ColumnType.NUMBER, Distribution.LOW_MIDDLE_LOOKER.name);

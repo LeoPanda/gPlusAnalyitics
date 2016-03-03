@@ -1,5 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
+
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.corechart.ComboChartOptions;
 import com.googlecode.gwt.charts.client.options.Options;
@@ -11,8 +13,8 @@ import com.googlecode.gwt.charts.client.options.SeriesType;
  * @author LeoPanda
  *
  */
-public abstract class ColumnChartRangeFilterdChart<O extends Options> extends
-    ChartRangeFilterdChart<O> {
+public abstract class ColumnChartRangeFilterdChart<I extends PlusItem,O extends Options> extends
+    ChartRangeFilterdChart<I,O> {
   protected ComboChartOptions filterChartOptions; // レンジフィルターのチャートオプション
 
   /**

@@ -8,8 +8,8 @@ package jp.leopanda.gPlusAnalytics.client.enums;
  */
 public enum CssStyle {
   NONE(""), NORMAL("normal"), LABEL_NORMAL("headerLabel"), LABEL_TITLE("titleLabel"), LABEL_COUNT(
-      "countLabel"), BUTTON_PAGE("pageButton"), BUTTON_FILTER("filterButton"), BUTTON_RESET(
-      "resetButton");
+      "countLabel"), LABEL_FILTER("filterLabel"), BUTTON_PAGE("pageButton"), BUTTON_FILTER(
+      "filterButton"), BUTTON_RESET("resetButton");
 
   private String styleName;
 

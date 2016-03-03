@@ -1,7 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
@@ -12,8 +11,6 @@ import com.googlecode.gwt.charts.client.ColumnType;
 import com.googlecode.gwt.charts.client.DataTable;
 import com.googlecode.gwt.charts.client.SortColumn;
 import com.googlecode.gwt.charts.client.corechart.PieChartOptions;
-import com.googlecode.gwt.charts.client.options.Legend;
-import com.googlecode.gwt.charts.client.options.LegendPosition;
 
 /**
  * アクテビティへの＋１数をグラフ化する
@@ -21,8 +18,7 @@ import com.googlecode.gwt.charts.client.options.LegendPosition;
  * @author LeoPanda
  *
  */
-public abstract class AggregatePieChart<I extends PlusItem> extends SimpleChart<PieChartOptions> {
-  private List<I> items;
+public abstract class AggregatePieChart<I extends PlusItem> extends SimpleChart<I,PieChartOptions> {
   private Map<String, Integer> aggregateMap = new HashMap<String, Integer>();
   protected Map<String, String> fieldAliasMap = new HashMap<String, String>();
   protected String columnTitle = "カラムタイトル";
@@ -31,10 +27,9 @@ public abstract class AggregatePieChart<I extends PlusItem> extends SimpleChart<
   /**
    * コンストラクタ
    */
-  public AggregatePieChart(List<I> items) {
+  public AggregatePieChart() {
     super(ChartType.PIE, ChartPackage.CORECHART);
     setFieldAliasMap();
-    this.items = items;
   }
 
   /*
@@ -43,15 +38,15 @@ public abstract class AggregatePieChart<I extends PlusItem> extends SimpleChart<
   protected PieChartOptions getChartOptions() {
     super.getChartOptions();
     chartOptions.setTitle(getChartTitle());
-    chartOptions.setLegend(Legend.create(LegendPosition.TOP));
     return chartOptions;
   }
 
   /*
    * グラフに表示するデータをセットする
    */
+  @Override
   protected DataTable getDataTable() {
-    for (I item : items) {
+    for (I item : sourceItems) {
       String targetField = getTargetField(item);
       if (targetField == null) {
         targetField = "null";
@@ -62,13 +57,14 @@ public abstract class AggregatePieChart<I extends PlusItem> extends SimpleChart<
         aggregateMap.put(targetField, aggregateMap.get(targetField) + 1);
       }
     }
-    DataTable dataTable = DataTable.create();
+    dataTable = super.getDataTable();
     dataTable.addColumn(ColumnType.STRING, columnTitle);
     dataTable.addColumn(ColumnType.NUMBER, numberColumnTitle);
     for (String field : aggregateMap.keySet()) {
       String title = fieldAliasMap.get(field) != null ? fieldAliasMap.get(field) : field;
       dataTable.addRow(title, aggregateMap.get(field));
     }
+    aggregateMap.clear();
     // 降順にソート
     SortColumn sortColum = SortColumn.create(1);
     sortColum.setDesc(true);

@@ -1,9 +1,13 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
+import java.util.List;
+
 import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.FilterableItemListPanel;
+import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.interFace.ItemEventListener;
+import jp.leopanda.gPlusAnalytics.interFace.TableEventListener;
 
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -20,6 +24,11 @@ public class TableLaunchPanel extends HorizontalPanel {
   PlusOnersTable plusOnersTable;
   FilterableActivityListPanel activityTablePanel;
   FilterableItemListPanel<PlusPeople, PlusOnersTable> plusOnersTablePanel;
+  TableEventListener eventListener;
+
+
+  private String activityFilterLog = "";
+  private String plusOnerFilterLog = "";
 
   /**
    * コンストラクタ
@@ -37,6 +46,33 @@ public class TableLaunchPanel extends HorizontalPanel {
   }
 
   /**
+   * イベントリスナーを設定する
+   * 
+   * @param eventListener 設定するイベントリスナー
+   */
+  public void addEventListener(TableEventListener eventListener) {
+    this.eventListener = eventListener;
+  }
+
+  /**
+   * 一覧表に表示されているアクティビティアイテムのリストを取得する
+   * 
+   * @return 一覧表に表示されているアクティビティアイテムのリスト
+   */
+  public List<PlusActivity> getActivityDisplayItems() {
+    return activityTable.getDisplayList();
+  }
+
+  /**
+   * 一覧表に表示されている+1erアイテムのリストを取得する
+   * 
+   * @return 一覧表に表示されている+1erアイテムのリスト
+   */
+  public List<PlusPeople> getPlusOnerDisplayItems() {
+    return plusOnersTable.getDisplayList();
+  }
+
+  /*
    * 一覧表テーブルと表示パネルを新規作成する
    */
   private void setUpTables() {
@@ -48,13 +84,47 @@ public class TableLaunchPanel extends HorizontalPanel {
         new FilterableItemListPanel<PlusPeople, PlusOnersTable>(Global.getPlusOners(), "+1ユーザー一覧",
             10, plusOnersTable) {};
 
+    activityTablePanel.addEventListener(new TableEventListener() {
+      @Override
+      public void onFilter(String filterLog) {
+        activityFilterLog = setFilterLog(filterLog, "activity ");
+        fireFilterEvent();
+      }
+    });
+    plusOnersTablePanel.addEventListener(new TableEventListener() {
+      @Override
+      public void onFilter(String filterLog) {
+        plusOnerFilterLog = setFilterLog(filterLog, "+1er ");
+        fireFilterEvent();
+      }
+    });
   }
 
-  /**
+  /*
+   * フィルターログの文言を設定する
+   */
+  private String setFilterLog(String filterLog, String headermsg) {
+    String result;
+    if (filterLog.length() > 0) {
+      result = headermsg + filterLog;
+    } else {
+      result = "";
+    }
+    return result;
+  }
+
+  /*
+   * フィルターイベントを発生させる
+   */
+  private void fireFilterEvent() {
+    eventListener.onFilter(activityFilterLog + " " + plusOnerFilterLog);
+  }
+
+  /*
    * +1er一覧でアクティビティフィルタボタンが押された場合の処理ハンドラ
    */
   private void addPlusOnerFilterButtonHandler() {
-    plusOnersTable.addFilterButtonClickEventListener(new ItemEventListener<PlusPeople>() {
+    plusOnersTable.addFilterEventListener(new ItemEventListener<PlusPeople>() {
       @Override
       public void onEvent(PlusPeople item) {
         activityTablePanel.doPlusOnerFilter(item.getId(), item.getDisplayName());

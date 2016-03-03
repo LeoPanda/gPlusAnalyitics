@@ -123,8 +123,6 @@ public class ActivityTable extends SimpleCellTable<PlusActivity> {
       }
     });
 
-    this.getColumnSortList().push(publishedColumn);
-
   }
 
   /*
