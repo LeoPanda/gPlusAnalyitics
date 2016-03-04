@@ -26,8 +26,9 @@ public abstract class FilterableItemListPanel<I extends PlusItem, T extends Simp
   TextBox filterInput = new TextBox();
   private String filterLog = new String(); // フィルターの履歴
   private Label filterLogPanel = new Label();
-  private TableEventListener eventListener; //イベント発生通知
-  public void addEventListener(TableEventListener eventListener){
+  private TableEventListener eventListener; // イベント発生通知
+
+  public void addEventListener(TableEventListener eventListener) {
     this.eventListener = eventListener;
   }
 

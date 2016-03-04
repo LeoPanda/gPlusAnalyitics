@@ -18,7 +18,8 @@ import com.googlecode.gwt.charts.client.options.Options;
  * @author LeoPanda
  *
  */
-public abstract class FilterdChart<I extends PlusItem, O extends Options, C extends ControlOptions<?>, S extends ControlState>
+public abstract class FilterdChart<I extends PlusItem, O extends Options,
+    C extends ControlOptions<?>, S extends ControlState>
     extends SimpleChart<I, O> {
   private Dashboard dashboard;
   private ControlWrapper<C, S> rangeFilter;

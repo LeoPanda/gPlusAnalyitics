@@ -112,7 +112,7 @@ public abstract class SimpleChart<I extends PlusItem, O extends Options> extends
       dataTable = DataTable.create();
     }
     return dataTable;
-  };
+  }
 
   /*
    * チャートを再描画する

@@ -20,7 +20,7 @@ import com.googlecode.gwt.charts.client.options.LegendPosition;
  * @author LeoPanda
  *
  */
-public class PlusOnersPieChart extends SimpleChart<PlusPeople,PieChartOptions> {
+public class PlusOnersPieChart extends SimpleChart<PlusPeople, PieChartOptions> {
   private int totalPlusOners = 0;
 
   /**
@@ -37,7 +37,6 @@ public class PlusOnersPieChart extends SimpleChart<PlusPeople,PieChartOptions> {
 
   /*
    * グラフのオプションを作成する
-   * 
    */
   protected PieChartOptions getChartOptions() {
     super.getChartOptions();
@@ -48,7 +47,6 @@ public class PlusOnersPieChart extends SimpleChart<PlusPeople,PieChartOptions> {
 
   /*
    * グラフに表示するデータをセットする
-   * 
    */
   protected DataTable getDataTable() {
     int first = 0;
@@ -77,12 +75,13 @@ public class PlusOnersPieChart extends SimpleChart<PlusPeople,PieChartOptions> {
     dataTable.addRow(Distribution.HIGH_LOOKER.name, high);
     return dataTable;
   }
-  /* 
-   * 再描画する 
+
+  /*
+   * 再描画する
    */
   @Override
   public void reDraw() {
-    remove(this.getWidgetCount()-1);
+    remove(this.getWidgetCount() - 1);
     totalPlusOners = 0;
     super.reDraw();
   }

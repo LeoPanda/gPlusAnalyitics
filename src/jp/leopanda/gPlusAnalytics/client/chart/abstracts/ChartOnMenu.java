@@ -37,11 +37,11 @@ public abstract class ChartOnMenu<I extends PlusItem> extends VerticalPanel {
   /**
    * チャートを描画する
    * 
-   * @param sourceItems
+   * @param sourceItems チャートのソースデータ
    */
   public void draw(List<I> sourceItems) {
     this.sourceItems = sourceItems;
-  };
+  }
 
   /**
    * チャートを再描画する

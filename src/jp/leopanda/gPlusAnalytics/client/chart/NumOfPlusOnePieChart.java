@@ -20,7 +20,7 @@ import com.googlecode.gwt.charts.client.options.LegendPosition;
  * @author LeoPanda
  *
  */
-public class NumOfPlusOnePieChart extends SimpleChart<PlusActivity,PieChartOptions> {
+public class NumOfPlusOnePieChart extends SimpleChart<PlusActivity, PieChartOptions> {
   private int totalPlusOne = 0;
 
   /**
@@ -69,12 +69,13 @@ public class NumOfPlusOnePieChart extends SimpleChart<PlusActivity,PieChartOptio
     dataTable.addRow(Distribution.HIGH_LOOKER.name, high);
     return dataTable;
   }
-  /* 
+
+  /*
    * 再描画する
    */
   @Override
   public void reDraw() {
-    remove(this.getWidgetCount()-1);
+    remove(this.getWidgetCount() - 1);
     super.reDraw();
   }
 }
