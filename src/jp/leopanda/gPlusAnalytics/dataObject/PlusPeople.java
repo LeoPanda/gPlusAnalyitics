@@ -22,6 +22,7 @@ public class PlusPeople extends PlusItem implements Serializable {
     return id;
   }
 
+  @Override
   public String getUrl() {
     return url;
   }

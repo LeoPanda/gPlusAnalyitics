@@ -10,7 +10,7 @@ import com.google.gwt.user.cellview.client.Column;
  * @author LeoPanda
  *
  */
-public abstract class SafeHtmlColumn<T> extends Column<T, SafeHtml> {
+public abstract class SafeHtmlColumn<I> extends Column<I, SafeHtml> {
   static final SafeHtmlCell cell = new SafeHtmlCell();
 
   public SafeHtmlColumn() {

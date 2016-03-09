@@ -3,6 +3,7 @@ package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
@@ -14,7 +15,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 /**
- * google+アイテムデータ表示するcellTable
+ * cellTableの基本クラス
  * 
  * @author LeoPanda
  *
@@ -29,6 +30,7 @@ public abstract class SimpleCellTable<I> extends CellTable<I> {
 
   /**
    * コンストラクタ
+   * 
    * @param items 表示するアイテムデータ
    */
   public SimpleCellTable(List<I> items) {
@@ -126,18 +128,19 @@ public abstract class SimpleCellTable<I> extends CellTable<I> {
     return String.valueOf(result) + "px";
   }
 
+
   /*
    * テーブルに表示する項目のカラムデータ（Column） をnewし columnSetへaddする処理を記述する。
    */
   protected abstract void setColumns();
 
   /*
-   * カラムソートハンドラのソート条件を記述する 
+   * カラムソートハンドラのソート条件を記述する
    */
   protected abstract void setSortHandler();
 
   /*
-   * to be new selectionChangeHanlder here.
+   * 行選択ハンドラの処理を記述する
    */
   protected abstract void setSelectionChangeHandler();
 

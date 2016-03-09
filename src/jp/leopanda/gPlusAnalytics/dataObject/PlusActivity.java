@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Google+ API activity Item object
+ * 
  * @author LeoPanda
  *
  */
@@ -54,6 +55,7 @@ public class PlusActivity extends PlusItem implements Serializable {
     return id;
   }
 
+  @Override
   public String getUrl() {
     return url;
   }
@@ -122,6 +124,7 @@ public class PlusActivity extends PlusItem implements Serializable {
 
   /**
    * set actorId
+   * 
    * @param actorId actor ID
    */
   public void setActorId(String actorId) {
@@ -145,6 +148,7 @@ public class PlusActivity extends PlusItem implements Serializable {
 
   /**
    * set ItemObjectContent
+   * 
    * @param content content
    */
   public void setItemObjectContent(String content) {
@@ -156,6 +160,7 @@ public class PlusActivity extends PlusItem implements Serializable {
 
   /**
    * set Attachment Image Urls
+   * 
    * @param urls attachment image Urls
    */
   public void setAttacimentImageUrls(List<String> urls) {
@@ -167,6 +172,7 @@ public class PlusActivity extends PlusItem implements Serializable {
 
   /**
    * set Number of PlusOners
+   * 
    * @param num number of plusoners
    */
   public void setNumOfPlusOners(int num) {
@@ -179,6 +185,7 @@ public class PlusActivity extends PlusItem implements Serializable {
 
   /**
    * set access description
+   * 
    * @param description access description
    */
   public void setAccessDescription(String description) {

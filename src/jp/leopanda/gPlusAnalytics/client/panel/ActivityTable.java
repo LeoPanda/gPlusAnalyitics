@@ -6,15 +6,13 @@ import java.util.List;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.i18n.shared.DateTimeFormat;
 
 import jp.leopanda.gPlusAnalytics.client.enums.DateFormat;
-import jp.leopanda.gPlusAnalytics.client.enums.WindowOption;
+import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ButtonColumn;
+import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PlusItemTable;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SafeHtmlColumn;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SimpleCellTable;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
@@ -23,7 +21,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
  * @author LeoPanda
  *
  */
-public class ActivityTable extends SimpleCellTable<PlusActivity> {
+public class ActivityTable extends PlusItemTable<PlusActivity> {
   /**
    * コンストラクタ
    */
@@ -35,7 +33,8 @@ public class ActivityTable extends SimpleCellTable<PlusActivity> {
   TextColumn<PlusActivity> titleColumn; // タイトル
   SafeHtmlColumn<PlusActivity> imageColumn; // 投稿写真
   TextColumn<PlusActivity> accessColumn;// 投稿先
-  TextColumn<PlusActivity> numOfPlusOneColumn; // +1の数
+  ButtonColumn<PlusActivity> filterButton; // +1er数フィルターボタン
+
 
   /**
    * 表示カラムをセットする
@@ -77,8 +76,14 @@ public class ActivityTable extends SimpleCellTable<PlusActivity> {
         return result;
       }
     };
-    // プラスワンユーザー数
-    numOfPlusOneColumn = new TextColumn<PlusActivity>() {
+    // +1er数フィルターボタン
+    filterButton = new ButtonColumn<PlusActivity>() {
+      @Override
+      public void addClickEvent(int index, PlusActivity item) {
+        disableOnselectEventTemporally();
+        itemEventListener.onEvent(item);
+      }
+
       @Override
       public String getValue(PlusActivity item) {
         return String.valueOf(item.getNumOfPlusOners());
@@ -89,8 +94,7 @@ public class ActivityTable extends SimpleCellTable<PlusActivity> {
     this.columSets.add(newColumnSet("タイトル", titleColumn, 400, null));
     this.columSets.add(newColumnSet("写真", imageColumn, 100, null));
     this.columSets.add(newColumnSet("投稿先", accessColumn, 100, null));
-    this.columSets.add(newColumnSet("+1", numOfPlusOneColumn, 30,
-        HasHorizontalAlignment.ALIGN_RIGHT));
+    this.columSets.add(newColumnSet("+1", filterButton, 30, HasHorizontalAlignment.ALIGN_RIGHT));
   }
 
   /**
@@ -115,8 +119,8 @@ public class ActivityTable extends SimpleCellTable<PlusActivity> {
       }
     });
     // +1でソート
-    numOfPlusOneColumn.setSortable(true);
-    sortHandler.setComparator(numOfPlusOneColumn, new Comparator<PlusActivity>() {
+    filterButton.setSortable(true);
+    sortHandler.setComparator(filterButton, new Comparator<PlusActivity>() {
       @Override
       public int compare(PlusActivity o1, PlusActivity o2) {
         return o1.getNumOfPlusOners() - o2.getNumOfPlusOners();
@@ -124,21 +128,4 @@ public class ActivityTable extends SimpleCellTable<PlusActivity> {
     });
 
   }
-
-  /*
-   * 行がクリックされたらg+アクテビティ画面を表示する
-   */
-  @Override
-  protected void setSelectionChangeHandler() {
-    this.selectionChangeHandler = new SelectionChangeEvent.Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        PlusActivity selected = selectionModel.getSelectedObject();
-        if (selected != null) {
-          Window.open(selected.getUrl(), "PlusActivity", WindowOption.ITEM_DETAIL.getValue());
-        }
-      }
-    };
-  }
-
 }

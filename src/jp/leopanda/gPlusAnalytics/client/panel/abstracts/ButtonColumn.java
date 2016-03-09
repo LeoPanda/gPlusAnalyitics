@@ -10,7 +10,7 @@ import com.google.gwt.user.cellview.client.Column;
  * @author LeoPanda
  *
  */
-public abstract class ButtonColumn<T> extends Column<T, String> {
+public abstract class ButtonColumn<I> extends Column<I, String> {
   static final ButtonCell cell = new ButtonCell();
 
   /**
@@ -18,10 +18,10 @@ public abstract class ButtonColumn<T> extends Column<T, String> {
    */
   public ButtonColumn() {
     super(cell);
-    this.setFieldUpdater(new FieldUpdater<T, String>() {
+    this.setFieldUpdater(new FieldUpdater<I, String>() {
       @Override
-      public void update(int index, T object, String value) {
-        addClickEvent(index, object);
+      public void update(int index, I item, String value) {
+        addClickEvent(index, item);
       }
 
     });
@@ -33,6 +33,6 @@ public abstract class ButtonColumn<T> extends Column<T, String> {
    * @param index クリック時のインデックス
    * @param item　クリック対象のアイテムオブジェクト
    */
-  public abstract void addClickEvent(int index, T item);
+  public abstract void addClickEvent(int index, I item);
 
 }

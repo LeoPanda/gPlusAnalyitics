@@ -6,23 +6,19 @@ import java.util.List;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.view.client.SelectionChangeEvent;
 
 import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
-import jp.leopanda.gPlusAnalytics.client.enums.WindowOption;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ButtonColumn;
+import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PlusItemTable;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SafeHtmlColumn;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SimpleCellTable;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
-import jp.leopanda.gPlusAnalytics.interFace.ItemEventListener;
 
 /**
  * @author LeoPanda
  *
  */
-public class PlusOnersTable extends SimpleCellTable<PlusPeople> {
+public class PlusOnersTable extends PlusItemTable<PlusPeople> {
 
   /**
    * コンストラクタ
@@ -37,13 +33,6 @@ public class PlusOnersTable extends SimpleCellTable<PlusPeople> {
   SafeHtmlColumn<PlusPeople> imageColumn;
   TextColumn<PlusPeople> nameColumn;
   ButtonColumn<PlusPeople> filterButton;
-
-  boolean excludeSelectionChanged = false; // ボタンクリック時は行選択アクションから除外する
-  ItemEventListener<PlusPeople> filterEventListener;// フィルター実行指示のイベントリスナー
-
-  public void addFilterEventListener(ItemEventListener<PlusPeople> listener) {
-    filterEventListener = listener;
-  }
 
   @Override
   protected void setColumns() {
@@ -64,12 +53,12 @@ public class PlusOnersTable extends SimpleCellTable<PlusPeople> {
         return item.getDisplayName();
       }
     };
-    // アクテビティフィルターボタン
+    // +1数 フィルターボタン
     filterButton = new ButtonColumn<PlusPeople>() {
       @Override
       public void addClickEvent(int index, PlusPeople item) {
-        filterEventListener.onEvent(item);
-        excludeSelectionChanged = true;
+        disableOnselectEventTemporally();
+        itemEventListener.onEvent(item);
       }
 
       @Override
@@ -98,25 +87,4 @@ public class PlusOnersTable extends SimpleCellTable<PlusPeople> {
       }
     });
   }
-
-  /**
-   * 行がクリックされたらg+プロファイル画面を表示する
-   */
-  @Override
-  protected void setSelectionChangeHandler() {
-    this.selectionChangeHandler = new SelectionChangeEvent.Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        PlusPeople selected = selectionModel.getSelectedObject();
-        if (selected != null) {
-          if (excludeSelectionChanged) {
-            excludeSelectionChanged = false;
-          } else {
-            Window.open(selected.getUrl(), "PlusPeople", WindowOption.ITEM_DETAIL.getValue());
-          }
-        }
-      }
-    };
-  }
-
 }
