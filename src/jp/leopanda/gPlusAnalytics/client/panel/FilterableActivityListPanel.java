@@ -1,7 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
-import java.util.List;
-
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.FilterableItemListPanel;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ItemFilter;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
@@ -24,9 +22,8 @@ public class FilterableActivityListPanel extends
    * @param pageSize １ページの表示行数
    * @param itemTable 一覧表示する表オブジェクト
    */
-  public FilterableActivityListPanel(List<PlusActivity> items, String titleName, int pageSize,
-      ActivityTable itemTable) {
-    super(items, titleName, pageSize, itemTable);
+  public FilterableActivityListPanel(String titleName, int pageSize, ActivityTable itemTable) {
+    super(titleName, pageSize, itemTable);
   }
 
   /**

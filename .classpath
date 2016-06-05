@@ -9,6 +9,6 @@
 	<classpathentry kind="lib" path="/Users/sakyo/Documents/workspace/gPlusAnalytics/war/WEB-INF/lib/gwt-charts-0.9.10.jar"/>
 	<classpathentry kind="lib" path="/Users/sakyo/Documents/workspace/gPlusAnalytics/war/WEB-INF/lib/gwt-oauth2-0.2-alpha.jar"/>
 	<classpathentry kind="lib" path="/Users/sakyo/Documents/workspace/gPlusAnalytics/war/WEB-INF/lib/jackson-core-asl-1.7.0.jar"/>
-	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/gwt-2.7.0"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

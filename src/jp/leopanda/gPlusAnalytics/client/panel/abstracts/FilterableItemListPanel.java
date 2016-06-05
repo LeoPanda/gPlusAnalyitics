@@ -1,5 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -22,7 +23,8 @@ import jp.leopanda.gPlusAnalytics.interFace.TableEventListener;
  *
  */
 public abstract class FilterableItemListPanel<I extends PlusItem, T extends SimpleCellTable<I>>
-    extends ItemListPanel<I, T> {
+    extends PagedItemListPanel<I, T> {
+  private List<I> originalItems;// フィルター前のオリジナルアイテムデータ
   TextBox filterInput = new TextBox();
   private String filterLog = new String(); // フィルターの履歴
   private Label filterLogPanel = new Label();
@@ -35,13 +37,14 @@ public abstract class FilterableItemListPanel<I extends PlusItem, T extends Simp
   /**
    * コンストラクタ
    * 
-   * @param itemList 表示するアイテムデータのリスト
+   * @param originalItems 表示するアイテムデータのリスト
    * @param titleName 一覧表のタイトル
    * @param pageSize 1ページに表示する行数
    * @param itemTable 表示に使用する表オブジェクト
    */
-  public FilterableItemListPanel(List<I> itemList, String titleName, int pageSize, T itemTable) {
-    super(itemList, titleName, pageSize, itemTable);
+  public FilterableItemListPanel(String titleName, int pageSize, T itemTable) {
+    super(titleName, pageSize, itemTable);
+    this.originalItems = backupOriginalItems(itemTable);
     addChangeHandler();
     spaceOfPageControl.add(filterInput);
     spaceOfPageControl.add(getResetButton());
@@ -49,6 +52,16 @@ public abstract class FilterableItemListPanel<I extends PlusItem, T extends Simp
     filterLogPanel.setStyleName(CssStyle.LABEL_FILTER.getName());
   }
 
+  /*
+   * フィルター前のオリジナルデータを保存する
+   */
+  private List<I> backupOriginalItems(T itemTable) {
+    List<I> originalItems = new ArrayList<I>();
+    for (I item : itemTable.getDisplayList()) {
+      originalItems.add(item);
+    }
+    return originalItems;
+  }
 
   /*
    * 入力フィールドにenter key検知ハンドラを設定する
@@ -117,7 +130,7 @@ public abstract class FilterableItemListPanel<I extends PlusItem, T extends Simp
   public void resetFilter() {
     List<I> displayList = itemTable.getDisplayList();
     displayList.clear();
-    for (I item : itemList) {
+    for (I item : originalItems) {
       displayList.add(item);
     }
     clearFilterInput();

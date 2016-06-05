@@ -20,9 +20,9 @@ public class FilterablePlusOnerListPanel extends FilterableItemListPanel<PlusPeo
    * @param pageSize １ページの表示行数
    * @param itemTable 一覧表示する表オブジェクト
    */
-  public FilterablePlusOnerListPanel(List<PlusPeople> items, String titleName, int pageSize,
+  public FilterablePlusOnerListPanel(String titleName, int pageSize,
       PlusOnersTable itemTable) {
-    super(items, titleName, pageSize, itemTable);
+    super(titleName, pageSize, itemTable);
   }
 
   /**
