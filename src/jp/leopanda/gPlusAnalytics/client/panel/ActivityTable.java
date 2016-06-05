@@ -4,11 +4,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.i18n.shared.DateTimeFormat;
 
+import jp.leopanda.gPlusAnalytics.client.Formatter;
+import jp.leopanda.gPlusAnalytics.client.HtmlBuilder;
 import jp.leopanda.gPlusAnalytics.client.enums.DateFormat;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ButtonColumn;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PlusItemTable;
@@ -34,6 +35,8 @@ public class ActivityTable extends PlusItemTable<PlusActivity> {
   SafeHtmlColumn<PlusActivity> imageColumn; // 投稿写真
   TextColumn<PlusActivity> accessColumn;// 投稿先
   ButtonColumn<PlusActivity> filterButton; // +1er数フィルターボタン
+  Formatter formatter = new Formatter(); //項目フォーマット関数
+
 
 
   /**
@@ -45,7 +48,7 @@ public class ActivityTable extends PlusItemTable<PlusActivity> {
     publishedColumn = new TextColumn<PlusActivity>() {
       @Override
       public String getValue(PlusActivity item) {
-        return DateTimeFormat.getFormat(DateFormat.YYMMDD.getValue()).format(item.getPublished());
+        return formatter.getYYMMDDString(item.getPublished());
       }
     };
     // タイトル
@@ -59,13 +62,11 @@ public class ActivityTable extends PlusItemTable<PlusActivity> {
     imageColumn = new SafeHtmlColumn<PlusActivity>() {
       @Override
       public SafeHtml getValue(PlusActivity item) {
-        SafeHtmlBuilder builder = new SafeHtmlBuilder();
+        HtmlBuilder builder = new HtmlBuilder();
         if (item.getAttachmentImageUrls() != null) {
-          String imageUrl = item.getAttachmentImageUrls().get(0);
-          builder.appendHtmlConstant("<img height=\"80\" width =\"80\" src=\"")
-              .appendEscaped(imageUrl).appendHtmlConstant("\">").appendHtmlConstant("<br/>");
+          builder.appendActivityTumbnailImg(item.getAttachmentImageUrls().get(0));
         }
-        return builder.toSafeHtml();
+        return builder.getSafeHtml();
       }
     };
     // 投稿先

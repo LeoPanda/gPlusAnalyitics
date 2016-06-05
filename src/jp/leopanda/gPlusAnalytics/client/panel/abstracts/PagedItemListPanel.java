@@ -1,6 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
-import java.util.List;
 
 import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
@@ -10,31 +9,22 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
- * Google+ API　アイテムデータの一覧表示パネル
+ * Google+ API　アイテムデータの一覧表示パネル　ページコントロール機能付き
  * 
  * @author LeoPanda
  *
  */
-public abstract class ItemListPanel<I extends PlusItem, T extends SimpleCellTable<I>> extends
-    VerticalPanel {
+public abstract class PagedItemListPanel<I extends PlusItem, T extends SimpleCellTable<I>> extends
+    SimpleItemListPanel<I,T> {
 
-  protected List<I> itemList;// 表示するアイテムデータ
-  protected SimpleCellTable<I> itemTable;// 表示するアイテムデータ用の表
-  private Label titleLabel = new Label();// パネルのタイトル名を表示するラベル
-  private String originalTitle;// 元のタイトル名
-  private Label lineCountLabel = new Label();// アイテムの総数を表示するラベル
-  private int pageSize = 0;// 表示するアイテムの行数
   protected int pageStart = 0;// 現在表示しているページ先頭行の位置
   private Button firstPageButton = new Button("◀◀");
   private Button lastPageButton = new Button("▶▶");
   private Button prevPageButton = new Button("◀");
   private Button nextPageButton = new Button("▶");
   // フリースペース
-  protected HorizontalPanel spaceOfafterTitle = new HorizontalPanel();// タイトル行の後
   protected HorizontalPanel spaceOfPageControl = new HorizontalPanel();// ページコントロールの間
 
   /**
@@ -45,70 +35,21 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleCellTabl
    * @param pageSize １ページに表示する行数
    * @param itemTable 一覧表示するテーブルオブジェクト SimpleListTabaleを継承するクラスのインスタンス
    */
-  public ItemListPanel(List<I> items, String titleName, int pageSize, T itemTable) {
-    this.itemTable = itemTable;
-    this.pageSize = pageSize;
-    this.itemList = items;
-
-    // タイトル行の作成
-    this.originalTitle = titleName;
-    HorizontalPanel headerLine = makeTitleLine();
-    this.add(headerLine);
-    this.add(spaceOfafterTitle);
-    // ページコントロール行の作成
+  public PagedItemListPanel(String titleName, int pageSize, T itemTable) {
+    super(pageSize,itemTable);
+    // タイトル行の追加
+    addTitleLine(titleName);
+    // ページコントロール行の追加
     HorizontalPanel pageControlLine = makePageControlLine();
     this.add(pageControlLine);
     // アイテム表示テーブルの追加
-    itemTable.setPageSize(this.pageSize);
-    this.add(itemTable);
-    // 表示幅の設定
-    this.setWidth(itemTable.getWidth());
+    addItemTable(itemTable);
     // カラムソート時に先頭行をリセット
     addSortEventHandler();
   }
 
   /*
-   * タイトル行クラスの作成
-   * 
-   */
-  private HorizontalPanel makeTitleLine() {
-    HorizontalPanel headerLine = new HorizontalPanel();
-    headerLine.setWidth(itemTable.getWidth());
-    setOriginalTitle();
-    titleLabel.addStyleName(CssStyle.LABEL_TITLE.getName());
-    lineCountLabel.addStyleName(CssStyle.LABEL_COUNT.getName());
-    headerLine.add(titleLabel);
-    headerLine.add(lineCountLabel);
-    return headerLine;
-  }
-
-  /*
-   * オリジナルのタイトルを表示する
-   */
-  public void setOriginalTitle() {
-    titleLabel.setText(originalTitle);
-    setDisplayCounter();
-  }
-
-  /**
-   * 代替のタイトルを表示する
-   * 
-   * @param title 表示するタイトル
-   */
-  public void setAlternateTitle(String title) {
-    titleLabel.setText(title);
-    setDisplayCounter();
-  }
-
-  /**
-   * 選択されたデータの合計行数を表示する
-   */
-  public void setDisplayCounter() {
-    lineCountLabel.setText("(" + String.valueOf(itemTable.getDisplayList().size()) + "件)");
-  }
-
-  /*
-   * ページコントロール行パネルの作成
+   * ページコントロール行の生成
    */
   private HorizontalPanel makePageControlLine() {
     addButtonClickHandlers();
@@ -132,7 +73,7 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleCellTabl
     return pageControlLine;
   }
 
-  /**
+  /*
    * 各ページコントロールボタンへクリックハンドラを追加する
    */
   private void addButtonClickHandlers() {
@@ -174,7 +115,7 @@ public abstract class ItemListPanel<I extends PlusItem, T extends SimpleCellTabl
     });
   }
 
-  /**
+  /*
    * セルテーブルのソートイベント発生時にテーブルの表示先頭行をリセット
    */
   private void addSortEventHandler() {

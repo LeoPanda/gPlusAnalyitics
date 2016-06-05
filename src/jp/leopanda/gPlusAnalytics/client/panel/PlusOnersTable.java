@@ -4,10 +4,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
+import jp.leopanda.gPlusAnalytics.client.HtmlBuilder;
 import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ButtonColumn;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PlusItemTable;
@@ -40,10 +40,11 @@ public class PlusOnersTable extends PlusItemTable<PlusPeople> {
     imageColumn = new SafeHtmlColumn<PlusPeople>() {
       @Override
       public SafeHtml getValue(PlusPeople item) {
-        SafeHtmlBuilder builder = new SafeHtmlBuilder();
-        builder.appendHtmlConstant("<img chartHeight=\"50\" chartWidth =\"50\" src=\"")
-            .appendEscaped(item.getImageUrl()).appendHtmlConstant("\">");
-        return builder.toSafeHtml();
+        HtmlBuilder builder = new HtmlBuilder();
+        if (item.getImageUrl() != null) {
+          builder.appendPeopleTumbnailImg(item.getImageUrl());
+        }
+        return builder.getSafeHtml();
       }
     };
     // ユーザー名

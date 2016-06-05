@@ -79,9 +79,9 @@ public class TableLaunchPanel extends HorizontalPanel {
     addTableEventHandler();
 
     activityTablePanel =
-        new FilterableActivityListPanel(Global.getActivityItems(), "アクティビティ一覧", 7, activityTable);
+        new FilterableActivityListPanel("アクティビティ一覧", 7, activityTable);
     plusOnersTablePanel =
-        new FilterablePlusOnerListPanel(Global.getPlusOners(), "+1ユーザー一覧", 10, plusOnersTable);
+        new FilterablePlusOnerListPanel("+1ユーザー一覧", 10, plusOnersTable);
     addPanelEventHandler();
   }
 
