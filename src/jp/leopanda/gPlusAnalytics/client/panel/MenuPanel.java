@@ -11,9 +11,9 @@ import com.google.gwt.user.client.ui.TabPanel;
  *
  */
 public class MenuPanel extends TabPanel {
-  private TableLaunchPanel tablePanel;
-  private ChartMenuPanel chartPanel;
-  private MaintenancePanel mentePanel;
+  private TableLaunchPanel tablePanel; //リスト表パネル
+  private ChartMenuPanel chartPanel;//図表パネル
+  private MaintenancePanel mentePanel; //データメンテナンスパネル
 
   /**
    * コンストラクタ

@@ -94,19 +94,12 @@ public class JsonDecoder<L extends PlusItemList<I>, I extends PlusItem> {
     Results results =
         urlService.fetchGet(urlStr,
             urlService.addToken(oauthToken, urlService.setHeader(ContentType.JSON)));
-
+    if(results == null){
+      return retryHttpRequest(pageToken, urlStr,"Http request return null.");
+    }
     if (results.getRetCode() != HttpStatus.SC_OK) {
       if (results.getRetCode() == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-        if (retryCount > 0) {
-          retryCount -= 1;
-          logger.log(Level.WARNING, "Server is busy,retry.");
-          logger.log(Level.SEVERE, "requestedUrl=" + urlStr);
-          pause(100);
-          return getHttpResult(pageToken);
-        } else {
-          logger.log(Level.SEVERE, "retry count over.");
-          throw new HostGateException(String.valueOf(results.getRetCode()));
-        }
+        return retryHttpRequest(pageToken, urlStr,"Server is bussy.");        
       }
       logger.log(Level.SEVERE, "HttpCode=" + String.valueOf(results.getRetCode()));
       logger.log(Level.SEVERE, "requestedUrl=" + urlStr);
@@ -115,6 +108,21 @@ public class JsonDecoder<L extends PlusItemList<I>, I extends PlusItem> {
     }
 
     return results.getBody();
+  }
+  /*
+   * HTTPリクエストのリトライ
+   */
+  private String retryHttpRequest(String pageToken, String urlStr,String warning) throws HostGateException {
+    if(retryCount > 0) {
+      retryCount -= 1;
+      logger.log(Level.WARNING, warning);
+      logger.log(Level.WARNING,"requestedUrl=" + urlStr);
+      pause(100);
+      return getHttpResult(pageToken);
+    } else {
+      logger.log(Level.SEVERE, warning + " retry cont over.");
+      throw new HostGateException(warning);
+    }
   }
 
   /**

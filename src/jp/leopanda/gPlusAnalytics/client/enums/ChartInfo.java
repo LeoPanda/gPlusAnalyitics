@@ -8,6 +8,7 @@ package jp.leopanda.gPlusAnalytics.client.enums;
  *
  */
 public enum ChartInfo {
+  //(チャートのタイトル,パネルに表示できるチャートの最大数,チャートの横幅,チャートの縦幅)
   ACTIVIY_COLUMN("アクテビティ別ユーザー頻度分布", 2, 1000, 600), ACTIVITY_CALENDAR("日付別＋１数分布", 2, 1400, 700),
   NUM_OF_PLUSONE("ユーザー頻度別＋１数", 1, 700, 700), PLUSONRES_PIE("＋１ユーザー頻度分布", 1, 700, 700),
   // GENDER_PIE("＋１ユーザー性別分布", 1, 700, 700),

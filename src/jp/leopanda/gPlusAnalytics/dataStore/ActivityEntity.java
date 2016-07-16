@@ -7,8 +7,9 @@ package jp.leopanda.gPlusAnalytics.dataStore;
  *
  */
 public enum ActivityEntity {
-  KIND("Activity"), ID("id"), ACTOR_ID("actorId"), PUBLISHED("published"), NUM_OF_PLUSONERS(
-      "numOfPlusOners"), ACTIVITY_ITEM("activityItem"), PLUSONER_ITEMS("plusOnerItems");
+  KIND("Activity"), ID("id"), ACTOR_ID("actorId"), PUBLISHED("published"), UPDATED("updated"),
+  NUM_OF_PLUSONERS("numOfPlusOners"), ACTIVITY_ITEM("activityItem"),
+  PLUSONER_ITEMS("plusOnerItems");
 
   public String val;
 

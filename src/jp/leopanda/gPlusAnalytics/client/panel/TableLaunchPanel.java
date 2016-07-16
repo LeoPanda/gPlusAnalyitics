@@ -58,6 +58,9 @@ public class TableLaunchPanel extends HorizontalPanel {
    * @return 一覧表に表示されているアクティビティアイテムのリスト
    */
   public List<PlusActivity> getActivityDisplayItems() {
+    if(activityTable == null){
+      return null;
+    }
     return activityTable.getDisplayList();
   }
 
@@ -67,6 +70,9 @@ public class TableLaunchPanel extends HorizontalPanel {
    * @return 一覧表に表示されている+1erアイテムのリスト
    */
   public List<PlusPeople> getPlusOnerDisplayItems() {
+    if(plusOnersTable == null){
+      return null;
+    }
     return plusOnersTable.getDisplayList();
   }
 
