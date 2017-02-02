@@ -1,6 +1,10 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
+import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
+import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.interFace.TableEventListener;
+
+import java.util.List;
 
 import com.google.gwt.user.client.ui.TabPanel;
 
@@ -11,18 +15,16 @@ import com.google.gwt.user.client.ui.TabPanel;
  *
  */
 public class MenuPanel extends TabPanel {
-  private TableLaunchPanel tablePanel; //リスト表パネル
-  private ChartMenuPanel chartPanel;//図表パネル
-  private MaintenancePanel mentePanel; //データメンテナンスパネル
+  private TableLaunchPanel tablePanel; // リスト表パネル
+  private ChartMenuPanel chartPanel;// 図表パネル
+  private MaintenancePanel mentePanel; // データメンテナンスパネル
 
   /**
    * コンストラクタ
    */
-  public MenuPanel() {
-    tablePanel = new TableLaunchPanel();
-    chartPanel =
-        new ChartMenuPanel(tablePanel.getActivityDisplayItems(),
-            tablePanel.getPlusOnerDisplayItems());
+  public MenuPanel(List<PlusActivity> activityItems, List<PlusPeople> plusOners) {
+    tablePanel = new TableLaunchPanel(activityItems, plusOners);
+    chartPanel = new ChartMenuPanel(activityItems, plusOners);
     mentePanel = new MaintenancePanel();
     tablePanel.addEventListener(new TableEventListener() {
       @Override

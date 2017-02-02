@@ -12,14 +12,16 @@ public class ItemObject implements Serializable {
 
   /**
    * getter
+   * 
    * @return Content
    */
   public String getContent() {
     return content;
   }
 
-  /** 
+  /**
    * getter
+   * 
    * @return plusOners
    */
   public Users getPlusoners() {
@@ -28,6 +30,7 @@ public class ItemObject implements Serializable {
 
   /**
    * getter
+   * 
    * @return attachmentImageUrls
    */
   public List<String> getAttachmentImageUrls() {
@@ -36,14 +39,18 @@ public class ItemObject implements Serializable {
     }
     List<String> results = new ArrayList<String>();
     for (Attachment attachment : attachments) {
-      results.add(attachment.getImageUrl());
+      if (attachment != null) {
+        results.add(attachment.getImageUrl());
+      }
     }
     return results;
   }
 
   /**
    * setter
-   * @param urls set attachmentImageUrls
+   * 
+   * @param urls
+   *          set attachmentImageUrls
    */
   public void setAttachmentImageUrls(List<String> urls) {
     List<Attachment> attachments = new ArrayList<Attachment>();

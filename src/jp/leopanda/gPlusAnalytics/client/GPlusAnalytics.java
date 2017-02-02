@@ -48,7 +48,7 @@ public class GPlusAnalytics implements EntryPoint {
     }
 
     @Override
-    // ログインを検出後、データストア更新処理を呼び出す
+    // ログインを検出後、データストアからデータを読み込む
     public void onLoggedIn(InfoEvent event) {
       Global.setAuthToken(loginBar.getToken());
       Global.setgoogeUserId(loginBar.getGoogleInnerId());
@@ -74,7 +74,7 @@ public class GPlusAnalytics implements EntryPoint {
       Global.setActivityItems(result.activities);
       Global.setPlusOners(result.plusOners);
       outerPanel.clear();
-      outerPanel.add(new MenuPanel());
+      outerPanel.add(new MenuPanel(result.activities,result.plusOners));
     }
 
   }

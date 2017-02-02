@@ -7,6 +7,8 @@ import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateService;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateServiceAsync;
 
+import java.io.IOException;
+
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -109,6 +111,8 @@ public class RpcGate<R> {
   private void asyncErrorHandler(Throwable caught) {
     if (caught instanceof HostGateException) {
       Window.alert("RPCエラー:" + ((HostGateException) caught).getStatus());
+    } else if (caught instanceof IOException){
+      Window.alert("RPC IOエラー:" + (caught.getMessage()));
     } else {
       Window.alert("RPCエラー:" + caught.toString());
     }

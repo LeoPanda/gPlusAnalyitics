@@ -2,7 +2,6 @@ package jp.leopanda.gPlusAnalytics.client.panel;
 
 import java.util.List;
 
-import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.interFace.ItemEventListener;
@@ -25,18 +24,17 @@ public class TableLaunchPanel extends HorizontalPanel {
   FilterablePlusOnerListPanel plusOnersTablePanel;
   TableEventListener eventListener;
 
-
   private String activityFilterLog = "";
   private String plusOnerFilterLog = "";
 
   /**
    * コンストラクタ
    */
-  public TableLaunchPanel() {
-    if ((Global.getActivityItems() == null) || (Global.getPlusOners() == null)) {
+  public TableLaunchPanel(List<PlusActivity> activityItems, List<PlusPeople> plusOners) {
+    if ((activityItems == null) || (plusOners == null)) {
       this.add(new Label("メンテナンスニューからデータストアの初期ロードを行ってください。"));
     } else {
-      setUpTables();
+      setUpTables(activityItems, plusOners);
       this.add(plusOnersTablePanel);
       this.add(new HTML("<br/>&nbsp;&nbsp;&nbsp;<br/>"));
       this.add(activityTablePanel);
@@ -46,7 +44,8 @@ public class TableLaunchPanel extends HorizontalPanel {
   /**
    * イベントリスナーを設定する
    * 
-   * @param eventListener 設定するイベントリスナー
+   * @param eventListener
+   *          設定するイベントリスナー
    */
   public void addEventListener(TableEventListener eventListener) {
     this.eventListener = eventListener;
@@ -58,7 +57,7 @@ public class TableLaunchPanel extends HorizontalPanel {
    * @return 一覧表に表示されているアクティビティアイテムのリスト
    */
   public List<PlusActivity> getActivityDisplayItems() {
-    if(activityTable == null){
+    if (activityTable == null) {
       return null;
     }
     return activityTable.getDisplayList();
@@ -70,7 +69,7 @@ public class TableLaunchPanel extends HorizontalPanel {
    * @return 一覧表に表示されている+1erアイテムのリスト
    */
   public List<PlusPeople> getPlusOnerDisplayItems() {
-    if(plusOnersTable == null){
+    if (plusOnersTable == null) {
       return null;
     }
     return plusOnersTable.getDisplayList();
@@ -79,18 +78,15 @@ public class TableLaunchPanel extends HorizontalPanel {
   /*
    * 一覧表テーブルと表示パネルを新規作成する
    */
-  private void setUpTables() {
-    activityTable = new ActivityTable(Global.getActivityItems());
-    plusOnersTable = new PlusOnersTable(Global.getPlusOners());
+  private void setUpTables(List<PlusActivity> activityItems, List<PlusPeople> plusOners) {
+    activityTable = new ActivityTable(activityItems);
+    plusOnersTable = new PlusOnersTable(plusOners);
     addTableEventHandler();
 
-    activityTablePanel =
-        new FilterableActivityListPanel("アクティビティ一覧", 7, activityTable);
-    plusOnersTablePanel =
-        new FilterablePlusOnerListPanel("+1ユーザー一覧", 10, plusOnersTable);
+    activityTablePanel = new FilterableActivityListPanel("アクティビティ一覧", 7, activityTable);
+    plusOnersTablePanel = new FilterablePlusOnerListPanel("+1ユーザー一覧", 10, plusOnersTable);
     addPanelEventHandler();
   }
-
 
   /*
    * フィルターログの文言を設定する
