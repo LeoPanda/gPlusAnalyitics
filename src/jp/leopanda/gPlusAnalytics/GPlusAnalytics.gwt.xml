@@ -32,8 +32,8 @@
   <source path='client.enums'/>
   <source path='client.panel'/>
   <source path='client.panel.abstracts'/>
-  <source path='dataObject'/>
   <source path='interFace'/>
+  <source path='dataObject'/>
 
   <!-- allow Super Dev Mode -->
   <add-linker name="xsiframe"/>

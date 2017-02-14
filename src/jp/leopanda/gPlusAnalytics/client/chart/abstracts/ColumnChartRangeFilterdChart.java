@@ -1,11 +1,11 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
-
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.corechart.ComboChartOptions;
 import com.googlecode.gwt.charts.client.options.Options;
 import com.googlecode.gwt.charts.client.options.SeriesType;
+
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 /**
  * レンジフィルターにカラムチャートを使用したチャート

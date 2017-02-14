@@ -2,10 +2,9 @@ package jp.leopanda.gPlusAnalytics.interFace;
 
 
 
-import jp.leopanda.gPlusAnalytics.dataObject.ResultPack;
-
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import jp.leopanda.gPlusAnalytics.dataObject.ResultPack;
 
 public interface GoogleGateServiceAsync {
   void getItems(String userId, AsyncCallback<ResultPack> callback);

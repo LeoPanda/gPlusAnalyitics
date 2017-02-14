@@ -19,10 +19,11 @@ import com.google.api.services.plus.model.Activity;
 import com.google.api.services.plus.model.ActivityFeed;
 import com.google.api.services.plus.model.Person;
 import com.google.appengine.api.utils.SystemProperty;
-import com.google.api.services.plus.model.PeopleFeed;
 
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
+
+import com.google.api.services.plus.model.PeopleFeed;
 
 /**
  * Google+ API client ライブラリーを呼び出すためのサーバーサイドコンポーネント

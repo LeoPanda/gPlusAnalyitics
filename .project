@@ -53,5 +53,10 @@
 			<type>2</type>
 			<location>/Users/sakyo/Documents/workspace/commonService/src</location>
 		</link>
+		<link>
+			<name>srcPlusApiCommon</name>
+			<type>2</type>
+			<location>/Users/sakyo/Documents/workspace/plusApiCommon/src</location>
+		</link>
 	</linkedResources>
 </projectDescription>

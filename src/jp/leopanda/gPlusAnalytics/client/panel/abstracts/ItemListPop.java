@@ -1,13 +1,13 @@
 package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
 
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 /**
  * 特定条件でフィルターされたアイテムデータのリストをポップアップ画面に表示する

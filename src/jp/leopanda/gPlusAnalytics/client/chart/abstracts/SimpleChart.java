@@ -2,14 +2,14 @@ package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
 import java.util.List;
 
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
-
 import com.googlecode.gwt.charts.client.ChartLoader;
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.ChartWrapper;
 import com.googlecode.gwt.charts.client.DataTable;
 import com.googlecode.gwt.charts.client.options.Options;
+
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 /**
  * @author LeoPanda

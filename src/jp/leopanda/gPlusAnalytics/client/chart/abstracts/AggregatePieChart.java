@@ -3,14 +3,14 @@ package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 import java.util.HashMap;
 import java.util.Map;
 
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
-
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.ColumnType;
 import com.googlecode.gwt.charts.client.DataTable;
 import com.googlecode.gwt.charts.client.SortColumn;
 import com.googlecode.gwt.charts.client.corechart.PieChartOptions;
+
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 /**
  * アクテビティへの＋１数をグラフ化する

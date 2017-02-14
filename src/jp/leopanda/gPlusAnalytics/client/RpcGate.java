@@ -2,10 +2,10 @@ package jp.leopanda.gPlusAnalytics.client;
 
 import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
 import jp.leopanda.gPlusAnalytics.dataObject.ResultPack;
-import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateService;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateServiceAsync;
+import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 
 import java.io.IOException;
 

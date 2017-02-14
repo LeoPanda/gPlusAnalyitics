@@ -1,13 +1,13 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
 
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
-
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.controls.ControlType;
 import com.googlecode.gwt.charts.client.controls.filter.NumberRangeFilterOptions;
 import com.googlecode.gwt.charts.client.controls.filter.NumberRangeFilterState;
 import com.googlecode.gwt.charts.client.options.Options;
+
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 /**
  * 数値フィルター付きチャート

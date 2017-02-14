@@ -1,8 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
 
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
-
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.controls.ControlOptions;
@@ -11,6 +9,8 @@ import com.googlecode.gwt.charts.client.controls.ControlType;
 import com.googlecode.gwt.charts.client.controls.ControlWrapper;
 import com.googlecode.gwt.charts.client.controls.Dashboard;
 import com.googlecode.gwt.charts.client.options.Options;
+
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 /**
  * フィルター付きチャート
