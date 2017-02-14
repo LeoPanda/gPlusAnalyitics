@@ -15,7 +15,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.Users;
 
 /**
- * Plus API ActivityからPlusActivityへデータ作成する
+ * Plus API ActivityからPlusActivityデータを作成する
  * 
  * @author LeoPanda
  *
@@ -24,6 +24,11 @@ public class ActivityMaker {
 
   Logger logger = Logger.getLogger("ActivityMaker");
 
+  /**
+   * PlusActivityの生成
+   * @param activity
+   * @return
+   */
   public PlusActivity get(Activity activity) {
     PlusActivity plusActivity = new PlusActivity();
     plusActivity.kind = activity.getKind();

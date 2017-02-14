@@ -74,6 +74,6 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    *           処理例外スロー
    */
   public ResultPack getItems(String userId) throws HostGateException {
-    return dataHandler.getActivityHanler().getItems(userId);
+    return dataHandler.getActivityHandler().getItems(userId);
   }
 }

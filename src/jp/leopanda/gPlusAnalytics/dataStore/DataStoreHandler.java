@@ -23,7 +23,7 @@ public class DataStoreHandler {
   DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
   ActivityStoreHandler activityHandler = new ActivityStoreHandler(ds);
 
-  public ActivityStoreHandler getActivityHanler() {
+  public ActivityStoreHandler getActivityHandler() {
     return this.activityHandler;
   }
 
