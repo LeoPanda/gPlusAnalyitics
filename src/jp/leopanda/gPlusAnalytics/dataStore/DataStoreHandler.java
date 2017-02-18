@@ -5,7 +5,7 @@ import java.util.List;
 
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
-import jp.leopanda.gPlusAnalytics.server.GoogleApiService;
+import jp.leopanda.gPlusAnalytics.server.PlusApiService;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -35,7 +35,7 @@ public class DataStoreHandler {
    * @param userId アクティビティのオーナーID @param oauthToken google認証トークン @return 常にNull(gwt
    * RPCのインターフェースに同期するため) @throws HostGateException 処理例外スロー @throws
    */
-  public String initialLoadToStore(String userId, GoogleApiService googleApi)
+  public String initialLoadToStore(String userId, PlusApiService googleApi)
       throws HostGateException, IOException {
     if (activityHandler.getLatestActivityPublished(userId) != null) {
       throw new HostGateException("データストアがすでに存在しています。初期化するためにはいったんデータストアを消去してください。");
@@ -72,7 +72,7 @@ public class DataStoreHandler {
    *           処理例外スロー
    * @throws IOException
    */
-  public String updateBrandNew(String userId, GoogleApiService googleApi)
+  public String updateBrandNew(String userId, PlusApiService googleApi)
       throws HostGateException, IOException {
     List<PlusActivity> activities = googleApi.getPlusActivity(userId);
     ActivityCheckMap checkMap = activityHandler.getActivityCheckMap(userId);

@@ -34,7 +34,7 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * @throws IOException 
    */
   public String updateDataStore(String userId, String oauthToken) throws HostGateException, IOException {
-      return  dataHandler.updateBrandNew(userId, new GoogleApiService(oauthToken));
+      return  dataHandler.updateBrandNew(userId, new PlusApiService(new GoogleApiCore(oauthToken)));
   }
 
   /**
@@ -61,7 +61,7 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * @throws IOException 
    */
   public String initialLoadToStore(String userId, String oauthToken) throws HostGateException, IOException {
-    return dataHandler.initialLoadToStore(userId, new GoogleApiService(oauthToken));
+    return dataHandler.initialLoadToStore(userId, new PlusApiService(new GoogleApiCore(oauthToken)));
   }
 
   /**

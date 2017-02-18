@@ -1,20 +1,11 @@
 package jp.leopanda.gPlusAnalytics.server;
 
-import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import com.google.api.client.auth.oauth2.BearerToken;
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.appengine.http.UrlFetchTransport;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.plus.Plus;
 import com.google.api.services.plus.Plus.People.ListByActivity;
-import com.google.api.services.plus.PlusScopes;
 import com.google.api.services.plus.model.Activity;
 import com.google.api.services.plus.model.ActivityFeed;
 import com.google.api.services.plus.model.Person;
@@ -31,77 +22,20 @@ import com.google.api.services.plus.model.PeopleFeed;
  * @author LeoPanda
  *
  */
-public class GoogleApiService {
+public class PlusApiService {
   private static final String collectionPublic = "public";
   private static final String collectionPlusoners = "plusoners";
   private Plus plus;
-  private UrlFetchTransport urlFetchTransport = new UrlFetchTransport();
-  private JacksonFactory jacksonFactory = JacksonFactory.getDefaultInstance();
   private String applicationName = SystemProperty.applicationId.get();
 
   /**
    * コンストラクタ クライアントサイドでoauthToken取得
    * 
-   * @param oauthToken
-   *          String oAuth認証トークン
+   * @param credential  credential oAuth認証
    */
-  public GoogleApiService(String oauthToken) {
-    this.plus = getPlus(getCredentialByToken(oauthToken));
+  public PlusApiService(GoogleApiCore apiCore) {
+    this.plus = getPlus(apiCore);
   }
-
-  /**
-   * コンストラクタ サービスアカウント キーファイル認証
-   * 
-   * @param keyfile
-   *          File 認証キー
-   * @param emailAdress
-   *          String サービスアカウントID
-   * @throws IOException
-   *           IO例外
-   * @throws GeneralSecurityException
-   *           認証例外
-   */
-  public GoogleApiService(File keyfile, String emailAdress)
-      throws IOException, GeneralSecurityException {
-    this.plus = getPlus(getCredentialByP12(keyfile, emailAdress));
-  }
-
-  /**
-   * キーファイル認証生成
-   * 
-   * @param p12key
-   *          File 認証キー
-   * @param emailAdress
-   *          String サービスアカウントID
-   * @return GoogleCredential Google認証オブジェクト
-   * @throws GeneralSecurityException
-   *           認証れ～概
-   * @throws IOException
-   *           IO例外
-   */
-  private GoogleCredential getCredentialByP12(File p12key, String emailAdress)
-      throws GeneralSecurityException, IOException {
-    GoogleCredential credential = new GoogleCredential.Builder().setTransport(urlFetchTransport)
-        .setJsonFactory(jacksonFactory)
-        .setServiceAccountId(emailAdress)
-        .setServiceAccountScopes(Collections.singleton(PlusScopes.PLUS_ME))
-        .setServiceAccountPrivateKeyFromP12File(p12key)
-        .build();
-    return credential;
-  }
-
-  /**
-   * oAuth認証
-   * 
-   * @param oauthToken
-   *          String 認証トークン
-   * @return Credential
-   */
-  private Credential getCredentialByToken(String oauthToken) {
-    return new Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(oauthToken)
-        .setExpiresInSeconds(3600L);
-  }
-
   /**
    * Google Plus APIオブジェクト取得
    * 
@@ -109,8 +43,8 @@ public class GoogleApiService {
    *          Google認証
    * @return Plus Google Plus APIオブジェクト取得
    */
-  private Plus getPlus(Credential credential) {
-    Plus plus = new Plus.Builder(urlFetchTransport, jacksonFactory, credential)
+  private Plus getPlus(GoogleApiCore apiCore) {
+    Plus plus = new Plus.Builder(apiCore.getTransport(), apiCore.getJacksonFactory(), apiCore.getCredential())
         .setApplicationName(applicationName)
         .build();
     return plus;
@@ -120,7 +54,7 @@ public class GoogleApiService {
    * Google plus 全アクティビティのリスト取得
    * 
    * @param userId
-   *          String ユーザー認証
+   *          String ユーザーID
    * @return List<PlusActivity> アクティビティ
    * @throws IOException
    *           IO例外
@@ -171,4 +105,5 @@ public class GoogleApiService {
     }
     return plusPeople;
   }
+  
 }
