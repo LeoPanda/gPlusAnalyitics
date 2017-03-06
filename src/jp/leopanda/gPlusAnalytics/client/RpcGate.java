@@ -1,8 +1,9 @@
 package jp.leopanda.gPlusAnalytics.client;
 
 import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
-import jp.leopanda.gPlusAnalytics.dataObject.ResultPack;
+import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
 import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
+import jp.leopanda.googleAuthorization.client.ForbiddenException;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateService;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateServiceAsync;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
@@ -23,7 +24,6 @@ public class RpcGate<R> {
   CallFunction function; // 呼び出す機能の種類
   R resultClass; // 戻り値のクラス
   // メソッド用パラメータ
-  private String userId;
   // RPC 非同期通信用のインターフェース
   private GoogleGateServiceAsync googleAsync = GWT.create(GoogleGateService.class);
   // イベントリスナー
@@ -31,14 +31,17 @@ public class RpcGate<R> {
 
   /**
    * コンストラクタ
-   * @param function　呼び出すRPC機能
-   * @param userId    Google ユーザーID
-   * @param listener  完了通知処理記述用リスナー
+   * 
+   * @param function
+   *          呼び出すRPC機能
+   * @param userId
+   *          Google ユーザーID
+   * @param listener
+   *          完了通知処理記述用リスナー
    */
-  public RpcGate(CallFunction function, String userId, RpcGateListener<R> listener) {
+  public RpcGate(CallFunction function, RpcGateListener<R> listener) {
     this.function = function;
     this.listener = listener;
-    this.userId = userId;
   }
 
   /**
@@ -49,30 +52,28 @@ public class RpcGate<R> {
     GenAsync<R> genAsync = new GenAsync<R>();
     genAsync.addListener((RpcGateListener<R>) this.listener);
     switch (function) {
-      case GET_ITEM: {
-        googleAsync.getItems(userId, (AsyncCallback<ResultPack>) genAsync.callbackR);
-      }
-        break;
-      case INITIAL_LOAD: {
-        googleAsync.initialLoadToStore(userId, Global.getAuthToken(),
-            (AsyncCallback<String>) genAsync.callbackR);
+    case GET_ITEM: {
+      googleAsync.getItems((AsyncCallback<StoredItems>) genAsync.callbackR);
+    }
+      break;
+    case INITIAL_LOAD: {
+      googleAsync.initialLoadToStore((AsyncCallback<String>) genAsync.callbackR);
 
-      }
-        break;
-      case UPDATE: {
-        googleAsync.updateDataStore(userId, Global.getAuthToken(),
-            (AsyncCallback<String>) genAsync.callbackR);
+    }
+      break;
+    case UPDATE: {
+      googleAsync.updateDataStore((AsyncCallback<String>) genAsync.callbackR);
 
-      }
-        break;
-      case CLEAR: {
-        googleAsync.clearDataStore(userId, (AsyncCallback<String>) genAsync.callbackR);
+    }
+      break;
+    case CLEAR: {
+      googleAsync.clearDataStore((AsyncCallback<String>) genAsync.callbackR);
 
-      }
-        break;
+    }
+      break;
 
-      default:
-        break;
+    default:
+      break;
     }
   }
 
@@ -106,13 +107,19 @@ public class RpcGate<R> {
 
   /**
    * エラー時の処理ハンドラ
-   * @param caught　スローオブジェクト
+   * 
+   * @param caught
+   *          スローオブジェクト
    */
   private void asyncErrorHandler(Throwable caught) {
     if (caught instanceof HostGateException) {
       Window.alert("RPCエラー:" + ((HostGateException) caught).getStatus());
-    } else if (caught instanceof IOException){
+    } else if (caught instanceof IOException) {
       Window.alert("RPC IOエラー:" + (caught.getMessage()));
+    } else if (caught instanceof ForbiddenException) {
+      if(Window.confirm("アクセス権が不足しています。リロードして認証を取得し直しますか？")){
+        Window.Location.reload();
+      }
     } else {
       Window.alert("RPCエラー:" + caught.toString());
     }

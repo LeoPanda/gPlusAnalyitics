@@ -15,7 +15,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
  * @author LeoPanda
  *
  */
-public abstract class SimpleChart<I extends PlusItem, O extends Options> extends ChartOnMenu<I> {
+public abstract class SimpleChart<I extends PlusItem, O extends Options> extends ChartPanel<I> {
   protected ChartWrapper<O> chart;
   protected O chartOptions;
   protected DataTable dataTable;

@@ -77,7 +77,7 @@ public abstract class SimpleCellTable<I> extends CellTable<I> {
   /*
    * 受信したデータを表示する
    */
-  private void displayLines(List<I> itemList) {
+  private void displayLines(List<I> items) {
     // テーブルにデータプロバイダを接続する
     this.dataProvider.addDataDisplay(this);
     // テーブルの表示幅を指定する
@@ -91,7 +91,7 @@ public abstract class SimpleCellTable<I> extends CellTable<I> {
     }
     // データプロバイダに明細データをセットする
     List<I> displayList = dataProvider.getList();
-    for (I item : itemList) {
+    for (I item : items) {
       displayList.add(item);
     }
     // カラムのソート条件をセットする

@@ -1,21 +1,19 @@
 package jp.leopanda.gPlusAnalytics.interFace;
 
 
-import java.io.IOException;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
-import jp.leopanda.gPlusAnalytics.dataObject.ResultPack;
+import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
 
 @RemoteServiceRelativePath("GoogleGateService")
 public interface GoogleGateService extends RemoteService {
-  ResultPack getItems(String userId) throws HostGateException;
+  StoredItems getItems() throws Exception;
 
-  String initialLoadToStore(String userId, String oauthToken) throws HostGateException, IOException;
+  String initialLoadToStore() throws Exception;
 
-  String updateDataStore(String userId, String oauthToken) throws HostGateException, IOException;
+  String updateDataStore() throws Exception;
 
-  String clearDataStore(String userId) throws HostGateException;
+  String clearDataStore() throws Exception;
 
 }

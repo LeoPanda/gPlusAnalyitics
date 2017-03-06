@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="srcCommon"/>
+	<classpathentry kind="src" path="srcAuth"/>
 	<classpathentry kind="src" output="test-classes" path="test"/>
 	<classpathentry kind="lib" path="/Applications/Eclipse.app/Contents/Eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.9.34/appengine-java-sdk-1.9.34/lib/shared/appengine-local-runtime-shared.jar">
 		<attributes>
@@ -124,11 +124,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/sakyo/Documents/workspace/gPlusAnalytics/war/WEB-INF/lib/jsonic-1.3.10.jar"/>
 	<classpathentry kind="lib" path="/Users/sakyo/Documents/workspace/gPlusAnalytics/war/WEB-INF/lib/gwt-charts-0.9.10.jar"/>
-	<classpathentry kind="lib" path="/Users/sakyo/Documents/workspace/gPlusAnalytics/war/WEB-INF/lib/gwt-oauth2-0.2-alpha.jar"/>
-	<classpathentry kind="lib" path="/Users/sakyo/Documents/workspace/gPlusAnalytics/war/WEB-INF/lib/jackson-core-asl-1.7.0.jar"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT"/>
-	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/plus-v1r483lv1.21.0"/>
+	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/plus-v1r501lv1.21.0"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

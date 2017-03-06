@@ -1,6 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
-import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.RpcGate;
 import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
 import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
@@ -79,7 +78,7 @@ public class MaintenancePanel extends VerticalPanel {
   private void confirmClicked(CallFunction clicked) {
     if (Window.confirm(clicked.msg + "よろしいですか？")) {
       setPanelToOnGoing();
-      new RpcGate<String>(clicked, Global.getGoogleUserId(), new Callback()) {}.request();
+      new RpcGate<String>(clicked, new Callback()) {}.request();
     }
   }
 

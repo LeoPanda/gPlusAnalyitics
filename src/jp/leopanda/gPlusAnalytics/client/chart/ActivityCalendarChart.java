@@ -94,7 +94,7 @@ public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOpt
       activitySelectorPop.closePop();
       activitySelectorPop = null;
     }
-    activitySelectorPop = new ActivitySelectorPop(selectedDate);
+    activitySelectorPop = new ActivitySelectorPop(selectedDate,sourceItems);
     activitySelectorPop.show();
   }
 

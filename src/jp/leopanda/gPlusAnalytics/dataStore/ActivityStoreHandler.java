@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
-import jp.leopanda.gPlusAnalytics.dataObject.ResultPack;
+import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 
 import com.google.appengine.api.datastore.Blob;
@@ -98,7 +98,7 @@ public class ActivityStoreHandler {
    * @return アクティビティと+1ersのアイテムオブジェクトをパックしたデータオブジェクト
    * @throws HostGateException 例外スロー
    */
-  public ResultPack getItems(String actorId) throws HostGateException {
+  public StoredItems getItems(String actorId) throws HostGateException {
     PlusOnerHandler plusOnerHandler = new PlusOnerHandler();
     List<PlusActivity> activities = new ArrayList<PlusActivity>();
     Serializer serializer = new Serializer();
@@ -133,7 +133,7 @@ public class ActivityStoreHandler {
         return o2.getNumOfPlusOne() - o1.getNumOfPlusOne();
       }
     });
-    ResultPack result = new ResultPack();
+    StoredItems result = new StoredItems();
     result.setActivities(activities);
     result.setPlusOners(plusOners);
     return result;

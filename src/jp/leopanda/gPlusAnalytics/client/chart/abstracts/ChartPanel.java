@@ -2,7 +2,7 @@ package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
 import java.util.List;
 
-import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartBody;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -13,25 +13,25 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  * @author LeoPanda
  *
  */
-public abstract class ChartOnMenu<I extends PlusItem> extends VerticalPanel {
-  private ChartInfo chartInfo;
+public abstract class ChartPanel<I extends PlusItem> extends VerticalPanel {
+  private ChartBody chartBody;
   protected List<I> sourceItems;
 
-  public void setMenuInfo(ChartInfo chartInfo) {
-    this.chartInfo = chartInfo;
-    setWidth(String.valueOf(chartInfo.width) + "px");
+  public void setMenuInfo(ChartBody chartBody) {
+    this.chartBody = chartBody;
+    setWidth(String.valueOf(chartBody.width) + "px");
   }
 
   protected int getChartWidth() {
-    return this.chartInfo.width;
+    return this.chartBody.width;
   }
 
   protected int getChartHeight() {
-    return this.chartInfo.height;
+    return this.chartBody.height;
   }
 
   protected String getChartTitle() {
-    return this.chartInfo.title;
+    return this.chartBody.title;
   }
 
   /**

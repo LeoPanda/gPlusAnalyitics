@@ -7,7 +7,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
 import jp.leopanda.gPlusAnalytics.client.HtmlBuilder;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PlusItemTable;
+import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ClickablePlusItemTable;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SafeHtmlColumn;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
@@ -17,7 +17,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
  * @author LeoPanda
  *
  */
-public class ActivityTableMini extends PlusItemTable<PlusActivity> {
+public class ActivityTableMini extends ClickablePlusItemTable<PlusActivity> {
   /**
    * コンストラクタ
    */

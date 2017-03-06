@@ -1,11 +1,11 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.i18n.shared.DateTimeFormat;
 
 import jp.leopanda.gPlusAnalytics.client.Formatter;
-import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.enums.DateFormat;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ItemFilter;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ItemListPop;
@@ -24,9 +24,9 @@ public class ActivitySelectorPop extends ItemListPop<PlusActivity, ActivityTable
    * 
    * @param published アクテビティの投稿日付
    */
-  public ActivitySelectorPop(Date published) {
+  public ActivitySelectorPop(Date published,List<PlusActivity> items) {
     super(DateTimeFormat.getFormat(DateFormat.YYMMDD.getValue()).format(published) + "のアクテビティ", 10,
-        new ActivityTableMini(Global.getActivityItems()), published,
+        new ActivityTableMini(items), published,
         new ItemFilter<PlusActivity, Date>() {
           @Override
           // フィルター条件

@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 
 import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
+import jp.leopanda.gPlusAnalytics.interFace.IsFilterable;
 import jp.leopanda.gPlusAnalytics.interFace.TableEventListener;
 
 /**
@@ -22,7 +22,7 @@ import jp.leopanda.gPlusAnalytics.interFace.TableEventListener;
  * @author LeoPanda
  *
  */
-public abstract class FilterableItemListPanel<I extends PlusItem, T extends SimpleCellTable<I>>
+public abstract class FilterableItemListPanel<I extends IsFilterable, T extends SimpleCellTable<I>>
     extends PagedItemListPanel<I, T> {
   private List<I> originalItems;// フィルター前のオリジナルアイテムデータ
   TextBox filterInput = new TextBox();

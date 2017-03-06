@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import jp.leopanda.gPlusAnalytics.client.HtmlBuilder;
 import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ButtonColumn;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PlusItemTable;
+import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ClickablePlusItemTable;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SafeHtmlColumn;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
@@ -18,7 +18,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
  * @author LeoPanda
  *
  */
-public class PlusOnersTable extends PlusItemTable<PlusPeople> {
+public class PlusOnersTable extends ClickablePlusItemTable<PlusPeople> {
 
   /**
    * コンストラクタ

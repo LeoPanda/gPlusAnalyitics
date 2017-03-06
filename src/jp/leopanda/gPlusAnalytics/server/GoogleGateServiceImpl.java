@@ -4,11 +4,11 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import java.io.IOException;
 
-import jp.leopanda.gPlusAnalytics.dataObject.ResultPack;
+import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
 import jp.leopanda.gPlusAnalytics.dataStore.DataStoreHandler;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateService;
-import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
-
+import jp.leopanda.googleAuthorization.server.CatchException;
+import jp.leopanda.googleAuthorization.server.CredentialUtils;
 
 /**
  * Google+ REST APIを呼び出すためのサーバーサイドコンポーネント
@@ -24,56 +24,92 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
   /**
    * データストアの内容を最新状態に更新する
    * 
-   * @param userId
-   *          アクティビティのオーナーID
-   * @param oauthToken
-   *          google認証トークン
    * @return 常にnull
-   * @throws HostGateException
-   *           処理例外スロー
-   * @throws IOException 
+   * @throws Exception
    */
-  public String updateDataStore(String userId, String oauthToken) throws HostGateException, IOException {
-      return  dataHandler.updateBrandNew(userId, new PlusApiService(new GoogleApiCore(oauthToken)));
+  public String updateDataStore()
+      throws Exception {
+    String result = new CatchException<String>() {
+
+      @Override
+      public String tryApiCall() throws Exception {
+        return dataHandler.updateBrandNew(getCurrentUserId(), getApiService());
+      }
+    }.execute();
+
+    return result;
   }
 
   /**
    * データストアをクリアする
    * 
-   * @param userid
-   *          アクティビティのオーナーID
+   * @throws Exception
    */
-  public String clearDataStore(String userid) {
-    dataHandler.clearDataStore(userid);
-    return null;
+  public String clearDataStore() throws Exception {
+    String result = new CatchException<String>() {
+
+      @Override
+      public String tryApiCall() throws Exception {
+        dataHandler.clearDataStore(getCurrentUserId());
+        return null;
+      }
+    }.execute();
+    return result;
   }
 
   /**
    * データストアの初期ロード
    * 
-   * @param userId
-   *          アクティビティのオーナーID
-   * @param oauthToken
-   *          google+認証トークン
-   * @return 常にnull
-   * @throws HostGateException
-   *           処理例外スロー
-   * @throws IOException 
+   * @throws Exception
    */
-  public String initialLoadToStore(String userId, String oauthToken) throws HostGateException, IOException {
-    return dataHandler.initialLoadToStore(userId, new PlusApiService(new GoogleApiCore(oauthToken)));
+  public String initialLoadToStore() throws Exception {
+    String result = new CatchException<String>() {
+
+      @Override
+      public String tryApiCall() throws Exception {
+        return dataHandler.initialLoadToStore(getCurrentUserId(), getApiService());
+      }
+    }.execute();
+
+    return result;
   }
 
   /**
    * データストアからactivityとplusOnersを得る
    * 
-   * @param userId
-   *          アクティビティのオーナーID
-   * @return アイテムオブジェクトリストのパック
-   * @throws HostGateException
-   *           処理例外スロー
+   * @throws Exception
    */
-  public ResultPack getItems(String userId) throws HostGateException {
-    return dataHandler.getActivityHandler().getItems(userId);
+  public StoredItems getItems() throws Exception {
+    StoredItems storedItems = new CatchException<StoredItems>() {
+
+      @Override
+      public StoredItems tryApiCall() throws Exception {
+        String userId = getApiService().getGplusUserId();
+        return dataHandler.getActivityHandler().getItems(userId);
+
+      }
+    }.execute();
+    return storedItems;
+  }
+
+  /**
+   * APIサービスの取得
+   * 
+   * @return
+   * @throws IOException
+   */
+  private PlusApiService getApiService() throws IOException {
+    CredentialUtils utils = new CredentialUtils();
+    return new PlusApiService(utils.httpTransport, utils.jsonFactory, utils.loadCredential());
+  }
+
+  /**
+   * カレントユーザーIDの取得
+   * 
+   * @return
+   * @throws IOException
+   */
+  private String getCurrentUserId() throws IOException {
+    return getApiService().getGplusUserId();
   }
 }

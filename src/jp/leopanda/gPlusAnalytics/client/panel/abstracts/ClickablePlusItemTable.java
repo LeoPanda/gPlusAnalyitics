@@ -10,12 +10,12 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.gPlusAnalytics.interFace.ItemEventListener;
 
 /**
- * google+アイテムデータ表示するcellTable
+ * google+アイテムデータをクリック時popup表示するcellTable
  * 
  * @author LeoPanda
  *
  */
-public abstract class PlusItemTable<I extends PlusItem> extends SimpleCellTable<I> {
+public abstract class ClickablePlusItemTable<I extends PlusItem> extends SimpleCellTable<I> {
 
   private boolean excludeSelectionChanged = false; // デフォルトの行選択アクションを一時的にスキップさせる場合にtrueをセット
   protected ItemEventListener<I> itemEventListener;// 表示アイテムに対して発生させたいイベントのリスナー
@@ -29,7 +29,7 @@ public abstract class PlusItemTable<I extends PlusItem> extends SimpleCellTable<
    * 
    * @param items 表示するアイテムデータ
    */
-  public PlusItemTable(List<I> items) {
+  public ClickablePlusItemTable(List<I> items) {
     super(items);
   }
   /**
@@ -42,7 +42,6 @@ public abstract class PlusItemTable<I extends PlusItem> extends SimpleCellTable<
   /*
    * デフォルトの行選択アクション 行がクリックされたらアイテムの詳細画面を表示する
    */
-  @Override
   protected void setSelectionChangeHandler() {
     this.selectionChangeHandler = new SelectionChangeEvent.Handler() {
       @Override

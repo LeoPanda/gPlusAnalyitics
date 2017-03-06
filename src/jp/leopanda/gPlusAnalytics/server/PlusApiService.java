@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
 import com.google.api.services.plus.Plus;
 import com.google.api.services.plus.Plus.People.ListByActivity;
 import com.google.api.services.plus.model.Activity;
@@ -26,28 +29,44 @@ public class PlusApiService {
   private static final String collectionPublic = "public";
   private static final String collectionPlusoners = "plusoners";
   private Plus plus;
-  private String applicationName = SystemProperty.applicationId.get();
 
   /**
    * コンストラクタ クライアントサイドでoauthToken取得
    * 
-   * @param credential  credential oAuth認証
+   * @param credential
+   *          credential oAuth認証
+   * @throws IOException
    */
-  public PlusApiService(GoogleApiCore apiCore) {
-    this.plus = getPlus(apiCore);
+  public PlusApiService(HttpTransport transport, JsonFactory jsonFactory,
+      Credential credential) throws IOException {
+    this.plus = getPlus(transport, jsonFactory, credential);
   }
+
   /**
    * Google Plus APIオブジェクト取得
    * 
    * @param credential
    *          Google認証
    * @return Plus Google Plus APIオブジェクト取得
+   * @throws IOException
    */
-  private Plus getPlus(GoogleApiCore apiCore) {
-    Plus plus = new Plus.Builder(apiCore.getTransport(), apiCore.getJacksonFactory(), apiCore.getCredential())
-        .setApplicationName(applicationName)
+  private Plus getPlus(HttpTransport transport, JsonFactory jsonFactory,
+      Credential credential) throws IOException {
+    Plus plus = new Plus.Builder(transport, jsonFactory, credential)
+        .setApplicationName(SystemProperty.applicationId.get())
         .build();
     return plus;
+  }
+
+  /**
+   * Google+ ユーザーIDの取得
+   * 
+   * @return String ユーザーID
+   * @throws IOException
+   */
+  public String getGplusUserId() throws IOException {
+    Person user = plus.people().get("me").execute();
+    return user.getId();
   }
 
   /**
@@ -59,11 +78,11 @@ public class PlusApiService {
    * @throws IOException
    *           IO例外
    */
-  public List<PlusActivity> getPlusActivity(String userId)
-      throws IOException {
+  public List<PlusActivity> getPlusActivity(String userId) throws IOException {
     List<PlusActivity> activities = new ArrayList<PlusActivity>();
     ActivityMaker activityMaker = new ActivityMaker();
-    Plus.Activities.List listActivities = plus.activities().list(userId, collectionPublic)
+    Plus.Activities.List listActivities = null;
+    listActivities = plus.activities().list(userId, collectionPublic)
         .setMaxResults(40L);
     ActivityFeed feed = null;
     String nextPageToken = "";
@@ -105,5 +124,5 @@ public class PlusApiService {
     }
     return plusPeople;
   }
-  
+
 }

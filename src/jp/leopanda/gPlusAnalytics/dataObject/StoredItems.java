@@ -4,12 +4,12 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * RPC　リザルトデータパッケージ
+ * データストアに保管されているすべてのデータアイテム
  * 
  * @author LeoPanda
  *
  */
-public class ResultPack implements Serializable {
+public class StoredItems implements Serializable {
   private static final long serialVersionUID = 1L;
   public List<PlusActivity> activities;
   public List<PlusPeople> plusOners;

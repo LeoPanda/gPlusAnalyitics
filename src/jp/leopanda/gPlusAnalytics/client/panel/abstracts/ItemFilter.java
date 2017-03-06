@@ -3,15 +3,13 @@ package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
-
 /**
  * セルテーブルの表示データをフィルタリングするための抽象クラス
  * 
  * @author LeoPanda
  *
  */
-public abstract class ItemFilter<I extends PlusItem, C> {
+public abstract class ItemFilter<I, C> {
   List<I> originalItems; // フィルター実行前のオリジナルデータ
 
   /**

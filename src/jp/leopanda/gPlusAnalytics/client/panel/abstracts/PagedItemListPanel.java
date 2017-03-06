@@ -2,7 +2,6 @@ package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
 
 import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -16,7 +15,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
  * @author LeoPanda
  *
  */
-public abstract class PagedItemListPanel<I extends PlusItem, T extends SimpleCellTable<I>> extends
+public abstract class PagedItemListPanel<I, T extends SimpleCellTable<I>> extends
     SimpleItemListPanel<I,T> {
 
   protected int pageStart = 0;// 現在表示しているページ先頭行の位置

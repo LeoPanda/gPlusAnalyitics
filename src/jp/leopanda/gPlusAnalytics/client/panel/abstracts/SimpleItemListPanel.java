@@ -2,7 +2,6 @@ package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
 
 import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -14,7 +13,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  * @author LeoPanda
  *
  */
-public abstract class SimpleItemListPanel<I extends PlusItem, T extends SimpleCellTable<I>> extends
+public abstract class SimpleItemListPanel<I, T extends SimpleCellTable<I>> extends
     VerticalPanel {
 
   protected SimpleCellTable<I> itemTable;// 表示するアイテムデータ用の表

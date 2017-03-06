@@ -5,14 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jp.leopanda.gPlusAnalytics.client.Global;
 import jp.leopanda.gPlusAnalytics.client.chart.ActivityCalendarChart;
 import jp.leopanda.gPlusAnalytics.client.chart.ActivityColumnChart;
 import jp.leopanda.gPlusAnalytics.client.chart.NumOfPlusOnePieChart;
 import jp.leopanda.gPlusAnalytics.client.chart.PlusOnersPieChart;
 import jp.leopanda.gPlusAnalytics.client.chart.PostCirclePieChart;
-import jp.leopanda.gPlusAnalytics.client.chart.abstracts.ChartOnMenu;
-import jp.leopanda.gPlusAnalytics.client.enums.ChartInfo;
+import jp.leopanda.gPlusAnalytics.client.chart.abstracts.ChartPanel;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartBody;
 import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
@@ -20,7 +19,6 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -43,8 +41,8 @@ public class ChartMenuPanel extends HorizontalPanel {
   private List<PlusActivity> activitySourceItems;//チャート表示するアクティビティアイテムのソースデータ
   private List<PlusPeople> plusOnersSourceItems;//チャート表示する+1erアイテムのソースデータ
 
-  private Map<ChartInfo, ChartOnMenu<?>> charts = new HashMap<ChartInfo, ChartOnMenu<?>>(); // チャートのインスタンス
-  private List<ChartInfo> onMenuChart = new ArrayList<ChartInfo>(); // 現在表示中のチャート
+  private Map<ChartBody, ChartPanel<?>> charts = new HashMap<ChartBody, ChartPanel<?>>(); // チャートのインスタンス
+  private List<ChartBody> onMenuChart = new ArrayList<ChartBody>(); // 現在表示中のチャート
 
   private final int chartPanelMaxColumn = 2; // チャートパネルの最大カラム数
   private int chartPanelColumns = 0; // チャートパネルの現在カラム数
@@ -66,7 +64,7 @@ public class ChartMenuPanel extends HorizontalPanel {
   private VerticalPanel getLinkPanel() {
     if (linkPanel == null) {
       linkPanel = new VerticalPanel();
-      for (ChartInfo chart : ChartInfo.values()) {
+      for (ChartBody chart : ChartBody.values()) {
         linkPanel.add(new HTML("<br/>"));
         Anchor link = new Anchor(chart.title);
         addLinkClickHandler(link, chart);
@@ -94,16 +92,12 @@ public class ChartMenuPanel extends HorizontalPanel {
   /*
    * アンカークリックハンドラの追加
    */
-  private void addLinkClickHandler(Anchor link, final ChartInfo chartInfo) {
+  private void addLinkClickHandler(Anchor link, final ChartBody chartBody) {
     link.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        if (Global.getActivityItems() == null || Global.getPlusOners() == null) {
-          Window.alert("データの読み込みが終わるまでしばらくお待ち下さい。");
-        } else {
-          addCharrtToPanel(chartInfo);
+          addCharrtToPanel(chartBody);
         }
-      }
 
     });
 
@@ -112,54 +106,54 @@ public class ChartMenuPanel extends HorizontalPanel {
   /*
    * チャートをパネルに追加する
    */
-  private void addCharrtToPanel(ChartInfo chartInfo) {
-    if (onMenuChart.contains(chartInfo)) {
+  private void addCharrtToPanel(ChartBody chartBody) {
+    if (onMenuChart.contains(chartBody)) {
       return;
     }
-    if (chartPanelColumns + chartInfo.occupiedColum > chartPanelMaxColumn) {
+    if (chartPanelColumns + chartBody.occupiedColum > chartPanelMaxColumn) {
       onMenuChart.clear();
       chartPanel.clear();
       chartPanelColumns = 0;
     }
-    onMenuChart.add(chartInfo);
-    chartPanel.add(getChartInstance(chartInfo));
-    chartPanelColumns += chartInfo.occupiedColum;
+    onMenuChart.add(chartBody);
+    chartPanel.add(getChartInstance(chartBody));
+    chartPanelColumns += chartBody.occupiedColum;
   }
 
   /*
    * チャートのインスタンスを取得する
    */
-  private ChartOnMenu<?> getChartInstance(ChartInfo chartInfo) {
-    if (charts.get(chartInfo) == null) {
-      charts.put(chartInfo, getNewWidget(chartInfo));
+  private ChartPanel<?> getChartInstance(ChartBody chartBody) {
+    if (charts.get(chartBody) == null) {
+      charts.put(chartBody, getNewWidget(chartBody));
     }
-    return charts.get(chartInfo);
+    return charts.get(chartBody);
   }
 
   /*
    * チャートを生成する
    */
-  private ChartOnMenu<?> getNewWidget(ChartInfo chartInfo) {
-    ChartOnMenu<?> newChart = null;
-    switch (chartInfo) {
+  private ChartPanel<?> getNewWidget(ChartBody chartBody) {
+    ChartPanel<?> newChart = null;
+    switch (chartBody) {
       case ACTIVIY_COLUMN:
-        newChart = setChart(new ActivityColumnChart(), activitySourceItems, chartInfo);
+        newChart = setChart(new ActivityColumnChart(), activitySourceItems, chartBody);
         break;
 
       case ACTIVITY_CALENDAR:
-        newChart = setChart(new ActivityCalendarChart(), activitySourceItems, chartInfo);
+        newChart = setChart(new ActivityCalendarChart(), activitySourceItems, chartBody);
         break;
 
       case NUM_OF_PLUSONE:
-        newChart = setChart(new NumOfPlusOnePieChart(), activitySourceItems, chartInfo);
+        newChart = setChart(new NumOfPlusOnePieChart(), activitySourceItems, chartBody);
         break;
 
       case PLUSONRES_PIE:
-        newChart = setChart(new PlusOnersPieChart(), plusOnersSourceItems, chartInfo);
+        newChart = setChart(new PlusOnersPieChart(), plusOnersSourceItems, chartBody);
         break;
 
       case POSTCIRCLE_PIE:
-        newChart = setChart(new PostCirclePieChart(), activitySourceItems, chartInfo);
+        newChart = setChart(new PostCirclePieChart(), activitySourceItems, chartBody);
         break;
       // case GENDER_PIE :
       // newChart = new GenderPieChart();
@@ -178,9 +172,9 @@ public class ChartMenuPanel extends HorizontalPanel {
   /*
    * 生成したチャートに諸元を与える
    */
-  private <I extends PlusItem> ChartOnMenu<I> setChart(ChartOnMenu<I> chart, List<I> sourceItems,
-      ChartInfo chartInfo) {
-    chart.setMenuInfo(chartInfo);
+  private <I extends PlusItem> ChartPanel<I> setChart(ChartPanel<I> chart, List<I> sourceItems,
+      ChartBody chartBody) {
+    chart.setMenuInfo(chartBody);
     chart.draw(sourceItems);
     return chart;
   }
@@ -192,8 +186,8 @@ public class ChartMenuPanel extends HorizontalPanel {
    */
   public void reloadChartDataTables(String filterLog) {
     filterLogPanel.setText(filterLog);
-    for (Map.Entry<ChartInfo, ChartOnMenu<?>> entry : charts.entrySet()) {
-      entry.getValue().reDraw();
+    for (Map.Entry<ChartBody, ChartPanel<?>> chart : charts.entrySet()) {
+      chart.getValue().reDraw();
     }
   }
 
