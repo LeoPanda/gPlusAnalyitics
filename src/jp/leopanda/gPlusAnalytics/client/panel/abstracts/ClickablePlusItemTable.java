@@ -7,7 +7,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 
 import jp.leopanda.gPlusAnalytics.client.enums.WindowOption;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
-import jp.leopanda.gPlusAnalytics.interFace.ItemEventListener;
+import jp.leopanda.gPlusAnalytics.interFace.ItemClickListener;
 
 /**
  * google+アイテムデータをクリック時popup表示するcellTable
@@ -18,10 +18,10 @@ import jp.leopanda.gPlusAnalytics.interFace.ItemEventListener;
 public abstract class ClickablePlusItemTable<I extends PlusItem> extends SimpleCellTable<I> {
 
   private boolean excludeSelectionChanged = false; // デフォルトの行選択アクションを一時的にスキップさせる場合にtrueをセット
-  protected ItemEventListener<I> itemEventListener;// 表示アイテムに対して発生させたいイベントのリスナー
+  protected ItemClickListener<I> itemClickListener;// 表示アイテムに対して発生させたいイベントのリスナー
 
-  public void addItemEventListener(ItemEventListener<I> listener) {
-    itemEventListener = listener;
+  public void addItemClickListener(ItemClickListener<I> listener) {
+    itemClickListener = listener;
   }
 
   /**

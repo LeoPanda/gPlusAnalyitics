@@ -1,7 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
 
-import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
+import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -35,7 +35,6 @@ public abstract class SimpleItemListPanel<I, T extends SimpleCellTable<I>> exten
   public SimpleItemListPanel(String titleName, int pageSize, T itemTable) {
     this.itemTable = itemTable;
     this.pageSize = pageSize;
-//    this.itemList = items;
     // タイトル行の追加
     addTitleLine(titleName);
     // アイテム表示テーブルの追加
@@ -71,8 +70,8 @@ public abstract class SimpleItemListPanel<I, T extends SimpleCellTable<I>> exten
     HorizontalPanel headerLine = new HorizontalPanel();
     headerLine.setWidth(itemTable.getWidth());
     setOriginalTitle();
-    titleLabel.addStyleName(CssStyle.LABEL_TITLE.getName());
-    lineCountLabel.addStyleName(CssStyle.LABEL_COUNT.getName());
+    titleLabel.addStyleName(MyStyle.TITLE_LABEL.getStyle());
+    lineCountLabel.addStyleName(MyStyle.COUNT_LABLEL.getStyle());
     headerLine.add(titleLabel);
     headerLine.add(lineCountLabel);
     return headerLine;

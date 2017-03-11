@@ -46,7 +46,7 @@ public abstract class AggregatePieChart<I extends PlusItem> extends SimpleChart<
    */
   @Override
   protected DataTable getDataTable() {
-    for (I item : sourceItems) {
+    for (I item : sourceData) {
       String targetField = getTargetField(item);
       if (targetField == null) {
         targetField = "null";

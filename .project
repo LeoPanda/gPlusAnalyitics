@@ -54,9 +54,9 @@
 			<location>/Users/sakyo/Google ドライブ/git/googleAuthorization/googleAuthorization/src</location>
 		</link>
 		<link>
-			<name>srcCommon</name>
+			<name>srcPanelFrame</name>
 			<type>2</type>
-			<location>/Users/sakyo/Documents/workspace/commonService/src</location>
+			<location>/Users/sakyo/Documents/workspace/panelFrame/src</location>
 		</link>
 		<link>
 			<name>srcPlusApiCommon</name>

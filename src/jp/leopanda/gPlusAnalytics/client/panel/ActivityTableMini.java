@@ -6,9 +6,9 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
-import jp.leopanda.gPlusAnalytics.client.HtmlBuilder;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ClickablePlusItemTable;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SafeHtmlColumn;
+import jp.leopanda.gPlusAnalytics.client.util.HtmlBuilder;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**

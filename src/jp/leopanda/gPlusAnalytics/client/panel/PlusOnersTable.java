@@ -7,11 +7,11 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
-import jp.leopanda.gPlusAnalytics.client.HtmlBuilder;
-import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
+import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ButtonColumn;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ClickablePlusItemTable;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SafeHtmlColumn;
+import jp.leopanda.gPlusAnalytics.client.util.HtmlBuilder;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
 /**
@@ -59,7 +59,7 @@ public class PlusOnersTable extends ClickablePlusItemTable<PlusPeople> {
       @Override
       public void addClickEvent(int index, PlusPeople item) {
         disableOnselectEventTemporally();
-        itemEventListener.onEvent(item);
+        itemClickListener.onClick(item);
       }
 
       @Override
@@ -67,7 +67,7 @@ public class PlusOnersTable extends ClickablePlusItemTable<PlusPeople> {
         return String.valueOf(item.getNumOfPlusOne());
       }
     };
-    filterButton.setCellStyleNames(CssStyle.BUTTON_FILTER.getName());
+    filterButton.setCellStyleNames(MyStyle.FILTER_LABEL.getStyle());
 
     // カラム表示リストに登録
     this.columSets.add(newColumnSet("", imageColumn, 50, null));

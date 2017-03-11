@@ -1,6 +1,5 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
-import jp.leopanda.gPlusAnalytics.interFace.IsFilterable;
 
 /**
  * Google+ REST API アイテムデータセットの同定用 PlusItemListのメンバであることを保証するために使用 GWT
@@ -9,6 +8,6 @@ import jp.leopanda.gPlusAnalytics.interFace.IsFilterable;
  * @author LeoPanda
  *
  */
-public abstract class PlusItem implements IsFilterable {
+public abstract class PlusItem {
   public abstract String getUrl();
 }

@@ -1,7 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client;
 
 import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
-import jp.leopanda.gPlusAnalytics.client.panel.MenuPanel;
+import jp.leopanda.gPlusAnalytics.client.panel.MainPanel;
 import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
 import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
 import jp.leopanda.googleAuthorization.client.Auth;
@@ -23,31 +23,45 @@ public class GPlusAnalytics implements EntryPoint {
    * メイン処理
    */
   public void onModuleLoad() {
+    
+    outerPanel = new HorizontalPanel();
+    outerPanel.add(new Label("認証取得中..."));
+    RootPanel.get(outerPanelName).add(outerPanel);
+
+    // oAuth2認証取得リクエスト
     @SuppressWarnings("unused")
     Auth auth = new Auth() {
 
       @Override
       public void onGetToken() {
-        outerPanel = new HorizontalPanel();
-        outerPanel.add(new Label("データロード中..."));
-        RootPanel.get(outerPanelName).add(outerPanel);
-        new RpcGate<StoredItems>(CallFunction.GET_ITEM, new AfterDataLoad()) {
-        }.request();
+        // 認証取得後の処理
+        requestDataLoad();
       }
+
     };
   }
 
   /**
-   * データロード後の処理
+   * サーバーサイドデータの取得をリクエストする
+   */
+  private void requestDataLoad() {
+    outerPanel.clear();
+    outerPanel.add(new Label("データロード中..."));
+    new RpcGate<StoredItems>(CallFunction.GET_STOREDITEMS, new OnDataLoad()) {
+    }.request();
+  }
+
+  /**
+   * データロード取得後の処理
    * 
    * @author LeoPanda
    *
    */
-  private class AfterDataLoad implements RpcGateListener<StoredItems> {
+  private class OnDataLoad implements RpcGateListener<StoredItems> {
     @Override
     public void onCallback(StoredItems result) {
       outerPanel.clear();
-      outerPanel.add(new MenuPanel(result.activities, result.plusOners));
+      outerPanel.add(new MainPanel(result.activities, result.plusOners));
     }
 
   }

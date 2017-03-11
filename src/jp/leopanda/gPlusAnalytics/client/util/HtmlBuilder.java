@@ -1,4 +1,4 @@
-package jp.leopanda.gPlusAnalytics.client;
+package jp.leopanda.gPlusAnalytics.client.util;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;

@@ -93,7 +93,7 @@ public class ActivityColumnChart extends
    */
   @Override
   protected void setRangeFilter() {
-    setMaxRangeValue(sourceItems.size());
+    setMaxRangeValue(sourceData.size());
     setMiniRangeWidth(5);
     setDefaultRangeWidth(10);
     super.setRangeFilter();
@@ -114,7 +114,7 @@ public class ActivityColumnChart extends
    */
   @Override
   protected DataTable getDataTable() {
-    List<PlusActivity> activities = new ArrayList<PlusActivity>(sourceItems);
+    List<PlusActivity> activities = new ArrayList<PlusActivity>(sourceData);
     Collections.sort(activities, new Comparator<PlusActivity>() {
       @Override
       public int compare(PlusActivity o1, PlusActivity o2) {
@@ -140,5 +140,6 @@ public class ActivityColumnChart extends
     }
     return dataTable;
   }
+
 
 }

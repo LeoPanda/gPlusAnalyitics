@@ -7,11 +7,11 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
-import jp.leopanda.gPlusAnalytics.client.Formatter;
-import jp.leopanda.gPlusAnalytics.client.HtmlBuilder;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ButtonColumn;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ClickablePlusItemTable;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SafeHtmlColumn;
+import jp.leopanda.gPlusAnalytics.client.util.Formatter;
+import jp.leopanda.gPlusAnalytics.client.util.HtmlBuilder;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
@@ -33,9 +33,6 @@ public class ActivityTable extends ClickablePlusItemTable<PlusActivity> {
   SafeHtmlColumn<PlusActivity> imageColumn; // 投稿写真
   TextColumn<PlusActivity> accessColumn;// 投稿先
   ButtonColumn<PlusActivity> filterButton; // +1er数フィルターボタン
-  Formatter formatter = new Formatter(); //項目フォーマット関数
-
-
 
   /**
    * 表示カラムをセットする
@@ -46,7 +43,7 @@ public class ActivityTable extends ClickablePlusItemTable<PlusActivity> {
     publishedColumn = new TextColumn<PlusActivity>() {
       @Override
       public String getValue(PlusActivity item) {
-        return formatter.getYYMMDDString(item.getPublished());
+        return Formatter.getYYMDString(item.getPublished());
       }
     };
     // タイトル
@@ -80,7 +77,7 @@ public class ActivityTable extends ClickablePlusItemTable<PlusActivity> {
       @Override
       public void addClickEvent(int index, PlusActivity item) {
         disableOnselectEventTemporally();
-        itemEventListener.onEvent(item);
+        itemClickListener.onClick(item);
       }
 
       @Override

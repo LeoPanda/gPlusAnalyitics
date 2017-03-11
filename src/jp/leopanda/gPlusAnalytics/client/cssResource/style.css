@@ -1,0 +1,33 @@
+.pageButton {
+    height: 25px;
+}
+.titleLabel {
+    font-size: large;
+    font-weight: bold;
+    text-align: center;
+}
+.filterLabel {
+    font-weight: bold;
+    text-align: right;
+}
+.countLabel {
+    font-weight: bold;
+    padding: 5px;
+}
+.filterButton {
+	font-size:10px;
+	font-family:Arial;
+	font-weight:normal;
+}
+.resetButton{
+	font-size:10px;
+}
+.filterLogText {
+    padding: 3px 15px;
+    text-align: left;
+    color: #8C9CD0;
+    text-shadow: #ddf 1px 1px 0;
+    overflow: hidden;
+    /* font-weight: bolder; */
+    font-size: larger;
+}

@@ -1,10 +1,9 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
-import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
-import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
-import jp.leopanda.gPlusAnalytics.interFace.TableEventListener;
+import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
+import jp.leopanda.gPlusAnalytics.interFace.ItemClickListener;
 
-import java.util.List;
 
 import com.google.gwt.user.client.ui.TabPanel;
 
@@ -18,24 +17,42 @@ public class MenuPanel extends TabPanel {
   private TableLaunchPanel tablePanel; // リスト表パネル
   private ChartMenuPanel chartPanel;// 図表パネル
   private MaintenancePanel mentePanel; // データメンテナンスパネル
+  private ItemClickListener<PlusItem> itemClickListener;
 
   /**
    * コンストラクタ
    */
-  public MenuPanel(List<PlusActivity> activityItems, List<PlusPeople> plusOners) {
-    tablePanel = new TableLaunchPanel(activityItems, plusOners);
-    chartPanel = new ChartMenuPanel(activityItems, plusOners);
+  public MenuPanel(FilterableSourceItems sourceItems) {
+ 
+    tablePanel = new TableLaunchPanel(sourceItems);
+    chartPanel = new ChartMenuPanel(sourceItems);
     mentePanel = new MaintenancePanel();
-    tablePanel.addEventListener(new TableEventListener() {
+
+    tablePanel.addItemEventListener(new ItemClickListener<PlusItem>() {
       @Override
-      public void onFilter(String filterLog) {
-        chartPanel.reloadChartDataTables(filterLog);
+      public void onClick(PlusItem item) {
+        itemClickListener.onClick(item);
       }
     });
+
     this.add(tablePanel, "tables");
     this.add(chartPanel, "chart");
     this.add(mentePanel, "maintenance");
     this.selectTab(0);
   }
 
+  /**
+   * テーブルメニュー上でのフィルターイベントを拾うリスナーを設定する
+   * 
+   * @param filterEventListener
+   */
+  public void addItemClickListener(ItemClickListener<PlusItem> itemClickListener) {
+    this.itemClickListener = itemClickListener;
+  }
+
+  public void reloadItems(){
+    tablePanel.reloadItems();
+    chartPanel.reloadChartDataTables();
+  }
+  
 }

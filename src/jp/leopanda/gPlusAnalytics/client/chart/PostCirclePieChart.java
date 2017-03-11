@@ -1,6 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.chart;
 
-
 import com.googlecode.gwt.charts.client.corechart.PieChartOptions;
 import com.googlecode.gwt.charts.client.options.Legend;
 import com.googlecode.gwt.charts.client.options.LegendPosition;
@@ -46,4 +45,5 @@ public class PostCirclePieChart extends AggregatePieChart<PlusActivity> {
   @Override
   protected void setFieldAliasMap() {}
 
+  
 }

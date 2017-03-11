@@ -53,7 +53,7 @@ public class NumOfPlusOnePieChart extends SimpleChart<PlusActivity, PieChartOpti
     int lowMiddle = 0;
     int highMiddle = 0;
     int high = 0;
-    for (PlusActivity activity : sourceItems) {
+    for (PlusActivity activity : sourceData) {
       first += activity.getFirstLookers();
       lowMiddle += activity.getLowMiddleLookers();
       highMiddle += activity.getHighMiddleLookers();
@@ -78,4 +78,5 @@ public class NumOfPlusOnePieChart extends SimpleChart<PlusActivity, PieChartOpti
     remove(this.getWidgetCount() - 1);
     super.reDraw();
   }
+
 }

@@ -1,11 +1,11 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
-import java.util.List;
-
+import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PagedItemListPanel;
+import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
-import jp.leopanda.gPlusAnalytics.interFace.ItemEventListener;
-import jp.leopanda.gPlusAnalytics.interFace.TableEventListener;
+import jp.leopanda.gPlusAnalytics.interFace.ItemClickListener;
 
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -18,23 +18,23 @@ import com.google.gwt.user.client.ui.Label;
  *
  */
 public class TableLaunchPanel extends HorizontalPanel {
+  FilterableSourceItems sourceItems;
   ActivityTable activityTable;
   PlusOnersTable plusOnersTable;
-  FilterableActivityListPanel activityTablePanel;
-  FilterablePlusOnerListPanel plusOnersTablePanel;
-  TableEventListener eventListener;
-
-  private String activityFilterLog = "";
-  private String plusOnerFilterLog = "";
+  PagedItemListPanel<PlusActivity, ActivityTable> activityTablePanel;
+  PagedItemListPanel<PlusPeople, PlusOnersTable> plusOnersTablePanel;
+  ItemClickListener<PlusItem> itemClickListener;
 
   /**
    * コンストラクタ
    */
-  public TableLaunchPanel(List<PlusActivity> activityItems, List<PlusPeople> plusOners) {
-    if ((activityItems == null) || (plusOners == null)) {
+  public TableLaunchPanel(FilterableSourceItems sourceItems) {
+    this.sourceItems = sourceItems;
+    if ((sourceItems.getActivities() == null) || (sourceItems.getPlusOners() == null)) {
       this.add(new Label("メンテナンスニューからデータストアの初期ロードを行ってください。"));
     } else {
-      setUpTables(activityItems, plusOners);
+      setUpTables();
+
       this.add(plusOnersTablePanel);
       this.add(new HTML("<br/>&nbsp;&nbsp;&nbsp;<br/>"));
       this.add(activityTablePanel);
@@ -42,118 +42,51 @@ public class TableLaunchPanel extends HorizontalPanel {
   }
 
   /**
-   * イベントリスナーを設定する
+   * テーブル上でのフィルターイベントを拾うリスナーを設定する
    * 
-   * @param eventListener
-   *          設定するイベントリスナー
+   * @param filterEventListener
    */
-  public void addEventListener(TableEventListener eventListener) {
-    this.eventListener = eventListener;
+  public void addItemEventListener(ItemClickListener<PlusItem> itemClickListener) {
+    this.itemClickListener = itemClickListener;
   }
 
   /**
-   * 一覧表に表示されているアクティビティアイテムのリストを取得する
-   * 
-   * @return 一覧表に表示されているアクティビティアイテムのリスト
+   * アイテムリストをロードし直す。
+   * @param activityItems
+   * @param plusOners
    */
-  public List<PlusActivity> getActivityDisplayItems() {
-    if (activityTable == null) {
-      return null;
-    }
-    return activityTable.getDisplayList();
-  }
-
-  /**
-   * 一覧表に表示されている+1erアイテムのリストを取得する
-   * 
-   * @return 一覧表に表示されている+1erアイテムのリスト
-   */
-  public List<PlusPeople> getPlusOnerDisplayItems() {
-    if (plusOnersTable == null) {
-      return null;
-    }
-    return plusOnersTable.getDisplayList();
+  public void reloadItems() {
+    activityTable.reLoadItems(sourceItems.getActivities());
+    activityTablePanel.setDisplayCounter();
+    plusOnersTable.reLoadItems(sourceItems.getPlusOners());
+    plusOnersTablePanel.setDisplayCounter();
   }
 
   /*
    * 一覧表テーブルと表示パネルを新規作成する
    */
-  private void setUpTables(List<PlusActivity> activityItems, List<PlusPeople> plusOners) {
-    activityTable = new ActivityTable(activityItems);
-    plusOnersTable = new PlusOnersTable(plusOners);
-    addTableEventHandler();
-
-    activityTablePanel = new FilterableActivityListPanel("アクティビティ一覧", 7, activityTable);
-    plusOnersTablePanel = new FilterablePlusOnerListPanel("+1ユーザー一覧", 10, plusOnersTable);
-    addPanelEventHandler();
-  }
-
-  /*
-   * フィルターログの文言を設定する
-   */
-  private String setFilterLog(String filterLog, String headermsg) {
-    String result;
-    if (filterLog.length() > 0) {
-      result = headermsg + filterLog;
-    } else {
-      result = "";
-    }
-    return result;
-  }
-
-  /*
-   * フィルターイベントを発生させる
-   */
-  private void fireFilterEvent() {
-    eventListener.onFilter(activityFilterLog + " " + plusOnerFilterLog);
-  }
-
-  /*
-   * テーブル上でのイベント通知ハンドラの設定（フィルタボタン）
-   */
-  private void addTableEventHandler() {
-    plusOnersTable.addItemEventListener(new ItemEventListener<PlusPeople>() {
+  private void setUpTables() {
+    activityTable = new ActivityTable(sourceItems.getActivities());
+    plusOnersTable = new PlusOnersTable(sourceItems.getPlusOners());
+    
+    activityTable.addItemClickListener(new ItemClickListener<PlusActivity>() {
       @Override
-      public void onEvent(PlusPeople item) {
-        activityTablePanel.doPlusOnerFilter(item.getId(), item.getDisplayName());
+      public void onClick(PlusActivity item) {
+        itemClickListener.onClick(item);
       }
     });
-    activityTable.addItemEventListener(new ItemEventListener<PlusActivity>() {
+    plusOnersTable.addItemClickListener(new ItemClickListener<PlusPeople>() {
       @Override
-      public void onEvent(PlusActivity item) {
-        plusOnersTablePanel.doActivityFilter(item.getPlusOnerIds(), shortenName(item, 6));
+      public void onClick(PlusPeople item) {
+        itemClickListener.onClick(item);
       }
     });
-  }
 
-  /*
-   * パネル上でのイベント通知ハンドラの設定（フィルター文言の入力）
-   */
-  private void addPanelEventHandler() {
-    activityTablePanel.addEventListener(new TableEventListener() {
-      @Override
-      public void onFilter(String filterLog) {
-        activityFilterLog = setFilterLog(filterLog, "activity ");
-        fireFilterEvent();
-      }
-    });
-    plusOnersTablePanel.addEventListener(new TableEventListener() {
-      @Override
-      public void onFilter(String filterLog) {
-        plusOnerFilterLog = setFilterLog(filterLog, "+1er ");
-        fireFilterEvent();
-      }
-    });
-  }
-
-  /*
-   * タイトルを指定文字数以内に切り取る
-   */
-  private String shortenName(PlusActivity source, int maxlength) {
-    String shortenTitle = source.getTitle();
-    if (source.getTitle().length() > maxlength) {
-      shortenTitle = source.getTitle().substring(0, maxlength) + "...";
-    }
-    return shortenTitle + "(" + source.getId() + ")";
+    activityTablePanel = new PagedItemListPanel<PlusActivity, ActivityTable>("アクティビティ一覧", 7,
+        activityTable) {
+    };
+    plusOnersTablePanel = new PagedItemListPanel<PlusPeople, PlusOnersTable>("+1ユーザー一覧", 10,
+        plusOnersTable) {
+    };
   }
 }

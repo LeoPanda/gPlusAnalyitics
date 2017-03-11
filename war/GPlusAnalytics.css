@@ -1,7 +1,3 @@
-/** Add css rules here for your application. */
-
-
-/** Example rules used by the template application (remove for your app) */
 h1 {
   font-size: 2em;
   font-weight: bold;
@@ -10,21 +6,8 @@ h1 {
   text-align: center;
 }
 
-/** panel styles */
-.listWidth { width:700px;}
-.pageButton {
-    height: 25px;
-}
-.titleLabel {
-    font-size: large;
-    font-weight: bold;
-    text-align: center;
-}
-.countLabel {
-    font-weight: bold;
-    padding: 5px;
-}
-/** num of plusone filter button */
+
+/** button */
 button{
 	-moz-border-radius:42px;
 	-webkit-border-radius:42px;
@@ -48,18 +31,4 @@ button{
 }button:active {
 	position:relative;
 	top:1px;
-}
-.filterButton button{
-	font-size:16px;
-	font-family:Arial;
-	font-weight:normal;
-}
-.filterLabel {
-    padding: 3px 15px;
-    text-align: left;
-    color: #8C9CD0;
-    text-shadow: #ddf 1px 1px 0;
-    overflow: hidden;
-    /* font-weight: bolder; */
-    font-size: larger;
 }

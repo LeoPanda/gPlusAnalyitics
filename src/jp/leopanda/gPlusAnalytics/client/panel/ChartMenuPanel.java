@@ -10,19 +10,16 @@ import jp.leopanda.gPlusAnalytics.client.chart.ActivityColumnChart;
 import jp.leopanda.gPlusAnalytics.client.chart.NumOfPlusOnePieChart;
 import jp.leopanda.gPlusAnalytics.client.chart.PlusOnersPieChart;
 import jp.leopanda.gPlusAnalytics.client.chart.PostCirclePieChart;
-import jp.leopanda.gPlusAnalytics.client.chart.abstracts.ChartPanel;
-import jp.leopanda.gPlusAnalytics.client.enums.ChartBody;
-import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
-import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
+import jp.leopanda.gPlusAnalytics.client.chart.abstracts.ChartBase;
+import jp.leopanda.gPlusAnalytics.client.enums.ChartType;
+import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
-import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
@@ -35,14 +32,12 @@ public class ChartMenuPanel extends HorizontalPanel {
 
   private VerticalPanel linkPanel;
   private VerticalPanel centerPanel;
-  private Label filterLogPanel;
   private HorizontalPanel chartPanel;
 
-  private List<PlusActivity> activitySourceItems;//チャート表示するアクティビティアイテムのソースデータ
-  private List<PlusPeople> plusOnersSourceItems;//チャート表示する+1erアイテムのソースデータ
+  private FilterableSourceItems sourceItems;
 
-  private Map<ChartBody, ChartPanel<?>> charts = new HashMap<ChartBody, ChartPanel<?>>(); // チャートのインスタンス
-  private List<ChartBody> onMenuChart = new ArrayList<ChartBody>(); // 現在表示中のチャート
+  private Map<ChartType, ChartBase<?>> chartInstances = new HashMap<ChartType, ChartBase<?>>(); // チャートのインスタンス
+  private List<ChartType> launchingChartTypes = new ArrayList<ChartType>(); // 現在表示中のチャート種類
 
   private final int chartPanelMaxColumn = 2; // チャートパネルの最大カラム数
   private int chartPanelColumns = 0; // チャートパネルの現在カラム数
@@ -50,25 +45,22 @@ public class ChartMenuPanel extends HorizontalPanel {
   /**
    * コンストラクタ
    */
-  public ChartMenuPanel(List<PlusActivity> activitySoruceItems,List<PlusPeople> plusOnerSourceItems) {
-    this.activitySourceItems = activitySoruceItems;
-    this.plusOnersSourceItems = plusOnerSourceItems;
+  public ChartMenuPanel(FilterableSourceItems sourceItems) {
+    this.sourceItems = sourceItems;
     this.setWidth("1600px");
-    this.add(getLinkPanel());
+    this.add(getMenuLinkPanel());
     this.add(getChartPanel());
   }
 
   /*
-   * リンク表示用パネルの作成
+   * メニューリンク表示用パネルの作成
    */
-  private VerticalPanel getLinkPanel() {
+  private VerticalPanel getMenuLinkPanel() {
     if (linkPanel == null) {
       linkPanel = new VerticalPanel();
-      for (ChartBody chart : ChartBody.values()) {
+      for (ChartType chart : ChartType.values()) {
         linkPanel.add(new HTML("<br/>"));
-        Anchor link = new Anchor(chart.title);
-        addLinkClickHandler(link, chart);
-        linkPanel.add(link);
+        linkPanel.add(new MenuAnchor(chart.title, chart));
       }
     }
     return linkPanel;
@@ -80,114 +72,108 @@ public class ChartMenuPanel extends HorizontalPanel {
   private VerticalPanel getChartPanel() {
     if (chartPanel == null) {
       centerPanel = new VerticalPanel();
-      filterLogPanel = new Label();
-      filterLogPanel.setStyleName(CssStyle.LABEL_FILTER.getName());
       chartPanel = new HorizontalPanel();
     }
-    centerPanel.add(filterLogPanel);
     centerPanel.add(chartPanel);
     return centerPanel;
   }
 
   /*
-   * アンカークリックハンドラの追加
+   * チャートをパネルに表示する
    */
-  private void addLinkClickHandler(Anchor link, final ChartBody chartBody) {
-    link.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-          addCharrtToPanel(chartBody);
-        }
-
-    });
-
-  }
-
-  /*
-   * チャートをパネルに追加する
-   */
-  private void addCharrtToPanel(ChartBody chartBody) {
-    if (onMenuChart.contains(chartBody)) {
+  private void launchChart(ChartType chartType) {
+    if (launchingChartTypes.contains(chartType)) {
       return;
     }
-    if (chartPanelColumns + chartBody.occupiedColum > chartPanelMaxColumn) {
-      onMenuChart.clear();
+    if (chartPanelColumns + chartType.occupiedColum > chartPanelMaxColumn) {
+      launchingChartTypes.clear();
       chartPanel.clear();
       chartPanelColumns = 0;
     }
-    onMenuChart.add(chartBody);
-    chartPanel.add(getChartInstance(chartBody));
-    chartPanelColumns += chartBody.occupiedColum;
+    launchingChartTypes.add(chartType);
+    chartPanel.add(getChart(chartType));
+    chartPanelColumns += chartType.occupiedColum;
   }
 
   /*
-   * チャートのインスタンスを取得する
+   * チャートを取得する
    */
-  private ChartPanel<?> getChartInstance(ChartBody chartBody) {
-    if (charts.get(chartBody) == null) {
-      charts.put(chartBody, getNewWidget(chartBody));
+  private ChartBase<?> getChart(ChartType chartType) {
+    if (chartInstances.get(chartType) == null) {
+        chartInstances.put(chartType, getChartInstance(chartType));
     }
-    return charts.get(chartBody);
+    return chartInstances.get(chartType);
   }
+
 
   /*
    * チャートを生成する
    */
-  private ChartPanel<?> getNewWidget(ChartBody chartBody) {
-    ChartPanel<?> newChart = null;
-    switch (chartBody) {
-      case ACTIVIY_COLUMN:
-        newChart = setChart(new ActivityColumnChart(), activitySourceItems, chartBody);
-        break;
+  private ChartBase<?> getChartInstance(ChartType chartType) {
+    ChartBase<?> chartInstance = null;
+    switch (chartType) {
+    case ACTIVIY_COLUMN:
+      chartInstance = newChart(new ActivityColumnChart(), chartType);
+      break;
 
-      case ACTIVITY_CALENDAR:
-        newChart = setChart(new ActivityCalendarChart(), activitySourceItems, chartBody);
-        break;
+    case ACTIVITY_CALENDAR:
+      chartInstance = newChart(new ActivityCalendarChart(), chartType);
+      break;
 
-      case NUM_OF_PLUSONE:
-        newChart = setChart(new NumOfPlusOnePieChart(), activitySourceItems, chartBody);
-        break;
+    case NUM_OF_PLUSONE:
+      chartInstance = newChart(new NumOfPlusOnePieChart(), chartType);
+      break;
 
-      case PLUSONRES_PIE:
-        newChart = setChart(new PlusOnersPieChart(), plusOnersSourceItems, chartBody);
-        break;
+    case PLUSONRES_PIE:
+      chartInstance = newChart(new PlusOnersPieChart(), chartType);
+      break;
 
-      case POSTCIRCLE_PIE:
-        newChart = setChart(new PostCirclePieChart(), activitySourceItems, chartBody);
-        break;
-      // case GENDER_PIE :
-      // newChart = new GenderPieChart();
-      // break;
-      //
-      // case LANGUAGE_PIE :
-      // newChart = new LanguagePieChart();
-      // break;
+    case POSTCIRCLE_PIE:
+      chartInstance = newChart(new PostCirclePieChart(), chartType);
+      break;
 
-      default:
-        break;
+    default:
+      break;
     }
-    return newChart;
+    return chartInstance;
   }
 
   /*
-   * 生成したチャートに諸元を与える
+   * チャートを生成し描画する
    */
-  private <I extends PlusItem> ChartPanel<I> setChart(ChartPanel<I> chart, List<I> sourceItems,
-      ChartBody chartBody) {
-    chart.setMenuInfo(chartBody);
-    chart.draw(sourceItems);
-    return chart;
+  private <I extends PlusItem> ChartBase<I> newChart(ChartBase<I> chartInstance, ChartType chartType) {
+    chartInstance.setChartType(chartType);
+    chartInstance.setSourceData(sourceItems.getItemList(chartType.getItemType()));
+    chartInstance.draw();
+    return chartInstance;
   }
 
   /**
-   * メニュー上にあるチャートを再描画する
-   * 
-   * @param filterLog 表のフィルター履歴
+   * インスタンス化されたチャートを現在データで再描画する
    */
-  public void reloadChartDataTables(String filterLog) {
-    filterLogPanel.setText(filterLog);
-    for (Map.Entry<ChartBody, ChartPanel<?>> chart : charts.entrySet()) {
-      chart.getValue().reDraw();
+  public void reloadChartDataTables() {
+    for (Map.Entry<ChartType, ChartBase<?>> entry : chartInstances.entrySet()) {
+      ChartBase<?> chartInstance = entry.getValue();
+      chartInstance.setSourceData(sourceItems.getItemList(entry.getKey().getItemType()));
+      chartInstance.reDraw();
+    }
+  }
+
+  /**
+   * チャート選択用リンクアンカー
+   * 
+   * @author LeoPanda
+   *
+   */
+  private class MenuAnchor extends Anchor {
+    MenuAnchor(String title, final ChartType chartType) {
+      super(title);
+      this.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          launchChart(chartType);
+        }
+      });
     }
   }
 

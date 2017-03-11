@@ -55,19 +55,19 @@ public class MaintenancePanel extends VerticalPanel {
     updateButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        confirmClicked(CallFunction.UPDATE);
+        confirmClicked(CallFunction.UPDATE＿ITEMSTORE);
       }
     });
     clearDataButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        confirmClicked(CallFunction.CLEAR);
+        confirmClicked(CallFunction.CLEAR＿ITEMSTORE);
       }
     });
     initialButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        confirmClicked(CallFunction.INITIAL_LOAD);
+        confirmClicked(CallFunction.INITIAL_ITEMSTORE);
       }
     });
   }

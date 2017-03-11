@@ -1,6 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
-
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.controls.ControlOptions;
@@ -18,8 +17,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
  * @author LeoPanda
  *
  */
-public abstract class FilterdChart<I extends PlusItem, O extends Options,
-    C extends ControlOptions<?>, S extends ControlState>
+public abstract class FilterdChart<I extends PlusItem, O extends Options, C extends ControlOptions<?>, S extends ControlState>
     extends SimpleChart<I, O> {
   private Dashboard dashboard;
   private ControlWrapper<C, S> rangeFilter;
@@ -31,8 +29,10 @@ public abstract class FilterdChart<I extends PlusItem, O extends Options,
    * コンストラクタ <br/>
    * ChartPackage.CONTROLS使用時にはChartype.CALENDARは使用できません。
    * 
-   * @param chartType チャートタイプ
-   * @param controlTyle チャートコントロールタイプ
+   * @param chartType
+   *          チャートタイプ
+   * @param controlTyle
+   *          チャートコントロールタイプ
    */
   public FilterdChart(ChartType chartType, ControlType controlTyle) {
     super(chartType, ChartPackage.CONTROLS);

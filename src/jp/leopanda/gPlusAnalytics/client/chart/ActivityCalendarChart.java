@@ -2,9 +2,9 @@ package jp.leopanda.gPlusAnalytics.client.chart;
 
 import java.util.Date;
 
-import jp.leopanda.gPlusAnalytics.client.Formatter;
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.SimpleChart;
 import jp.leopanda.gPlusAnalytics.client.panel.ActivitySelectorPop;
+import jp.leopanda.gPlusAnalytics.client.util.Formatter;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 import com.google.gwt.user.client.Window;
@@ -74,7 +74,7 @@ public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOpt
     dataTable.addColumn(ColumnType.DATE, "投稿日");
     dataTable.addColumn(ColumnType.NUMBER, "+1数");
     PlusOnerCounter counter = new PlusOnerCounter();
-    for (PlusActivity activity : sourceItems) {
+    for (PlusActivity activity : sourceData) {
       if (counter.isSamePublished(activity)) {
       } else {
         dataTable = counter.addNumOfPlusOnersByPublished(dataTable);
@@ -94,7 +94,7 @@ public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOpt
       activitySelectorPop.closePop();
       activitySelectorPop = null;
     }
-    activitySelectorPop = new ActivitySelectorPop(selectedDate,sourceItems);
+    activitySelectorPop = new ActivitySelectorPop(selectedDate,sourceData);
     activitySelectorPop.show();
   }
 
@@ -104,7 +104,6 @@ public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOpt
   class PlusOnerCounter {
     public Date published = null;
     private int numOfPlusOners = 0;
-    private Formatter formatter = new Formatter();
 
     /**
      * カウンターに+1er数を加算する
@@ -136,9 +135,10 @@ public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOpt
         published = activity.getPublished();
         return true;
       } else {
-        return formatter.getYYMMDDString(activity.published).equals(
-            formatter.getYYMMDDString(published));
+        return Formatter.getYYMDString(activity.published).equals(
+            Formatter.getYYMDString(published));
       }
     }
   }
+
 }

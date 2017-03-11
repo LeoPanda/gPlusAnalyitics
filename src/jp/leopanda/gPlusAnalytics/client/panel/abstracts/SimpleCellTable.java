@@ -3,7 +3,6 @@ package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
@@ -31,7 +30,8 @@ public abstract class SimpleCellTable<I> extends CellTable<I> {
   /**
    * コンストラクタ
    * 
-   * @param items 表示するアイテムデータ
+   * @param items
+   *          表示するアイテムデータ
    */
   public SimpleCellTable(List<I> items) {
     // 初期化
@@ -89,24 +89,47 @@ public abstract class SimpleCellTable<I> extends CellTable<I> {
       // 表示カラムをテーブルに追加する
       this.addColumn(columSet.colum, columSet.columName);
     }
-    // データプロバイダに明細データをセットする
-    List<I> displayList = dataProvider.getList();
-    for (I item : items) {
-      displayList.add(item);
-    }
+    // アイテムデータをロードする
+    loadItems(items);
     // カラムのソート条件をセットする
     setSortHandler();
     // ソートハンドラをテーブルに接続する
     this.addColumnSortHandler(sortHandler);
   }
 
+  /*
+   * アイテムデータをロードする
+   */
+  private void loadItems(List<I> items) {
+    List<I> displayList = dataProvider.getList();
+    for (I item : items) {
+      displayList.add(item);
+    }
+  }
+
+  /**
+   * アイテムデータをロードし直す
+   * 
+   * @param items
+   *          アイテムデータ
+   */
+  public void reLoadItems(List<I> items) {
+    dataProvider.getList().clear();
+    loadItems(items);
+    this.setPageStart(0);
+  }
+
   /**
    * カラム情報セットを作成する
    * 
-   * @param columName カラムの名称
-   * @param colum カラムオブジェクト
-   * @param columWidth カラムの表示幅
-   * @param alignment カラムの表示修飾
+   * @param columName
+   *          カラムの名称
+   * @param colum
+   *          カラムオブジェクト
+   * @param columWidth
+   *          カラムの表示幅
+   * @param alignment
+   *          カラムの表示修飾
    * @return 作成されたカラム情報セット
    */
   public ColumnSet newColumnSet(String columName, Column<I, ?> colum, int columWidth,
@@ -127,7 +150,6 @@ public abstract class SimpleCellTable<I> extends CellTable<I> {
     }
     return String.valueOf(result) + "px";
   }
-
 
   /*
    * テーブルに表示する項目のカラムデータ（Column） をnewし columnSetへaddする処理を記述する。

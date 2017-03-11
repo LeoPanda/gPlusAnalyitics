@@ -1,5 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
+import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -7,6 +8,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+import jp.leopanda.gPlusAnalytics.client.util.ItemFilter;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 /**
@@ -20,15 +22,19 @@ public abstract class ItemListPop<I extends PlusItem, T extends SimpleCellTable<
 
   private VerticalPanel innerPanel = new VerticalPanel();// ポップアップ画面の内枠
 
-
   /**
    * コンストラクタ
    * 
-   * @param titleName 画面のタイトル
-   * @param pageSize　リストの最大行数
-   * @param itemTable 表示するアイテムテーブル
-   * @param comparator フィルターの比較対象値
-   * @param filter 　　フィルター比較演算関数
+   * @param titleName
+   *          画面のタイトル
+   * @param pageSize
+   *          リストの最大行数
+   * @param itemTable
+   *          表示するアイテムテーブル
+   * @param comparator
+   *          フィルターの比較対象値
+   * @param filter
+   *          フィルター比較演算関数
    */
   public ItemListPop(String titleName, int pageSize, T itemTable, C comparator,
       ItemFilter<I, C> filter) {
@@ -54,11 +60,19 @@ public abstract class ItemListPop<I extends PlusItem, T extends SimpleCellTable<
    */
   private SimpleItemListPanel<I, T> makeItemList(String titleName, int pageSize, T itemTable,
       C comparator, ItemFilter<I, C> filter) {
-    SimpleItemListPanel<I, T> itemPanel =
-        new SimpleItemListPanel<I, T>(titleName, pageSize, itemTable) {};
-    filter.doFilter(comparator, itemTable);
+
+    SimpleItemListPanel<I, T> itemPanel = new SimpleItemListPanel<I, T>(titleName, pageSize,
+        itemTable) {};
+    List<I> displayList = itemTable.getDisplayList();
+    List<I> filteredList = filter.doFilter(displayList, comparator);
+    displayList.clear();
+    for (I item : filteredList) {
+      displayList.add(item);
+    }
+    itemTable.setPageStart(0);
     itemPanel.setDisplayCounter();
     return itemPanel;
+
   }
 
   /*

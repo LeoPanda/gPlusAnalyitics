@@ -1,7 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
-import java.util.List;
-
 import com.googlecode.gwt.charts.client.ChartLoader;
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartType;
@@ -15,7 +13,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
  * @author LeoPanda
  *
  */
-public abstract class SimpleChart<I extends PlusItem, O extends Options> extends ChartPanel<I> {
+public abstract class SimpleChart<I extends PlusItem, O extends Options> extends ChartBase<I> {
   protected ChartWrapper<O> chart;
   protected O chartOptions;
   protected DataTable dataTable;
@@ -26,7 +24,6 @@ public abstract class SimpleChart<I extends PlusItem, O extends Options> extends
    * コンストラクタ
    */
   public SimpleChart(ChartType chartType, ChartPackage chartPackage) {
-    super();
     this.chartType = chartType;
     this.chartLoader = new ChartLoader(chartPackage);
   }
@@ -35,8 +32,7 @@ public abstract class SimpleChart<I extends PlusItem, O extends Options> extends
    * チャートを描画する
    */
   @Override
-  public void draw(List<I> sourceItems) {
-    super.draw(sourceItems);
+  public void draw() {
     chartLoader.loadApi(new Runnable() {
       @Override
       public void run() {
@@ -71,7 +67,8 @@ public abstract class SimpleChart<I extends PlusItem, O extends Options> extends
   /**
    * チャート描画前処理
    */
-  protected void beforeDrawChart() {}
+  protected void beforeDrawChart() {
+  }
 
   /**
    * チャート描画処理
@@ -87,7 +84,8 @@ public abstract class SimpleChart<I extends PlusItem, O extends Options> extends
   /**
    * チャート描画後処理
    */
-  protected void afterDrawChart() {}
+  protected void afterDrawChart() {
+  }
 
   /**
    * チャートオプションの生成
@@ -121,7 +119,7 @@ public abstract class SimpleChart<I extends PlusItem, O extends Options> extends
   public void reDraw() {
     clearDataTable();
     chart.removeAllHandlers();
-    draw(sourceItems);
+    draw();
   }
 
   /**

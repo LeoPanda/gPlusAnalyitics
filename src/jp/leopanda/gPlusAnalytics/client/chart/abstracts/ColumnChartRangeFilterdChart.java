@@ -13,13 +13,15 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
  * @author LeoPanda
  *
  */
-public abstract class ColumnChartRangeFilterdChart<I extends PlusItem,O extends Options> extends
-    ChartRangeFilterdChart<I,O> {
+public abstract class ColumnChartRangeFilterdChart<I extends PlusItem, O extends Options> extends
+    ChartRangeFilterdChart<I, O> {
   protected ComboChartOptions filterChartOptions; // レンジフィルターのチャートオプション
 
   /**
    * コンストラクタ
-   * @param chartType チャートの種類
+   * 
+   * @param chartType
+   *          チャートの種類
    */
   public ColumnChartRangeFilterdChart(ChartType chartType) {
     super(chartType);

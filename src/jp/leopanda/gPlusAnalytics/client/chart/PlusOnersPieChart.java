@@ -53,7 +53,7 @@ public class PlusOnersPieChart extends SimpleChart<PlusPeople, PieChartOptions> 
     int lowMiddle = 0;
     int highMiddle = 0;
     int high = 0;
-    for (PlusPeople plusOner : sourceItems) {
+    for (PlusPeople plusOner : sourceData) {
       totalPlusOners += 1;
       int plusOne = plusOner.getNumOfPlusOne();
       if (plusOne >= Distribution.HIGH_LOOKER.threshold) {
@@ -85,4 +85,5 @@ public class PlusOnersPieChart extends SimpleChart<PlusPeople, PieChartOptions> 
     totalPlusOners = 0;
     super.reDraw();
   }
+
 }

@@ -52,21 +52,21 @@ public class RpcGate<R> {
     GenAsync<R> genAsync = new GenAsync<R>();
     genAsync.addListener((RpcGateListener<R>) this.listener);
     switch (function) {
-    case GET_ITEM: {
+    case GET_STOREDITEMS: {
       googleAsync.getItems((AsyncCallback<StoredItems>) genAsync.callbackR);
     }
       break;
-    case INITIAL_LOAD: {
+    case INITIAL_ITEMSTORE: {
       googleAsync.initialLoadToStore((AsyncCallback<String>) genAsync.callbackR);
 
     }
       break;
-    case UPDATE: {
+    case UPDATE＿ITEMSTORE: {
       googleAsync.updateDataStore((AsyncCallback<String>) genAsync.callbackR);
 
     }
       break;
-    case CLEAR: {
+    case CLEAR＿ITEMSTORE: {
       googleAsync.clearDataStore((AsyncCallback<String>) genAsync.callbackR);
 
     }

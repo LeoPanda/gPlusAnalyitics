@@ -7,8 +7,8 @@ package jp.leopanda.gPlusAnalytics.client.enums;
  *
  */
 public enum DateFormat {
-  YYMMDD("yyyy/M/d"), YYMMDDTIME("yy/M/d h:m"), YYMMDD_JP("yyyy'年'M'月'd'日'"), YYMMDDTIME_JP(
-      "yyyy'年'M'月'd'日 'h'時'm'分'"), YYMM_JP("yyyy'年'M'月'");
+  YYMD("yyyy/M/d"), YYMDHM("yy/M/d h:m"), YYMD_JP("yyyy'年'M'月'd'日'"), YYMDHM_JP(
+      "yyyy'年'M'月'd'日 'h'時'm'分'"), YYM_JP("yyyy'年'M'月'"),MONTH("M"),YEAR("yyyy");
 
   private String format;
 

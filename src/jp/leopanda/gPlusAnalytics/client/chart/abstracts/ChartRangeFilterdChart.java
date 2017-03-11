@@ -1,6 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
-
 import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.controls.ControlType;
 import com.googlecode.gwt.charts.client.controls.filter.ChartRangeFilterOptions;
@@ -16,10 +15,11 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
  * 
  * @author LeoPanda
  *
- * @param <O> チャートオプション
+ * @param <O>
+ *          チャートオプション
  */
-public abstract class ChartRangeFilterdChart<I extends PlusItem,O extends Options> extends
-    FilterdChart<I,O, ChartRangeFilterOptions, ChartRangeFilterState> {
+public abstract class ChartRangeFilterdChart<I extends PlusItem, O extends Options> extends
+    FilterdChart<I, O, ChartRangeFilterOptions, ChartRangeFilterState> {
   private int miniRangeWidth; // レンジフィルターの最小レンジ幅
   private int maxRangeValue; // レンジフィルターの最大値
   private int defaultRangeWidth; // レンジフィルターのデフォルト幅
@@ -29,7 +29,8 @@ public abstract class ChartRangeFilterdChart<I extends PlusItem,O extends Option
   /**
    * コンストラクタ
    * 
-   * @param chartType チャートタイプ
+   * @param chartType
+   *          チャートタイプ
    */
   public ChartRangeFilterdChart(ChartType chartType) {
     super(chartType, ControlType.CHART_RANGE_FILTER);
@@ -112,6 +113,5 @@ public abstract class ChartRangeFilterdChart<I extends PlusItem,O extends Option
   protected void setDefaultRangeWidth(int defaultRangeWidth) {
     this.defaultRangeWidth = defaultRangeWidth;
   }
-
 
 }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
 import jp.leopanda.gPlusAnalytics.dataStore.DataStoreHandler;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateService;
+import jp.leopanda.googleAuthorization.client.NoCredentialException;
 import jp.leopanda.googleAuthorization.server.CatchException;
 import jp.leopanda.googleAuthorization.server.CredentialUtils;
 
@@ -97,8 +98,9 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * 
    * @return
    * @throws IOException
+   * @throws NoCredentialException 
    */
-  private PlusApiService getApiService() throws IOException {
+  private PlusApiService getApiService() throws IOException, NoCredentialException {
     CredentialUtils utils = new CredentialUtils();
     return new PlusApiService(utils.httpTransport, utils.jsonFactory, utils.loadCredential());
   }
@@ -108,8 +110,9 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * 
    * @return
    * @throws IOException
+   * @throws NoCredentialException 
    */
-  private String getCurrentUserId() throws IOException {
+  private String getCurrentUserId() throws IOException, NoCredentialException {
     return getApiService().getGplusUserId();
   }
 }

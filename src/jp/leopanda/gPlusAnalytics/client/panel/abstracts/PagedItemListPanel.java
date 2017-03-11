@@ -1,7 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
 
-import jp.leopanda.gPlusAnalytics.client.enums.CssStyle;
+import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -52,10 +52,10 @@ public abstract class PagedItemListPanel<I, T extends SimpleCellTable<I>> extend
    */
   private HorizontalPanel makePageControlLine() {
     addButtonClickHandlers();
-    firstPageButton.addStyleName(CssStyle.BUTTON_PAGE.getName());
-    prevPageButton.addStyleName(CssStyle.BUTTON_PAGE.getName());
-    nextPageButton.addStyleName(CssStyle.BUTTON_PAGE.getName());
-    lastPageButton.addStyleName(CssStyle.BUTTON_PAGE.getName());
+    firstPageButton.addStyleName(MyStyle.PAGE_BUTTON.getStyle());
+    prevPageButton.addStyleName(MyStyle.PAGE_BUTTON.getStyle());
+    nextPageButton.addStyleName(MyStyle.PAGE_BUTTON.getStyle());
+    lastPageButton.addStyleName(MyStyle.PAGE_BUTTON.getStyle());
     HorizontalPanel pageControlLine = new HorizontalPanel();
     pageControlLine.setWidth(itemTable.getWidth());
     HorizontalPanel leftSide = new HorizontalPanel();
