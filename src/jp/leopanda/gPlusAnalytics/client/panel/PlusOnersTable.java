@@ -44,7 +44,7 @@ public class PlusOnersTable extends ClickablePlusItemTable<PlusPeople> {
         if (item.getImageUrl() != null) {
           builder.appendPeopleTumbnailImg(item.getImageUrl());
         }
-        return builder.getSafeHtml();
+        return builder.toSafeHtml();
       }
     };
     // ユーザー名

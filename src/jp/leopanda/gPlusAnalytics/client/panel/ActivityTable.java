@@ -7,6 +7,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
+import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ButtonColumn;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ClickablePlusItemTable;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SafeHtmlColumn;
@@ -46,6 +47,7 @@ public class ActivityTable extends ClickablePlusItemTable<PlusActivity> {
         return Formatter.getYYMDString(item.getPublished());
       }
     };
+    
     // タイトル
     titleColumn = new TextColumn<PlusActivity>() {
       @Override
@@ -53,6 +55,8 @@ public class ActivityTable extends ClickablePlusItemTable<PlusActivity> {
         return item.getTitle();
       }
     };
+    titleColumn.setCellStyleNames(MyStyle.TABLE_TEXT.getStyle());
+    
     // 投稿写真
     imageColumn = new SafeHtmlColumn<PlusActivity>() {
       @Override
@@ -61,9 +65,11 @@ public class ActivityTable extends ClickablePlusItemTable<PlusActivity> {
         if (item.getAttachmentImageUrls() != null) {
           builder.appendActivityTumbnailImg(item.getAttachmentImageUrls().get(0));
         }
-        return builder.getSafeHtml();
+        return builder.toSafeHtml();
       }
     };
+    imageColumn.setCellStyleNames(MyStyle.TABLE_PHOTO.getStyle());
+    
     // 投稿先
     accessColumn = new TextColumn<PlusActivity>() {
       @Override
@@ -72,6 +78,8 @@ public class ActivityTable extends ClickablePlusItemTable<PlusActivity> {
         return result;
       }
     };
+    accessColumn.setCellStyleNames(MyStyle.TABLE_TEXT.getStyle());
+    
     // +1er数フィルターボタン
     filterButton = new ButtonColumn<PlusActivity>() {
       @Override
@@ -79,12 +87,12 @@ public class ActivityTable extends ClickablePlusItemTable<PlusActivity> {
         disableOnselectEventTemporally();
         itemClickListener.onClick(item);
       }
-
       @Override
       public String getValue(PlusActivity item) {
         return String.valueOf(item.getNumOfPlusOners());
       }
     };
+    
     // カラム表示リストに登録
     this.columSets.add(newColumnSet("投稿日", publishedColumn, 100, null));
     this.columSets.add(newColumnSet("タイトル", titleColumn, 400, null));

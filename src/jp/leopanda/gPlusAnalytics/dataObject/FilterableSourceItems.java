@@ -145,15 +145,24 @@ public class FilterableSourceItems {
   }
 
   /**
-   * アクテビティを投稿日でフィルタする
+   * アクテビティを投稿年でフィルタする
    * 
-   * @param comparator
+   * @param year
    */
-  public void filterActivitesByPublished(String year, String month) {
-    currentPlusActivities = filterActivities.byPublished(currentPlusActivities,year, month);
+  public void filterActivitesByPublishedYear(String year) {
+    currentPlusActivities = filterActivities.byPublishedYear(currentPlusActivities,year);
     currentPlusOners = filterPlusOners.byActivies(currentPlusOners, currentPlusActivities);
-    String logword = year != null ? year + "年" : "";
-    logword += month != null ? month + "月" : "";
+    String logword =year + "年";
+    addFilterLog(LogType.ACTIVITY,logword);
+  }
+  /**
+   * アクティビティを投稿月でフィルタする
+   * @param month
+   */
+  public void filterActivitesByPublishedMonth(String month) {
+    currentPlusActivities = filterActivities.byPublishedMonth(currentPlusActivities,month);
+    currentPlusOners = filterPlusOners.byActivies(currentPlusOners, currentPlusActivities);
+    String logword = month + "月";
     addFilterLog(LogType.ACTIVITY,logword);
   }
 

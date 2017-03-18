@@ -1,17 +1,18 @@
 package jp.leopanda.gPlusAnalytics.client.enums;
 
 /**
- * window.openのオプションパラメータ
+ * 固定文字列
  * 
  * @author LeoPanda
  *
  */
-public enum WindowOption {
-  ITEM_DETAIL("width=800,height=800,top=100,left=800,location=0");
+public enum FixedString {
+  WINDOW_OPTION("width=800,height=800,top=100,left=800,location=0"),
+  BLANK_CELL("<br/>&nbsp;&nbsp;&nbsp;<br/>");
 
   private String value;
 
-  private WindowOption(String value) {
+  private FixedString(String value) {
     this.value = value;
   }
 

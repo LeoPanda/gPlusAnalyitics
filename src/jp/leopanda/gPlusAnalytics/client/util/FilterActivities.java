@@ -49,6 +49,7 @@ public class FilterActivities {
 
   /**
    * 投稿先でフィルタする
+   * 
    * @param plusActivites
    * @param keyword
    * @return
@@ -61,64 +62,76 @@ public class FilterActivities {
       }
     }.doFilter(plusActivites, keyword);
   }
-  
+
   /**
-   * 投稿日でフィルタする
+   * 投稿年でフィルタする
+   * 
    * @param plusActivites
    * @param year
-   * @param month
    * @return
    */
-  public List<PlusActivity> byPublished(List<PlusActivity> plusActivites,String year, String month){
-    List<PlusActivity> currentPlusActivites = new ItemFilter<PlusActivity, String>() {
+  public List<PlusActivity> byPublishedYear(List<PlusActivity> plusActivites, String year) {
+    return new ItemFilter<PlusActivity, String>() {
       @Override
       public boolean compare(PlusActivity sourceItem, String year) {
         return Formatter.getYear(sourceItem.getPublished()).equals(year);
       }
     }.doFilter(plusActivites, year);
+  }
 
+  /**
+   * 投稿月でフィルタする
+   * 
+   * @param plusActivites
+   * @param month
+   * @return
+   */
+  public List<PlusActivity> byPublishedMonth(List<PlusActivity> plusActivites, String month) {
     return new ItemFilter<PlusActivity, String>() {
       @Override
       public boolean compare(PlusActivity item, String month) {
         String publishedMonth = Formatter.getMonth(item.getPublished());
         return publishedMonth.equals(month);
       }
-    }.doFilter(currentPlusActivites, month);
+    }.doFilter(plusActivites, month);
   }
-  
+
   /**
    * リストで示されたユーザーが+1したアクテビティを抽出する
+   * 
    * @param plusActivities
    * @param plusOners
    * @return
    */
-  public List<PlusActivity> byPlusOners(List<PlusActivity> plusActivities,List<PlusPeople> plusOners){
+  public List<PlusActivity> byPlusOners(List<PlusActivity> plusActivities,
+      List<PlusPeople> plusOners) {
     Set<String> activityIds = new HashSet<String>();
     for (PlusPeople plusOner : plusOners) {
-      for(PlusActivity plusActivity:plusActivities){
-        if(plusActivity.getPlusOnerIds().contains(plusOner.getId())){
+      for (PlusActivity plusActivity : plusActivities) {
+        if (plusActivity.getPlusOnerIds().contains(plusOner.getId())) {
           activityIds.add(plusActivity.getId());
         }
-      }  
+      }
     }
-    return byActivityIds(plusActivities,activityIds);
+    return byActivityIds(plusActivities, activityIds);
   }
-  
-  
+
   /**
    * ActivityIDのセットでフィルタする
+   * 
    * @param plusActivites
    * @param activityId
    * @return
    */
-  private List<PlusActivity> byActivityIds(List<PlusActivity> plusActivities,Set<String> activityIds){
-    return new ItemFilter<PlusActivity,Set<String>>(){
+  private List<PlusActivity> byActivityIds(List<PlusActivity> plusActivities,
+      Set<String> activityIds) {
+    return new ItemFilter<PlusActivity, Set<String>>() {
 
       @Override
       public boolean compare(PlusActivity sourceItem, Set<String> activityIds) {
         return activityIds.contains(sourceItem.getId());
       }
-      
+
     }.doFilter(plusActivities, activityIds);
   }
 }

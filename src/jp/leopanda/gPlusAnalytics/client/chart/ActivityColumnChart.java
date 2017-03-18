@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.ColumnChartRangeFilterdChart;
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
-import jp.leopanda.gPlusAnalytics.client.enums.WindowOption;
+import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 import com.google.gwt.user.client.Window;
@@ -62,7 +62,7 @@ public class ActivityColumnChart extends
       public void onSelect(SelectEvent event) {
         Integer selectedRow =
             (int) chart.getDataTable().getValueNumber(chart.getSelection().get(0).getRow(), 0);
-        Window.open(activityUrls.get(selectedRow), "", WindowOption.ITEM_DETAIL.getValue());
+        Window.open(activityUrls.get(selectedRow), "", FixedString.WINDOW_OPTION.getValue());
       }
     });
     return chart;

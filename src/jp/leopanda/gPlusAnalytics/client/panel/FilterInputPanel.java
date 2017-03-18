@@ -1,17 +1,20 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
+import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.client.enums.Month;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.interFace.FilterRequestListener;
+import jp.leopanda.panelFrame.filedParts.EventAction;
 import jp.leopanda.panelFrame.filedParts.ListBoxField;
 import jp.leopanda.panelFrame.filedParts.TextBoxField;
 import jp.leopanda.panelFrame.panelParts.PanelBase;
@@ -35,11 +38,8 @@ public class FilterInputPanel extends PanelBase {
       FilterType.PLUSONER_KEYWORD);
   RequestButton activityFilterButton = new RequestButton("▶",
       FilterType.ACTIVITIES_KEYWORD);
-  RequestButton postCategoryFilterButton = new RequestButton("▶",
-      FilterType.ACTIVITIES_ACCESSDESCRIPTION);
-  RequestButton publishedFilterButton = new RequestButton("▶",
-      FilterType.ACTIVITIES_PUBLISHED);
   RequestButton resetButton = new RequestButton("☓", FilterType.RESET_ITEMS);
+  CheckBox incrementalFilterCheck = new CheckBox();
   // リスナー
   FilterRequestListener requestListener;
 
@@ -68,6 +68,10 @@ public class FilterInputPanel extends PanelBase {
     fieldMap.add(postCategory.getField());
     fieldMap.add(publishedYear.getField());
     fieldMap.add(publishedMonth);
+
+    postCategory.addEventListener(new OnValueChange(FilterType.ACTIVITIES_ACCESSDESCRIPTION));
+    publishedYear.addEventListener(new OnValueChange(FilterType.ACTIVITIES_PUBLISHED_YEAR));
+    publishedMonth.addEventListener(new OnValueChange(FilterType.ACTIVITIES_PUBLISHED_MONTH));
   }
 
   /**
@@ -80,20 +84,32 @@ public class FilterInputPanel extends PanelBase {
     filterLine.add(activityFilter);
     filterLine.add(activityFilterButton);
     filterLine.add(postCategory.getField());
-    filterLine.add(postCategoryFilterButton);
     filterLine.add(publishedYear.getField());
     filterLine.add(publishedMonth);
-    filterLine.add(publishedFilterButton);
-    filterLine.add(new HTML("<br/>"));
+    filterLine.add(new HTML(FixedString.BLANK_CELL.getValue()));
     filterLine.add(resetButton);
+    filterLine.add(getCheckBox());
 
     this.add(filterLine);
-    plusOnerFilter.addStyleName(MyStyle.FILTER_LABEL.getStyle());
-    activityFilter.addStyleName(MyStyle.FILTER_LABEL.getStyle());
-    plusOnerFilter.addStyleName(MyStyle.FILTER_LABEL.getStyle());
+    plusOnerFilter.addLabelStyle(MyStyle.FILTER_LABEL.getStyle());
+    activityFilter.addLabelStyle(MyStyle.FILTER_LABEL.getStyle());
+    plusOnerFilter.addLabelStyle(MyStyle.FILTER_LABEL.getStyle());
     resetButton.addStyleName(MyStyle.RESET_BUTTON.getStyle());
   }
 
+  /**
+   * 累積フィルターチェックボックスを設定する
+   * @return
+   */
+  private HorizontalPanel getCheckBox(){
+    HorizontalPanel checkBoxPanel = new HorizontalPanel();
+    checkBoxPanel.add(incrementalFilterCheck);
+    Label title = new Label("フィルター累積");
+    title.addStyleName(MyStyle.CHECKBOX_LABEL.getStyle());
+    checkBoxPanel.add(title);
+    return checkBoxPanel;
+  }
+  
   /**
    * リスナーを設定する
    * 
@@ -108,6 +124,7 @@ public class FilterInputPanel extends PanelBase {
    */
   public void resetFields() {
     fieldMap.resetFields();
+    incrementalFilterCheck.setValue(false);
   }
 
   /**
@@ -154,6 +171,14 @@ public class FilterInputPanel extends PanelBase {
   public String getFilterMonth() {
     return Month.values()[publishedMonth.getSelectedIndex()].getNumber();
   }
+  
+  /**
+   * 累積フィルターチェックの有無を取得する
+   * @return
+   */
+  public boolean getIncrimentalFilterCheck(){
+    return incrementalFilterCheck.getValue();
+  }
 
   /**
    * フィルターリクエストボタン
@@ -173,4 +198,25 @@ public class FilterInputPanel extends PanelBase {
       });
     }
   }
+
+  /**
+   * リストボックス値変更時アクション定義クラス
+   * 
+   * @author LeoPanda
+   *
+   */
+  private class OnValueChange implements EventAction {
+    FilterType filterType;
+
+    public OnValueChange(FilterType filterType) {
+      this.filterType = filterType;
+    }
+
+    @Override
+    public void onValueChange() {
+      requestListener.request(filterType);
+    }
+
+  }
+
 }

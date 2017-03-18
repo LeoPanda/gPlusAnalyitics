@@ -21,10 +21,22 @@ public interface CssStyle extends ClientBundle {
     String filterButton();
 
     String filterLogText();
-    
+
     String filterLabel();
-    
+
     String resetButton();
+
+    String tableText();
+
+    String tablePhoto();
+
+    String publishedLabel();
+
+    String detailPopWindow();
+
+    String detailPopLine();
+
+    String cehckBoxLabel();
   }
 
   Style style();

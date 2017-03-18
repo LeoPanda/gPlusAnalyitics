@@ -50,7 +50,7 @@ public class ActivityTableMini extends ClickablePlusItemTable<PlusActivity> {
         if (item.getAttachmentImageUrls() != null) {
           builder.appendActivityTumbnailImg(item.getAttachmentImageUrls().get(0));
         }
-        return builder.getSafeHtml();
+        return builder.toSafeHtml();
       }
     };
     // +1er数

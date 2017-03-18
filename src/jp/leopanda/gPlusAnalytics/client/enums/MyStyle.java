@@ -11,11 +11,18 @@ import jp.leopanda.gPlusAnalytics.client.cssResource.CssStyle;
 public enum MyStyle {
   PAGE_BUTTON(CssStyle.INSTANCE.style().pageButton()),
   TITLE_LABEL(CssStyle.INSTANCE.style().titleLabel()),
+  CHECKBOX_LABEL(CssStyle.INSTANCE.style().cehckBoxLabel()),
+  TITLE_PUBLISHED(CssStyle.INSTANCE.style().publishedLabel()),
   COUNT_LABLEL(CssStyle.INSTANCE.style().countLabel()),
+  TABLE_TEXT(CssStyle.INSTANCE.style().tableText()),
+  TABLE_PHOTO(CssStyle.INSTANCE.style().tablePhoto()),
   FILTER_BUTTON(CssStyle.INSTANCE.style().filterButton()),
   RESET_BUTTON(CssStyle.INSTANCE.style().resetButton()),
   FILTER_TEXT(CssStyle.INSTANCE.style().filterLogText()),
-  FILTER_LABEL(CssStyle.INSTANCE.style().filterLabel());
+  FILTER_LABEL(CssStyle.INSTANCE.style().filterLabel()),
+  DETAIL_POPWINDOW(CssStyle.INSTANCE.style().detailPopWindow()),
+  DETAIL_POPLINE(CssStyle.INSTANCE.style().detailPopLine()),
+  GRID_IMAGE("gridImage");
   private String style;
 
   private MyStyle(String style) {

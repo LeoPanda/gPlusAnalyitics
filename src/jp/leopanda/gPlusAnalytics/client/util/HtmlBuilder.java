@@ -5,47 +5,68 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
 /**
  * Common utility for building SafeHtml
+ * 
  * @author LeoPanda
  *
  */
 public class HtmlBuilder {
 
-  private SafeHtmlBuilder builder = new SafeHtmlBuilder();
-
+  private SafeHtmlBuilder builder;
+  
+  public HtmlBuilder(){
+    this.builder = new SafeHtmlBuilder();
+  }
 
   /**
    * HTMLの生成
+   * 
    * @return
    */
-  public SafeHtml getSafeHtml() {
+  public SafeHtml toSafeHtml() {
     return builder.toSafeHtml();
   }
 
   /**
    * アクティビティ要約表示用イメージタグの追加
+   * 
    * @param imgUrl
    */
-  public void appendActivityTumbnailImg(String imgUrl) {
-    appendImgTag(imgUrl, "80", "80");
+  public SafeHtmlBuilder appendActivityTumbnailImg(String imgUrl) {
+    return appendImgTag(imgUrl, "80", "");
   }
+
+  /**
+   * 写真グリッド用イメージタグの追加
+   * @param imgUrl
+   * @return
+   */
+  public SafeHtmlBuilder appendPhotoGridImg(String imgUrl){
+    return appendImgTag(imgUrl,"120","");
+  }
+  
   /**
    * 人物要約表示用イメージタグの追加
+   * 
    * @param imgUrl
    */
-  public void appendPeopleTumbnailImg(String imgUrl) {
-    appendImgTag(imgUrl, "50", "50");
+  public SafeHtmlBuilder appendPeopleTumbnailImg(String imgUrl) {
+    return appendImgTag(imgUrl, "50", "50");
   }
 
   /**
    * イメージタグの追加
+   * 
    * @param imgUrl
    * @param height
    * @param width
    */
-  private void appendImgTag(String imgUrl, String height, String width) {
-    builder
+  private SafeHtmlBuilder appendImgTag(String imgUrl, String height, String width) {
+    return builder
         .appendHtmlConstant(
-            "<img height=\"" + height + "\" width =\"" + width + "\" src=\"")
+            "<img " +
+                (height.length() > 0 ? "height=\"" + height + "\"" : "") +
+                (width.length() > 0 ? "width =\"" + width + "\"" : "") +
+                " src=\"")
         .appendEscaped(imgUrl).appendHtmlConstant("\">").appendHtmlConstant("<br/>");
   }
 

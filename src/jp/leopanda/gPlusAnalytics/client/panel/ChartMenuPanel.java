@@ -12,6 +12,7 @@ import jp.leopanda.gPlusAnalytics.client.chart.PlusOnersPieChart;
 import jp.leopanda.gPlusAnalytics.client.chart.PostCirclePieChart;
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.ChartBase;
 import jp.leopanda.gPlusAnalytics.client.enums.ChartType;
+import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
@@ -59,7 +60,7 @@ public class ChartMenuPanel extends HorizontalPanel {
     if (linkPanel == null) {
       linkPanel = new VerticalPanel();
       for (ChartType chart : ChartType.values()) {
-        linkPanel.add(new HTML("<br/>"));
+        linkPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
         linkPanel.add(new MenuAnchor(chart.title, chart));
       }
     }

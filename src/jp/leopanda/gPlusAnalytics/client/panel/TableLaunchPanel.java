@@ -1,5 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
+import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PagedItemListPanel;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
@@ -36,7 +37,7 @@ public class TableLaunchPanel extends HorizontalPanel {
       setUpTables();
 
       this.add(plusOnersTablePanel);
-      this.add(new HTML("<br/>&nbsp;&nbsp;&nbsp;<br/>"));
+      this.add(new HTML(FixedString.BLANK_CELL.getValue()));
       this.add(activityTablePanel);
     }
   }

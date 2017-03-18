@@ -6,6 +6,7 @@ import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.util.AgregatedValueList;
 import jp.leopanda.gPlusAnalytics.client.util.Formatter;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
+import jp.leopanda.panelFrame.filedParts.EventAction;
 import jp.leopanda.panelFrame.filedParts.ListBoxField;
 
 /**
@@ -25,7 +26,7 @@ public class PostCategoryListBox {
   public PostCategoryListBox(String label,List<PlusActivity> sourceItems) {
     elementList = getList(sourceItems);
     listBox = new ListBoxField(label, null, elementList);
-    listBox.addStyleName(MyStyle.FILTER_LABEL.getStyle());
+    listBox.addLabelStyle(MyStyle.FILTER_LABEL.getStyle());
   }
   /**
    * リストボックスの要素リストを作成する
@@ -51,7 +52,15 @@ public class PostCategoryListBox {
 
     return valueList;
   }
-
+  
+  /**
+   * リストボックスイベントアクションの追加
+   * @param eventAction
+   */
+  public void addEventListener(EventAction eventAction){
+    listBox.addEventListener(eventAction);
+  }
+  
   /**
    * リストボックスフィールドを提供する
    * @return

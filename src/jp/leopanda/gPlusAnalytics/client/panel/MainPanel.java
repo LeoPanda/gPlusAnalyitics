@@ -74,13 +74,18 @@ public class MainPanel extends VerticalPanel {
     filterInputPanel.addFilterRequestListener(new FilterRequestListener() {
       @Override
       public void request(FilterType filterType) {
+        if(!filterInputPanel.getIncrimentalFilterCheck()){
+          sourceItems.resetItems();
+        }
         switch (filterType) {
         case ACTIVITIES_KEYWORD:
           sourceItems.filterActivitiesByKeyword(filterInputPanel.getActivityKeyword());
           break;
-        case ACTIVITIES_PUBLISHED:
-          sourceItems.filterActivitesByPublished(filterInputPanel.getFilterYear(),
-              filterInputPanel.getFilterMonth());
+        case ACTIVITIES_PUBLISHED_YEAR:
+          sourceItems.filterActivitesByPublishedYear(filterInputPanel.getFilterYear());
+          break;
+        case ACTIVITIES_PUBLISHED_MONTH:
+          sourceItems.filterActivitesByPublishedMonth(filterInputPanel.getFilterMonth());
           break;
         case ACTIVITIES_ACCESSDESCRIPTION:
           sourceItems.filterActivitiesByAccessDescription(filterInputPanel.getPostCategoryKeyword());

@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.TabPanel;
  */
 public class MenuPanel extends TabPanel {
   private TableLaunchPanel tablePanel; // リスト表パネル
+  private PhotoGridPanel photoPanel; //写真一覧パネル
   private ChartMenuPanel chartPanel;// 図表パネル
   private MaintenancePanel mentePanel; // データメンテナンスパネル
   private ItemClickListener<PlusItem> itemClickListener;
@@ -25,6 +26,7 @@ public class MenuPanel extends TabPanel {
   public MenuPanel(FilterableSourceItems sourceItems) {
  
     tablePanel = new TableLaunchPanel(sourceItems);
+    photoPanel = new PhotoGridPanel(sourceItems);
     chartPanel = new ChartMenuPanel(sourceItems);
     mentePanel = new MaintenancePanel();
 
@@ -36,6 +38,7 @@ public class MenuPanel extends TabPanel {
     });
 
     this.add(tablePanel, "tables");
+    this.add(photoPanel, "photos");
     this.add(chartPanel, "chart");
     this.add(mentePanel, "maintenance");
     this.selectTab(0);
@@ -50,9 +53,13 @@ public class MenuPanel extends TabPanel {
     this.itemClickListener = itemClickListener;
   }
 
+  /**
+   * パネルのリロード 
+   */
   public void reloadItems(){
     tablePanel.reloadItems();
     chartPanel.reloadChartDataTables();
+    photoPanel.reload();
   }
   
 }

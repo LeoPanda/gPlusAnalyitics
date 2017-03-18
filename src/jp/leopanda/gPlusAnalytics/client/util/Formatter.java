@@ -26,6 +26,15 @@ public class Formatter {
   }
 
   /**
+   * 日付項目から年月のみを取り出す
+   * @param date
+   * @return
+   */
+  public static String getYYMString(Date date) {
+    return DateTimeFormat.getFormat(DateFormat.YYM.getValue()).format(date);
+  }
+
+  /**
    * 日付項目から月のみを取り出す
    * 
    * @param date

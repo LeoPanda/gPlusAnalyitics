@@ -2,7 +2,10 @@ package jp.leopanda.gPlusAnalytics.client.panel;
 
 import jp.leopanda.gPlusAnalytics.client.RpcGate;
 import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
+import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
+
+import org.apache.commons.collections.list.FixedSizeList;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -39,9 +42,9 @@ public class MaintenancePanel extends VerticalPanel {
     if (buttonPanel == null) {
       buttonPanel = new VerticalPanel();
       buttonPanel.add(updateButton);
-      buttonPanel.add(new HTML("<br/>"));
+      buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
       buttonPanel.add(initialButton);
-      buttonPanel.add(new HTML("<br/>"));
+      buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
       buttonPanel.add(clearDataButton);
       addClickHandlers();
     }

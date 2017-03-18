@@ -1,33 +1,84 @@
 .pageButton {
-    height: 25px;
+	height: 25px;
 }
+
 .titleLabel {
-    font-size: large;
-    font-weight: bold;
-    text-align: center;
+	font-size: large;
+	font-weight: bold;
+	text-align: center;
 }
+
+.publishedLabel {
+	color: #e26d6d;
+	border-bottom-style: double;
+	height: 14px;
+	font-size: 12px;
+	font-style: italic;
+}
+
 .filterLabel {
-    font-weight: bold;
-    text-align: right;
+	padding: 3px 5px;
+	color: #4b4a4a;
+	text-shadow: #ddf 1px 1px 0;
+	overflow: hidden;
 }
+
+.cehckBoxLabel {
+	text-align: right;
+	font-size: 8px;
+	padding: 1px 1px;
+	color: #4b4a4a;
+	font-style: italic;
+}
+
+.detailPopWindow {
+	opacity: 0.7;
+	background: black;
+	font-weight: normal;
+	color: white;
+	width: 300px;
+	height: 100px;
+}
+
+.detailPopLine {
+	color: white;
+	border: white;
+	font-weight: bold;
+	width: 300px;
+	border-bottom-style: ridge;
+	opacity: 0.8;
+}
+
 .countLabel {
-    font-weight: bold;
-    padding: 5px;
+	font-weight: bold;
+	padding: 5px;
 }
+
 .filterButton {
-	font-size:10px;
-	font-family:Arial;
-	font-weight:normal;
+	font-size: 10px;
+	font-family: Arial;
+	font-weight: normal;
 }
-.resetButton{
-	font-size:10px;
+
+.resetButton {
+	font-size: 10px;
 }
+
 .filterLogText {
-    padding: 3px 15px;
-    text-align: left;
-    color: #8C9CD0;
-    text-shadow: #ddf 1px 1px 0;
-    overflow: hidden;
-    /* font-weight: bolder; */
-    font-size: larger;
+	padding: 3px 15px;
+	text-align: left;
+	color: #8C9CD0;
+	text-shadow: #ddf 1px 1px 0;
+	overflow: hidden;
+	/* font-weight: bolder; */
+	font-size: larger;
+}
+
+.tableText {
+	font-family: "ÉÅÉCÉäÉI", Meiryo, Verdana, Helvetica, "ÉqÉâÉMÉmäpÉS Pro W3",
+		"Hiragino Kaku Gothic Pro", "ÇlÇr ÇoÉSÉVÉbÉN", sans-serif;
+}
+
+.tablePhoto {
+	text-align: center;
 }

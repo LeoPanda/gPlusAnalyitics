@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
-import jp.leopanda.gPlusAnalytics.client.enums.WindowOption;
+import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.gPlusAnalytics.interFace.ItemClickListener;
 
@@ -51,7 +51,7 @@ public abstract class ClickablePlusItemTable<I extends PlusItem> extends SimpleC
           if (excludeSelectionChanged) {
             excludeSelectionChanged = false;
           } else {
-            Window.open(selected.getUrl(), "detail", WindowOption.ITEM_DETAIL.getValue());
+            Window.open(selected.getUrl(), "detail", FixedString.WINDOW_OPTION.getValue());
           }
         }
       }
