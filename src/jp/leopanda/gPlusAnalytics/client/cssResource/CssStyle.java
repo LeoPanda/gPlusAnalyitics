@@ -20,9 +20,11 @@ public interface CssStyle extends ClientBundle {
 
     String filterButton();
 
-    String filterLogText();
+    String filterLogCard();
 
     String filterLabel();
+
+    String filterDisable();
 
     String resetButton();
 
@@ -30,7 +32,7 @@ public interface CssStyle extends ClientBundle {
 
     String tablePhoto();
 
-    String publishedLabel();
+    String dividerLabel();
 
     String detailPopWindow();
 

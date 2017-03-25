@@ -8,12 +8,14 @@
 	text-align: center;
 }
 
-.publishedLabel {
-	color: #e26d6d;
-	border-bottom-style: double;
-	height: 14px;
-	font-size: 12px;
-	font-style: italic;
+.dividerLabel {
+color: #73807b;
+    border-bottom-style: groove;
+    border-bottom-color: #f6fffc;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: bolder;
+    padding: 2px 2px;
 }
 
 .filterLabel {
@@ -21,6 +23,22 @@
 	color: #4b4a4a;
 	text-shadow: #ddf 1px 1px 0;
 	overflow: hidden;
+}
+
+.filterLogCard {
+	padding: 3px 5px;
+	color: darkgreen;;
+	background-color: beige;
+	text-shadow: #ddf 1px 1px 0;
+	overflow: hidden;
+	border-radius: 6px;
+}
+
+.filterDisable {
+	padding: 3px 5px;
+	background-color: darkgray;
+	color: gray;
+	border-radius: 6px;
 }
 
 .cehckBoxLabel {
@@ -62,16 +80,6 @@
 
 .resetButton {
 	font-size: 10px;
-}
-
-.filterLogText {
-	padding: 3px 15px;
-	text-align: left;
-	color: #8C9CD0;
-	text-shadow: #ddf 1px 1px 0;
-	overflow: hidden;
-	/* font-weight: bolder; */
-	font-size: larger;
 }
 
 .tableText {

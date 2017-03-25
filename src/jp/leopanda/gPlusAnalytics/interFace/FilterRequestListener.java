@@ -8,5 +8,5 @@ import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
  *
  */
 public interface FilterRequestListener {
-  void request(FilterType filterType);
+  void request(FilterType filterType,String keyword);
 }

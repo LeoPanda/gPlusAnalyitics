@@ -1,4 +1,4 @@
-package jp.leopanda.gPlusAnalytics.client.panel;
+package jp.leopanda.gPlusAnalytics.client.util;
 
 import com.google.gwt.user.client.ui.Label;
 
@@ -7,7 +7,7 @@ import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 /**
  * 集合データグルーピング補助クラス
  */
-class Divider {
+public class Divider {
   private String groupBy = null;
  
   /**
@@ -53,7 +53,7 @@ class Divider {
    */
   public Label getLabel(String width) {
     Label label = new Label(groupBy);
-    label.addStyleName(MyStyle.TITLE_PUBLISHED.getStyle());
+    label.addStyleName(MyStyle.DIVIDER_LABEL.getStyle());
     label.setWidth(width);
     return label;
   }

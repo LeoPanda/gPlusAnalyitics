@@ -27,11 +27,14 @@ public abstract class ClickablePlusItemTable<I extends PlusItem> extends SimpleC
   /**
    * コンストラクタ
    * 
-   * @param items 表示するアイテムデータ
+   * @param items
+   *          表示するアイテムデータ
    */
   public ClickablePlusItemTable(List<I> items) {
     super(items);
+    this.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
   }
+
   /**
    * デフォルトの行選択アクションを一時的に無効にする
    */
@@ -48,6 +51,7 @@ public abstract class ClickablePlusItemTable<I extends PlusItem> extends SimpleC
       public void onSelectionChange(SelectionChangeEvent event) {
         I selected = selectionModel.getSelectedObject();
         if (selected != null) {
+          selectionModel.setSelected(selected, false);
           if (excludeSelectionChanged) {
             excludeSelectionChanged = false;
           } else {
