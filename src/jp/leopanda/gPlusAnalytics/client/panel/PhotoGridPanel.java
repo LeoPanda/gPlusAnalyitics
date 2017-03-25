@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PageControlLine;
+import jp.leopanda.gPlusAnalytics.client.util.Divider;
 import jp.leopanda.gPlusAnalytics.client.util.Formatter;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;

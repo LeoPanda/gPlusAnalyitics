@@ -99,9 +99,10 @@ public class FilterInputPanel extends PanelBase {
 
   /**
    * 累積フィルターチェックボックスを設定する
+   * 
    * @return
    */
-  private HorizontalPanel getCheckBox(){
+  private HorizontalPanel getCheckBox() {
     HorizontalPanel checkBoxPanel = new HorizontalPanel();
     checkBoxPanel.add(incrementalFilterCheck);
     Label title = new Label("フィルター累積");
@@ -109,7 +110,7 @@ public class FilterInputPanel extends PanelBase {
     checkBoxPanel.add(title);
     return checkBoxPanel;
   }
-  
+
   /**
    * リスナーを設定する
    * 
@@ -128,55 +129,41 @@ public class FilterInputPanel extends PanelBase {
   }
 
   /**
-   * +1erフィルターキーワードを取得する
+   * フィルター条件キーワードを取得する
    * 
+   * @param filterType
    * @return
    */
-  public String getPlusOnerKeyword() {
-    return plusOnerFilter.getText();
+  private String getFilterKeyword(FilterType filterType) {
+    String keyword = null;
+    switch (filterType) {
+    case PLUSONER_KEYWORD:
+      keyword = plusOnerFilter.getText();
+      break;
+    case ACTIVITIES_KEYWORD:
+      keyword = activityFilter.getText();
+      break;
+    case ACTIVITIES_PUBLISHED_YEAR:
+      keyword = publishedYear.getValue();
+      break;
+    case ACTIVITIES_PUBLISHED_MONTH:
+      keyword = Month.values()[publishedMonth.getSelectedIndex()].getNumber();
+      break;
+    case ACTIVITIES_ACCESSDESCRIPTION:
+      keyword = postCategory.getValue();
+      break;
+    default:
+      break;
+    }
+    return keyword;
   }
 
-  /**
-   * アクテビティフィルターキーワードを取得する
-   * 
-   * @return
-   */
-  public String getActivityKeyword() {
-    return activityFilter.getText();
-  }
-
-  /**
-   * 投稿先キーワードを取得する
-   * 
-   * @return
-   */
-  public String getPostCategoryKeyword() {
-    return postCategory.getValue();
-  }
-
-  /**
-   * アクテビティフィルター投稿年キーワードを取得する
-   * 
-   * @return
-   */
-  public String getFilterYear() {
-    return publishedYear.getValue();
-  }
-
-  /**
-   * アクテビティフィルター投稿月キーワードを取得する
-   * 
-   * @return
-   */
-  public String getFilterMonth() {
-    return Month.values()[publishedMonth.getSelectedIndex()].getNumber();
-  }
-  
   /**
    * 累積フィルターチェックの有無を取得する
+   * 
    * @return
    */
-  public boolean getIncrimentalFilterCheck(){
+  public boolean getIncrimentalFilterCheck() {
     return incrementalFilterCheck.getValue();
   }
 
@@ -193,7 +180,7 @@ public class FilterInputPanel extends PanelBase {
       this.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
-          requestListener.request(filterType);
+          requestListener.request(filterType, getFilterKeyword(filterType));
         }
       });
     }
@@ -214,7 +201,7 @@ public class FilterInputPanel extends PanelBase {
 
     @Override
     public void onValueChange() {
-      requestListener.request(filterType);
+      requestListener.request(filterType, getFilterKeyword(filterType));
     }
 
   }

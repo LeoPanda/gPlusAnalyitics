@@ -9,6 +9,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
+import jp.leopanda.gPlusAnalytics.interFace.CheckBoxListener;
 import jp.leopanda.gPlusAnalytics.interFace.FilterRequestListener;
 import jp.leopanda.gPlusAnalytics.interFace.ItemClickListener;
 
@@ -35,10 +36,12 @@ public class MainPanel extends VerticalPanel {
     sourceItems = new FilterableSourceItems(plusActivities, plusOners);
 
     filterInputPanel = new FilterInputPanel(sourceItems);
-    filterLogPanel = new FilterLogPanel(sourceItems);
+    filterLogPanel = new FilterLogPanel();
     menuPanel = new MenuPanel(sourceItems);
 
-    addListeners();
+    filterInputPanel.addFilterRequestListener(getFilterInputPanelRequestListener());
+    menuPanel.addItemClickListener(getMenuPanelClickListener());
+
     setupPanel();
 
   }
@@ -53,57 +56,95 @@ public class MainPanel extends VerticalPanel {
   }
 
   /**
-   * 各パネルのリスナー設定
+   * フィルター入力パネルからフィルターリクエストがあった場合の処理
+   * 
+   * @return
    */
-  private void addListeners() {
-    // メニューパネルでフィルターボタンが押された場合の処理
-    menuPanel.addItemClickListener(new ItemClickListener<PlusItem>() {
+  private FilterRequestListener getFilterInputPanelRequestListener() {
+    return new FilterRequestListener() {
       @Override
-      public void onClick(PlusItem item) {
-        if (item instanceof PlusActivity) {
-          sourceItems.filterPlusOnersByActivity((PlusActivity) item);
-        } else if (item instanceof PlusPeople) {
-          sourceItems.filterActiviesByPlusOner((PlusPeople) item);
+      public void request(FilterType filterType, String keyword) {
+
+        if (!filterInputPanel.getIncrimentalFilterCheck()) {
+          resetFilter();
         }
-        menuPanel.reloadItems();
-        filterLogPanel.displayLog();
-      }
-    });
-    
-    // フィルター入力画面からのリクエスト処理
-    filterInputPanel.addFilterRequestListener(new FilterRequestListener() {
-      @Override
-      public void request(FilterType filterType) {
-        if(!filterInputPanel.getIncrimentalFilterCheck()){
-          sourceItems.resetItems();
+        if (filterType == FilterType.RESET_ITEMS) {
+          resetFilter();
+        } else {
+          addFilterLog(filterType,keyword);
         }
-        switch (filterType) {
-        case ACTIVITIES_KEYWORD:
-          sourceItems.filterActivitiesByKeyword(filterInputPanel.getActivityKeyword());
-          break;
-        case ACTIVITIES_PUBLISHED_YEAR:
-          sourceItems.filterActivitesByPublishedYear(filterInputPanel.getFilterYear());
-          break;
-        case ACTIVITIES_PUBLISHED_MONTH:
-          sourceItems.filterActivitesByPublishedMonth(filterInputPanel.getFilterMonth());
-          break;
-        case ACTIVITIES_ACCESSDESCRIPTION:
-          sourceItems.filterActivitiesByAccessDescription(filterInputPanel.getPostCategoryKeyword());
-          break;
-        case PLUSONER_KEYWORD:
-          sourceItems.filterPlusOnersByKeyword(filterInputPanel.getPlusOnerKeyword());
-          break;
-        case RESET_ITEMS:
-          sourceItems.resetItems();
-          filterInputPanel.resetFields();
-        default:
-          break;
-        }
-        menuPanel.reloadItems();
-        filterLogPanel.displayLog();
+        reloadPanel();
 
       }
-    });
-    
+    };
+  }
+
+  /**
+   * ログパネルでカードのチェックボックスが変更された場合の処理
+   * 
+   * @return
+   */
+  private CheckBoxListener getCheckBoxListener() {
+    return new CheckBoxListener() {
+
+      @Override
+      public void onValueChange(boolean value) {
+        reloadPanel();
+      }
+    };
+  }
+
+  /**
+   * メニューパネルでフィルターボタンが押された場合の処理
+   * 
+   * @return
+   */
+  private ItemClickListener<PlusItem> getMenuPanelClickListener() {
+    return new ItemClickListener<PlusItem>() {
+      @Override
+      public void onClick(PlusItem item) {
+
+        if (!filterInputPanel.getIncrimentalFilterCheck()) {
+          resetFilter();
+        }
+        addFilterLog(null,item);
+        reloadPanel();
+      }
+    };
+  }
+
+  /**
+   * フィルターをリセットする
+   */
+  private void resetFilter() {
+    sourceItems.resetItems();
+    filterInputPanel.resetFields();
+    filterLogPanel.clear();
+  }
+
+  /**
+   * メインパネルのリロード
+   */
+  private void reloadPanel() {
+    sourceItems.doFilter(filterLogPanel);
+    menuPanel.reloadItems();
+  }
+
+  /**
+   * フィルターログにカードを追加する
+   * 
+   * @param keyword
+   */
+  private void addFilterLog(FilterType filterType, Object keyword) {
+    if (keyword instanceof PlusActivity) {
+      filterLogPanel.add(new FilterLogCard(FilterType.PLUSONER_ACTIVITY, (PlusActivity) keyword));
+    } else if (keyword instanceof PlusPeople) {
+      filterLogPanel.add(new FilterLogCard(FilterType.ACTIVITIES_PLUSONER, (PlusPeople) keyword));
+    } else if (keyword instanceof String) {
+      filterLogPanel.add(new FilterLogCard(filterType, (String) keyword));
+    } else {
+      return;
+    }
+    filterLogPanel.addCardCheckBoxListerer(getCheckBoxListener());
   }
 }

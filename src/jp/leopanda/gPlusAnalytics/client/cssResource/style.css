@@ -23,6 +23,22 @@
 	overflow: hidden;
 }
 
+.filterLogText {
+	padding: 3px 5px;
+	color: darkgreen;;
+	background-color: beige;
+	text-shadow: #ddf 1px 1px 0;
+	overflow: hidden;
+	border-radius: 6px;
+}
+
+.filterDisable {
+	padding: 3px 5px;
+	background-color: darkgray;
+	color: gray;
+	border-radius: 6px;
+}
+
 .cehckBoxLabel {
 	text-align: right;
 	font-size: 8px;
@@ -62,16 +78,6 @@
 
 .resetButton {
 	font-size: 10px;
-}
-
-.filterLogText {
-	padding: 3px 15px;
-	text-align: left;
-	color: #8C9CD0;
-	text-shadow: #ddf 1px 1px 0;
-	overflow: hidden;
-	/* font-weight: bolder; */
-	font-size: larger;
 }
 
 .tableText {

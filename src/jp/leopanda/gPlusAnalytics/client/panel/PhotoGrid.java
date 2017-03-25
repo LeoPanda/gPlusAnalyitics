@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.google.gwt.user.client.ui.Grid;
 
+import jp.leopanda.gPlusAnalytics.client.util.Divider;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
