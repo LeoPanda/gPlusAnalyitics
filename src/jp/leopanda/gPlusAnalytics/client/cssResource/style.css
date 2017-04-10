@@ -12,10 +12,10 @@
 color: #73807b;
     border-bottom-style: groove;
     border-bottom-color: #f6fffc;
-    font-size: 14px;
+    font-size: 11px;
     font-style: italic;
     font-weight: bolder;
-    padding: 2px 2px;
+    padding: 0px 2px;
 }
 
 .filterLabel {
@@ -50,12 +50,11 @@ color: #73807b;
 }
 
 .detailPopWindow {
-	opacity: 0.7;
+	opacity: 0.9;
 	background: black;
 	font-weight: normal;
 	color: white;
 	width: 300px;
-	height: 100px;
 }
 
 .detailPopLine {

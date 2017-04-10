@@ -74,6 +74,7 @@ public class FilterLogPanel extends HorizontalPanel {
   public void clear() {
     super.clear();
     this.add(titleLabel);
+    titleLabel.setVisible(false);
   }
 
 }

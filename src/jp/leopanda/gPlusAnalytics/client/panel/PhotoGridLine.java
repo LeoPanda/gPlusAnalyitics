@@ -13,10 +13,15 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
  * @author LeoPanda
  *
  */
-public class PhotoGrid extends ArrayList<PlusActivity> {
+public class PhotoGridLine extends ArrayList<PlusActivity> {
 
   private static final long serialVersionUID = 1L;
   private Divider divider = new Divider();
+  private int gridHeight;
+  
+  public PhotoGridLine(int gridHeight){
+    this.gridHeight = gridHeight;
+  }
 
   /**
    * アクテビティをグリッドに追加する 
@@ -26,7 +31,7 @@ public class PhotoGrid extends ArrayList<PlusActivity> {
    * @param groupBy
    * @return
    */
-  public boolean addGrid(PlusActivity activity,String groupBy) {
+  public boolean addGridByDivider(PlusActivity activity,String groupBy) {
     boolean agregateCheck = divider.checkAgregate(groupBy);
     if (agregateCheck) {
       this.add(activity);
@@ -48,8 +53,8 @@ public class PhotoGrid extends ArrayList<PlusActivity> {
    */
   @Override
   public void clear() {
-    this.clear();
-    divider.reset();
+    super.clear();
+    divider = new Divider();
   }
 
   /**
@@ -59,14 +64,17 @@ public class PhotoGrid extends ArrayList<PlusActivity> {
    */
   public Grid getGrid() {
 
-    int numOfCell = this.size();
-    if (numOfCell == 0) {
+    if (this.size() == 0) {
       return null;
     }
-    Grid grid = new Grid(1, numOfCell);
-    for (int cellIndex = 0; cellIndex < numOfCell; cellIndex++) {
-      grid.setWidget(0, cellIndex, new PhotoGridCell(this.get(cellIndex)));
+    Grid grid = new Grid(1, this.size());
+    int cellIndex = 0;
+    for (PlusActivity activity : this) {
+      grid.setWidget(0, cellIndex++, new PhotoGridCell(activity,gridHeight));
     }
+//    for (int cellIndex = 0; cellIndex < numOfCell; cellIndex++) {
+//      grid.setWidget(0, cellIndex, new PhotoGridCell(this.get(cellIndex)));
+//    }
     return grid;
   }
 

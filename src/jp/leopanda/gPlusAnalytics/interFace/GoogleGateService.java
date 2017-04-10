@@ -15,5 +15,7 @@ public interface GoogleGateService extends RemoteService {
   String updateDataStore() throws Exception;
 
   String clearDataStore() throws Exception;
+  
+  String updateActivities() throws Exception;
 
 }

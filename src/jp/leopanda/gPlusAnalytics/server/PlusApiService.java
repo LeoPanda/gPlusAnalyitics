@@ -3,8 +3,12 @@ package jp.leopanda.gPlusAnalytics.server;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
+import org.apache.http.HttpStatus;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.services.plus.Plus;
@@ -42,6 +46,8 @@ public class PlusApiService {
     this.plus = getPlus(transport, jsonFactory, credential);
   }
 
+  Logger loger = Logger.getLogger("PlusApiService");
+
   /**
    * Google Plus APIオブジェクト取得
    * 
@@ -78,9 +84,9 @@ public class PlusApiService {
    * @throws IOException
    *           IO例外
    */
-  public List<PlusActivity> getPlusActivity(String userId) throws IOException {
+  public List<PlusActivity> getPlusActivies(String userId) throws IOException {
     List<PlusActivity> activities = new ArrayList<PlusActivity>();
-    ActivityMaker activityMaker = new ActivityMaker();
+    PlusActivityMaker activityMaker = new PlusActivityMaker();
     Plus.Activities.List listActivities = null;
     listActivities = plus.activities().list(userId, collectionPublic)
         .setMaxResults(40L);
@@ -89,12 +95,40 @@ public class PlusApiService {
     while (nextPageToken != null) {
       feed = listActivities.execute();
       for (Activity activity : feed.getItems()) {
-        activities.add(activityMaker.get(activity));
+        activities.add(activityMaker.generate(activity));
       }
       nextPageToken = feed.getNextPageToken();
       listActivities.setPageToken(nextPageToken);
     }
     return activities;
+  }
+  
+  /**
+   * Google Plus 単一アクテビティの取得
+   * @param activityId
+   * @return
+   * @throws IOException
+   */
+  public PlusActivity getPlusActiviy(String activityId) throws IOException{
+    Activity activity = null;
+    try {
+      activity = plus.activities().get(activityId).execute();
+    } catch (IOException e) {
+      if (e instanceof GoogleJsonResponseException) {
+        int statusCode = ((GoogleJsonResponseException) e).getStatusCode();
+        if (statusCode == HttpStatus.SC_NOT_FOUND) {
+          loger.info("activity not exist in google+ any more.");
+          return null;
+        } else {
+          e.printStackTrace();
+          throw new IOException(e);
+        }
+      }
+    }
+    if(activity == null){
+      return null;
+    }
+    return  new PlusActivityMaker().generate(activity);
   }
 
   /**

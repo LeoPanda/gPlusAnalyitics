@@ -25,6 +25,7 @@ public class MaintenancePanel extends VerticalPanel {
   Button updateButton = new Button("データストア更新");
   Button clearDataButton = new Button("データクリア");
   Button initialButton = new Button("データストア初期ロード");
+  Button updateActivityButton = new Button("アクテビティ再設定");
   VerticalPanel buttonPanel;
 
   /**
@@ -45,6 +46,8 @@ public class MaintenancePanel extends VerticalPanel {
       buttonPanel.add(initialButton);
       buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
       buttonPanel.add(clearDataButton);
+      buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
+      buttonPanel.add(updateActivityButton);
       addClickHandlers();
     }
     return buttonPanel;
@@ -70,6 +73,12 @@ public class MaintenancePanel extends VerticalPanel {
       @Override
       public void onClick(ClickEvent event) {
         confirmClicked(CallFunction.INITIAL_ITEMSTORE);
+      }
+    });
+    updateActivityButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        confirmClicked(CallFunction.UPDATE_ACTIVITIES);
       }
     });
   }

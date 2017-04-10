@@ -10,9 +10,8 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ButtonColumn;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ClickablePlusItemTable;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SafeHtmlColumn;
+import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ImageColumn;
 import jp.leopanda.gPlusAnalytics.client.util.Formatter;
-import jp.leopanda.gPlusAnalytics.client.util.HtmlBuilder;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
@@ -31,7 +30,7 @@ public class ActivityTable extends ClickablePlusItemTable<PlusActivity> {
 
   TextColumn<PlusActivity> publishedColumn; // 投稿日
   TextColumn<PlusActivity> titleColumn; // タイトル
-  SafeHtmlColumn<PlusActivity> imageColumn; // 投稿写真
+  ImageColumn<PlusActivity> imageColumn; // 投稿写真
   TextColumn<PlusActivity> accessColumn;// 投稿先
   ButtonColumn<PlusActivity> filterButton; // +1er数フィルターボタン
 
@@ -58,14 +57,14 @@ public class ActivityTable extends ClickablePlusItemTable<PlusActivity> {
     titleColumn.setCellStyleNames(MyStyle.TABLE_TEXT.getStyle());
     
     // 投稿写真
-    imageColumn = new SafeHtmlColumn<PlusActivity>() {
+    imageColumn = new ImageColumn<PlusActivity>() {
       @Override
       public SafeHtml getValue(PlusActivity item) {
-        HtmlBuilder builder = new HtmlBuilder();
         if (item.getAttachmentImageUrls() != null) {
-          builder.appendActivityTumbnailImg(item.getAttachmentImageUrls().get(0));
+          setImageHeight(80);
+          setImageUrl(item.getAttachmentImageUrls().get(0));
         }
-        return builder.toSafeHtml();
+        return getImageTag();
       }
     };
     imageColumn.setCellStyleNames(MyStyle.TABLE_PHOTO.getStyle());

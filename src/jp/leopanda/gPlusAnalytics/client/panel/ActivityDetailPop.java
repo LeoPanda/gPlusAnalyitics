@@ -6,6 +6,7 @@ import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -16,18 +17,16 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
  * アクテビティ詳細ポップアップ画面
+ * 
  * @author LeoPanda
  *
  */
 public class ActivityDetailPop extends PopupPanel {
   PlusActivity activity;
-  Label published;
-  Label accessDescription;
-  Label title;
-  Timer closeTimer;
 
   /**
    * コンストラクタ
+   * 
    * @param activity
    * @param posX
    * @param posY
@@ -35,21 +34,22 @@ public class ActivityDetailPop extends PopupPanel {
   public ActivityDetailPop(PlusActivity activity, int posX, int posY) {
     super();
     this.activity = activity;
-    setPosition(posX,posY);
+    setPosition(posX, posY);
     sinkEvents(Event.ONCLICK);
     sinkEvents(Event.ONMOUSEOUT);
     addDomHandler(setMouseOutHanlder(), MouseOutEvent.getType());
     setClickHandler(activity);
-   
+
     setPanel(activity);
     show();
   }
 
   /**
    * クリックハンドラの設定
+   * 
    * @param activity
    */
-  private void setClickHandler(final PlusActivity activity){
+  private void setClickHandler(final PlusActivity activity) {
     this.addHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -57,28 +57,32 @@ public class ActivityDetailPop extends PopupPanel {
       }
     }, ClickEvent.getType());
   }
+
   /**
    * マウスアウト時ハンドラの設定
+   * 
    * @return
    */
-  private MouseOutHandler setMouseOutHanlder(){
-    return  new MouseOutHandler() {
+  private MouseOutHandler setMouseOutHanlder() {
+    return new MouseOutHandler() {
       @Override
       public void onMouseOut(MouseOutEvent event) {
         hide();
       }
     };
   }
+
   /**
    * パネルの表示内容設定
    * 
    * @param activity
    */
   private void setPanel(PlusActivity activity) {
-    published = new Label(Formatter.getYYMDString(activity.getPublished()));
-    accessDescription = new Label(activity.getAccessDescription());
-    title = new Label(activity.getTitle());
+    Label published = new Label(Formatter.getYYMDString(activity.getPublished()));
+    Label accessDescription = new Label(activity.getAccessDescription());
+    Label title = new Label(activity.getTitle());
     VerticalPanel innerPanel = new VerticalPanel();
+    innerPanel.add(getImage(activity));
     innerPanel.add(published);
     innerPanel.add(accessDescription);
     innerPanel.add(title);
@@ -89,20 +93,36 @@ public class ActivityDetailPop extends PopupPanel {
   }
 
   /**
-   *ウィンドウの再表示 
+   * アクテビティ写真オブジェクトの取得
+   * 
+   * @param activity
+   * @return
+   */
+  private Image getImage(PlusActivity activity) {
+    Image image = new Image();
+    if (activity.getAttachmentImageUrls().size() > 0) {
+      image.setUrl(activity.getAttachmentImageUrls().get(0));
+      image.setWidth("300px");
+    }
+    return image;
+  }
+
+  /**
+   * ウィンドウの再表示
    */
   public void reShow(int posX, int posY) {
-    setPosition(posX,posY);
-      show();
+    setPosition(posX, posY);
+    show();
   }
-  
+
   /**
    * 表示位置を設定する
+   * 
    * @param posX
    * @param posY
    */
-  private void setPosition(int posX, int posY){
-    this.setPopupPosition(posX - 150, posY - 50);
+  private void setPosition(int posX, int posY) {
+    this.setPopupPosition(posX - 150, posY - 200);
   }
-  
+
 }

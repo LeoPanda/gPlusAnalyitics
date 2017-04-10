@@ -10,8 +10,7 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ButtonColumn;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ClickablePlusItemTable;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SafeHtmlColumn;
-import jp.leopanda.gPlusAnalytics.client.util.HtmlBuilder;
+import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ImageColumn;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
 /**
@@ -30,21 +29,22 @@ public class PlusOnersTable extends ClickablePlusItemTable<PlusPeople> {
 
   }
 
-  SafeHtmlColumn<PlusPeople> imageColumn;
+  ImageColumn<PlusPeople> imageColumn;
   TextColumn<PlusPeople> nameColumn;
   ButtonColumn<PlusPeople> filterButton;
 
   @Override
   protected void setColumns() {
     // 写真
-    imageColumn = new SafeHtmlColumn<PlusPeople>() {
+    imageColumn = new ImageColumn<PlusPeople>() {
       @Override
       public SafeHtml getValue(PlusPeople item) {
-        HtmlBuilder builder = new HtmlBuilder();
         if (item.getImageUrl() != null) {
-          builder.appendPeopleTumbnailImg(item.getImageUrl());
+          setImageHeight(50);
+          setImageWidth(50);
+          setImageUrl(item.getImageUrl());
         }
-        return builder.toSafeHtml();
+        return getImageTag();
       }
     };
     // ユーザー名

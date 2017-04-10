@@ -1,5 +1,6 @@
 package jp.leopanda.gPlusAnalytics.dataStore;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,11 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
+import jp.leopanda.gPlusAnalytics.server.PlusApiService;
 
 import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.DatastoreService;
@@ -45,9 +48,12 @@ public class ActivityStoreHandler {
   /**
    * データストアへActivity Entityを書き込む
    * 
-   * @param activity　アクティビティのアイテムオブジェクト
-   * @param plusOners アクティビティに+1したユーザーのアイテムオブジェクトリスト
-   * @throws HostGateException 例外スロー 
+   * @param activity
+   *          アクティビティのアイテムオブジェクト
+   * @param plusOners
+   *          アクティビティに+1したユーザーのアイテムオブジェクトリスト
+   * @throws HostGateException
+   *           例外スロー
    */
   public void putActivity(PlusActivity activity, List<PlusPeople> plusOners, Key entityKey)
       throws HostGateException {
@@ -73,16 +79,66 @@ public class ActivityStoreHandler {
   }
 
   /**
+   * データストアのアクテビティをAPIを読み直して再更新する。
+   * 
+   * @param actorId
+   * @param googleApi
+   * @throws HostGateException
+   * @throws IOException
+   */
+  public void updateActivies(String actorId, PlusApiService googleApi)
+      throws HostGateException, IOException {
+    PreparedQuery pq = ds.prepare(getActivityQuery(actorId));
+    for (Entity entity : pq.asIterable()) {
+      PlusActivity oldActivity = getOldActivity(entity);
+      if (oldActivity == null) {
+        continue;
+      }
+      PlusActivity newActivity = googleApi.getPlusActiviy(oldActivity.getId());
+      if (newActivity == null) {
+        ds.delete(entity.getKey());
+        loger.info("entity deleted.");
+        continue;
+      }
+      entity.setProperty(ActivityEntity.ACTIVITY_ITEM.val, new Serializer().encode(newActivity));
+      ds.put(entity);
+      loger.info("entity updated.");
+    }
+
+  }
+
+  /**
+   * データストア上の更新対象アクテビティを取得する。
+   * すでに更新が完了している場合はNullを返す。
+   * @param entity
+   * @return
+   * @throws HostGateException
+   */
+  private PlusActivity getOldActivity(Entity entity) throws HostGateException {
+    PlusActivity oldActivity = new Serializer()
+        .decodeAsPlusActivity((Blob) entity.getProperty(ActivityEntity.ACTIVITY_ITEM.val));
+    loger.info("entity key=" + entity.getKey().toString());
+    loger.info("activityID=" + oldActivity.id);
+    if (oldActivity.object.attachments != null) {
+      if (oldActivity.object.attachments.get(0).getImageHeight() != null) {
+        loger.info("has been updated. skip process.");
+        return null;
+      }
+    }
+    return oldActivity;
+  }
+
+  /**
    * アクテビティチェックマップを返す
    * 
-   * @param actorId アクティビティのオーナーID
+   * @param actorId
+   *          アクティビティのオーナーID
    * @return アクティビティチェックマップ
    */
   public ActivityCheckMap getActivityCheckMap(String actorId) {
     ActivityCheckMap checkMap = new ActivityCheckMap();
-    PreparedQuery pq =
-        ds.prepare(getActivityQuery(actorId).addProjection(
-            new PropertyProjection(ActivityEntity.ID.val, String.class)).addProjection(
+    PreparedQuery pq = ds.prepare(getActivityQuery(actorId).addProjection(
+        new PropertyProjection(ActivityEntity.ID.val, String.class)).addProjection(
             new PropertyProjection(ActivityEntity.NUM_OF_PLUSONERS.val, Integer.class)));
     for (Entity entity : pq.asIterable()) {
       checkMap.put((String) entity.getProperty(ActivityEntity.ID.val),
@@ -92,11 +148,13 @@ public class ActivityStoreHandler {
   }
 
   /**
-   * 　データストアの内容をオブジェクト形式で返す
+   * データストアの内容をオブジェクト形式で返す
    * 
-   * @param actorId アクティビティのオーナーID
+   * @param actorId
+   *          アクティビティのオーナーID
    * @return アクティビティと+1ersのアイテムオブジェクトをパックしたデータオブジェクト
-   * @throws HostGateException 例外スロー
+   * @throws HostGateException
+   *           例外スロー
    */
   public StoredItems getItems(String actorId) throws HostGateException {
     PlusOnerHandler plusOnerHandler = new PlusOnerHandler();
@@ -104,13 +162,11 @@ public class ActivityStoreHandler {
     Serializer serializer = new Serializer();
     PreparedQuery pq = ds.prepare(getActivityQuery(actorId));
     for (Entity entity : pq.asIterable()) {
-      PlusActivity activity =
-          serializer.decodeAsPlusActivity((Blob) entity
-              .getProperty(ActivityEntity.ACTIVITY_ITEM.val));
+      PlusActivity activity = serializer.decodeAsPlusActivity((Blob) entity
+          .getProperty(ActivityEntity.ACTIVITY_ITEM.val));
       activities.add(activity);
-      List<PlusPeople> plusOners =
-          serializer
-              .decodeAsPlusOners((Blob) entity.getProperty(ActivityEntity.PLUSONER_ITEMS.val));
+      List<PlusPeople> plusOners = serializer
+          .decodeAsPlusOners((Blob) entity.getProperty(ActivityEntity.PLUSONER_ITEMS.val));
       activity.setPlusOnerIds(getPlusOnerIds(plusOners));// アクテビティに+1ユーザーIDリストをセット
       plusOnerHandler.aggregatePlusOnes(plusOners); // +1情報を集計
     }
@@ -142,7 +198,8 @@ public class ActivityStoreHandler {
   /**
    * +1ユーザーのIDをリストにして抽出
    * 
-   * @param plusOners +1ersアイテムオブジェクトリスト
+   * @param plusOners
+   *          +1ersアイテムオブジェクトリスト
    * @return +1ersユーザーIDのリスト
    */
   public List<String> getPlusOnerIds(List<PlusPeople> plusOners) {
@@ -156,7 +213,8 @@ public class ActivityStoreHandler {
   /**
    * エンティティを削除する
    * 
-   * @param actorId アクティビティのオーナーID
+   * @param actorId
+   *          アクティビティのオーナーID
    */
   public void remove(String actorId) {
     PreparedQuery pq = ds.prepare(getActivityQuery(actorId).setKeysOnly());
@@ -168,13 +226,13 @@ public class ActivityStoreHandler {
   /**
    * データストア上の最新のアクテビティエンティティの作成日付を返す
    * 
-   * @param actorId アクティビティのオーナーID
+   * @param actorId
+   *          アクティビティのオーナーID
    * @return データストア上の最新のアクテビティエンティティの作成日付
    */
   public Date getLatestActivityPublished(String actorId) {
-    PreparedQuery pq =
-        ds.prepare(getActivityQuery(actorId).addProjection(
-            new PropertyProjection(ActivityEntity.PUBLISHED.val, Date.class)).addSort(
+    PreparedQuery pq = ds.prepare(getActivityQuery(actorId).addProjection(
+        new PropertyProjection(ActivityEntity.PUBLISHED.val, Date.class)).addSort(
             ActivityEntity.PUBLISHED.val, SortDirection.DESCENDING));
     List<Entity> entities = pq.asList(FetchOptions.Builder.withLimit(1));
     if (entities.size() == 0) {
@@ -186,8 +244,10 @@ public class ActivityStoreHandler {
   /**
    * アクティビティに統計情報をセットする
    * 
-   * @param activity アクティビティアイテムオブジェクト
-   * @param numOfPlusOneMap +1resチェックマップ
+   * @param activity
+   *          アクティビティアイテムオブジェクト
+   * @param numOfPlusOneMap
+   *          +1resチェックマップ
    * @return 統計情報をセットしたアイテムオブジェクト
    */
   public PlusActivity setDistributionInfo(PlusActivity activity,
@@ -219,7 +279,8 @@ public class ActivityStoreHandler {
   /**
    * Activityデータストアの基本クエリを作成する
    * 
-   * @param actorId アクティビティのオーナーID
+   * @param actorId
+   *          アクティビティのオーナーID
    * @return アクティビティエンティティを取り出す基本Query
    */
   private Query getActivityQuery(String actorId) {

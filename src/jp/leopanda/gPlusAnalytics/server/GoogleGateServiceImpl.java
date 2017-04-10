@@ -28,17 +28,14 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * @return 常にnull
    * @throws Exception
    */
-  public String updateDataStore()
-      throws Exception {
-    String result = new CatchException<String>() {
+  public String updateDataStore() throws Exception {
+    return new CatchException<String>() {
 
       @Override
       public String tryApiCall() throws Exception {
         return dataHandler.updateBrandNew(getCurrentUserId(), getApiService());
       }
     }.execute();
-
-    return result;
   }
 
   /**
@@ -47,7 +44,7 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * @throws Exception
    */
   public String clearDataStore() throws Exception {
-    String result = new CatchException<String>() {
+    return new CatchException<String>() {
 
       @Override
       public String tryApiCall() throws Exception {
@@ -55,7 +52,6 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
         return null;
       }
     }.execute();
-    return result;
   }
 
   /**
@@ -64,15 +60,13 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * @throws Exception
    */
   public String initialLoadToStore() throws Exception {
-    String result = new CatchException<String>() {
+    return new CatchException<String>() {
 
       @Override
       public String tryApiCall() throws Exception {
         return dataHandler.initialLoadToStore(getCurrentUserId(), getApiService());
       }
     }.execute();
-
-    return result;
   }
 
   /**
@@ -81,16 +75,31 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * @throws Exception
    */
   public StoredItems getItems() throws Exception {
-    StoredItems storedItems = new CatchException<StoredItems>() {
+    return new CatchException<StoredItems>() {
 
       @Override
       public StoredItems tryApiCall() throws Exception {
         String userId = getApiService().getGplusUserId();
-        return dataHandler.getActivityHandler().getItems(userId);
+        return dataHandler.getActivityStoreHandler().getItems(userId);
 
       }
     }.execute();
-    return storedItems;
+  }
+
+  /**
+   * データストアのアクテビティをAPIを読み直して再更新する。
+   * 
+   * @return
+   * @throws Exception
+   */
+  public String updateActivities() throws Exception {
+    return new CatchException<String>() {
+
+      @Override
+      public String tryApiCall() throws Exception {
+        return dataHandler.updateActivities(getCurrentUserId(), getApiService());
+      }
+    }.execute();
   }
 
   /**
@@ -98,7 +107,7 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * 
    * @return
    * @throws IOException
-   * @throws NoCredentialException 
+   * @throws NoCredentialException
    */
   private PlusApiService getApiService() throws IOException, NoCredentialException {
     CredentialUtils utils = new CredentialUtils();
@@ -110,7 +119,7 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * 
    * @return
    * @throws IOException
-   * @throws NoCredentialException 
+   * @throws NoCredentialException
    */
   private String getCurrentUserId() throws IOException, NoCredentialException {
     return getApiService().getGplusUserId();

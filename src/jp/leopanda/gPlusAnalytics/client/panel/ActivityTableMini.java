@@ -7,8 +7,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ClickablePlusItemTable;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.SafeHtmlColumn;
-import jp.leopanda.gPlusAnalytics.client.util.HtmlBuilder;
+import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ImageColumn;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
@@ -26,7 +25,7 @@ public class ActivityTableMini extends ClickablePlusItemTable<PlusActivity> {
   }
 
   TextColumn<PlusActivity> titleColumn; // タイトル
-  SafeHtmlColumn<PlusActivity> imageColumn; // 投稿写真
+  ImageColumn<PlusActivity> imageColumn; // 投稿写真
   TextColumn<PlusActivity> numOfPlusOneColumn; // +1er数
 
 
@@ -43,14 +42,14 @@ public class ActivityTableMini extends ClickablePlusItemTable<PlusActivity> {
       }
     };
     // 投稿写真
-    imageColumn = new SafeHtmlColumn<PlusActivity>() {
+    imageColumn = new ImageColumn<PlusActivity>() {
       @Override
       public SafeHtml getValue(PlusActivity item) {
-        HtmlBuilder builder = new HtmlBuilder();
         if (item.getAttachmentImageUrls() != null) {
-          builder.appendActivityTumbnailImg(item.getAttachmentImageUrls().get(0));
+          setImageHeight(80);
+          setImageUrl(item.getAttachmentImageUrls().get(0));
         }
-        return builder.toSafeHtml();
+        return getImageTag();
       }
     };
     // +1er数

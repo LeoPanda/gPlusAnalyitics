@@ -14,4 +14,6 @@ public interface GoogleGateServiceAsync {
   void updateDataStore(AsyncCallback<String> callback);
 
   void clearDataStore(AsyncCallback<String> callback);
+  
+  void updateActivities(AsyncCallback<String> callback);
 }

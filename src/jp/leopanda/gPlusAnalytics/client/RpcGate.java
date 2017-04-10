@@ -66,9 +66,12 @@ public class RpcGate<R> {
 
     }
       break;
+    case UPDATE_ACTIVITIES: {
+      googleAsync.updateActivities((AsyncCallback<String>) genAsync.callbackR);
+    }
+      break;
     case CLEAR＿ITEMSTORE: {
       googleAsync.clearDataStore((AsyncCallback<String>) genAsync.callbackR);
-
     }
       break;
 
@@ -117,7 +120,7 @@ public class RpcGate<R> {
     } else if (caught instanceof IOException) {
       Window.alert("RPC IOエラー:" + (caught.getMessage()));
     } else if (caught instanceof ForbiddenException) {
-      if(Window.confirm("アクセス権が不足しています。リロードして認証を取得し直しますか？")){
+      if (Window.confirm("アクセス権が不足しています。リロードして認証を取得し直しますか？")) {
         Window.Location.reload();
       }
     } else {

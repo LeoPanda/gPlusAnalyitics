@@ -21,10 +21,10 @@ import java.util.logging.Logger;
 public class DataStoreHandler {
 
   DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-  ActivityStoreHandler activityHandler = new ActivityStoreHandler(ds);
+  ActivityStoreHandler activityStoreHandler = new ActivityStoreHandler(ds);
 
-  public ActivityStoreHandler getActivityHandler() {
-    return this.activityHandler;
+  public ActivityStoreHandler getActivityStoreHandler() {
+    return this.activityStoreHandler;
   }
 
   Logger logger = Logger.getLogger("DataHandler");
@@ -37,15 +37,15 @@ public class DataStoreHandler {
    */
   public String initialLoadToStore(String userId, PlusApiService googleApi)
       throws HostGateException, IOException {
-    if (activityHandler.getLatestActivityPublished(userId) != null) {
+    if (activityStoreHandler.getLatestActivityPublished(userId) != null) {
       throw new HostGateException("データストアがすでに存在しています。初期化するためにはいったんデータストアを消去してください。");
     }
-    List<PlusActivity> activities = googleApi.getPlusActivity(userId);
+    List<PlusActivity> activities = googleApi.getPlusActivies(userId);
     for (PlusActivity activity : activities) {
-      if (activityFilter(activity)) {
+      if (noImages(activity)) {
         continue;
       }
-      activityHandler.putActivity(activity,
+      activityStoreHandler.putActivity(activity,
           googleApi.getPlusOnersByActivity(activity.getId()), null);
     }
     return null;
@@ -58,7 +58,7 @@ public class DataStoreHandler {
    *          アクティビティのオーナーID
    */
   public void clearDataStore(String actorId) {
-    activityHandler.remove(actorId);
+    activityStoreHandler.remove(actorId);
   }
 
   /**
@@ -74,22 +74,34 @@ public class DataStoreHandler {
    */
   public String updateBrandNew(String userId, PlusApiService googleApi)
       throws HostGateException, IOException {
-    List<PlusActivity> activities = googleApi.getPlusActivity(userId);
-    ActivityCheckMap checkMap = activityHandler.getActivityCheckMap(userId);
+    List<PlusActivity> activities = googleApi.getPlusActivies(userId);
+    ActivityCheckMap checkMap = activityStoreHandler.getActivityCheckMap(userId);
     for (PlusActivity activity : activities) {
-      if (activityFilter(activity)) {
+      if (noImages(activity)) {
         continue;
       }
       Integer numOfPlusOne = checkMap.getNumOfPlusOne(activity.getId());
       if (numOfPlusOne == null) { // データストアになければ新規作成
-        activityHandler.putActivity(activity,
+        activityStoreHandler.putActivity(activity,
             googleApi.getPlusOnersByActivity(activity.getId()), null);
       } else if (!numOfPlusOne.equals(activity.getNumOfPlusOners())) { // +1数が違えばアップデート
-        activityHandler.putActivity(activity,
+        activityStoreHandler.putActivity(activity,
             googleApi.getPlusOnersByActivity(activity.getId()),
             checkMap.getEntityKey(activity.getId()));
       }
     }
+    return null;
+  }
+  /**
+   * データストアのアクテビティをAPIを読み直して再更新する。
+   * @param userId
+   * @param googleApi
+   * @return
+   * @throws HostGateException
+   * @throws IOException
+   */
+  public String updateActivities(String userId,PlusApiService googleApi) throws HostGateException, IOException{
+    activityStoreHandler.updateActivies(userId, googleApi);
     return null;
   }
 
@@ -100,7 +112,7 @@ public class DataStoreHandler {
    *          チェック対象のアクティビティアイテムオブジェクト
    * @return アイテムに写真投稿がない場合にtrue
    */
-  private boolean activityFilter(PlusActivity activity) {
+  private boolean noImages(PlusActivity activity) {
     if (activity.getAttachmentImageUrls() == null) {
       return true;
     } else if (activity.getAttachmentImageUrls().size() == 0){
