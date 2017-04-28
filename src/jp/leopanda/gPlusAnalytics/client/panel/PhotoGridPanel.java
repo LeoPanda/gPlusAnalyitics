@@ -8,9 +8,9 @@ import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-import jp.leopanda.gPlusAnalytics.client.Unit;
+import jp.leopanda.gPlusAnalytics.client.Statics;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PageControlLine;
-import jp.leopanda.gPlusAnalytics.client.util.CalcUtil;
+import jp.leopanda.gPlusAnalytics.client.util.PhotoCalcUtil;
 import jp.leopanda.gPlusAnalytics.client.util.Divider;
 import jp.leopanda.gPlusAnalytics.client.util.Formatter;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
@@ -29,7 +29,7 @@ public class PhotoGridPanel extends VerticalPanel {
   final int gridHeight = 120;
 
   PageControlPanel pageControlPanel = new PageControlPanel(
-      Unit.getStringWithLength((int) panelWidth));
+      Statics.getLengthWithUnit((int) panelWidth));
   VerticalPanel gridLinePanel = new VerticalPanel();
   Label pageLabel = new Label();
 
@@ -44,7 +44,7 @@ public class PhotoGridPanel extends VerticalPanel {
    */
   PhotoGridPanel(FilterableSourceItems items) {
     this.items = items;
-    gridLinePanel.setWidth(Unit.getStringWithLength((int) panelWidth));
+    gridLinePanel.setWidth(Statics.getLengthWithUnit((int) panelWidth));
     this.add(pageControlPanel);
     this.add(gridLinePanel);
     pageControlPanel.getFreeSpace().add(pageLabel);
@@ -88,7 +88,7 @@ public class PhotoGridPanel extends VerticalPanel {
       if (currentIndex < gridLines.size()) {
         PhotoGridLine currentGrid = gridLines.get(currentIndex);
         if (divider.checkLabel(currentGrid.getGroupBy())) {
-          gridLinePanel.add(divider.getLabel(Unit.getStringWithLength((int) panelWidth)));
+          gridLinePanel.add(divider.getLabel(Statics.getLengthWithUnit((int) panelWidth)));
         }
         Grid grid = currentGrid.getGrid();
         gridLinePanel.add(grid);
@@ -115,11 +115,11 @@ public class PhotoGridPanel extends VerticalPanel {
   private List<PhotoGridLine> getAllGridLines(List<PlusActivity> activities) {
     List<PhotoGridLine> allGridLines = new ArrayList<PhotoGridLine>();
     PhotoGridLine gridLine = new PhotoGridLine(gridHeight);
-    CalcUtil calcUtil = new CalcUtil();
+    PhotoCalcUtil calcUtil = new PhotoCalcUtil();
     double gridWidth = 0;
     boolean divided;
     for (PlusActivity activity : activities) {
-      gridWidth += calcUtil.getPhotoWidth(activity,gridHeight);
+      gridWidth += calcUtil.getPhotoWidthOnGrid(activity,gridHeight);
       if (gridWidth > panelWidth) {
         divided = true;
       } else {
@@ -129,7 +129,7 @@ public class PhotoGridPanel extends VerticalPanel {
       if (divided) {
         allGridLines.add(gridLine);
         gridLine = new PhotoGridLine(gridHeight);
-        gridWidth = calcUtil.getPhotoWidth(activity,gridHeight);
+        gridWidth = calcUtil.getPhotoWidthOnGrid(activity,gridHeight);
         gridLine.addGridByDivider(activity, Formatter.getYYMString(activity.getPublished()));
       }
     }

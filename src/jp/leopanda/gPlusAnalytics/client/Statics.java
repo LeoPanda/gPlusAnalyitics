@@ -5,10 +5,10 @@ package jp.leopanda.gPlusAnalytics.client;
  * @author LeoPanda
  *
  */
-public class Unit {
-  private static String lengthUnit = "px";
+public class Statics {
+  public final static String lengthUnit = "px";
   
-  public static String getStringWithLength(int length){
+  public static String getLengthWithUnit(int length){
     return String.valueOf(length) + lengthUnit;
   }
 

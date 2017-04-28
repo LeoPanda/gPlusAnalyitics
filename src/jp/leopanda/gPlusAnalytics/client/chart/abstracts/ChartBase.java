@@ -2,7 +2,7 @@ package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
 import java.util.List;
 
-import jp.leopanda.gPlusAnalytics.client.Unit;
+import jp.leopanda.gPlusAnalytics.client.Statics;
 import jp.leopanda.gPlusAnalytics.client.enums.ChartType;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItemList;
@@ -44,7 +44,7 @@ public abstract class ChartBase<I extends PlusItem> extends VerticalPanel {
    */
   public void setChartType(ChartType chartType) {
     this.chartType = chartType;
-    setWidth(Unit.getStringWithLength(chartType.width));
+    setWidth(Statics.getLengthWithUnit(chartType.width));
   }
 
   protected int getChartWidth() {

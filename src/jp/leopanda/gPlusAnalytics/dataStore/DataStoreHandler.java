@@ -58,7 +58,7 @@ public class DataStoreHandler {
    *          アクティビティのオーナーID
    */
   public void clearDataStore(String actorId) {
-    activityStoreHandler.remove(actorId);
+    activityStoreHandler.removeAllActivities(actorId);
   }
 
   /**
@@ -74,8 +74,8 @@ public class DataStoreHandler {
    */
   public String updateBrandNew(String userId, PlusApiService googleApi)
       throws HostGateException, IOException {
-    List<PlusActivity> activities = googleApi.getPlusActivies(userId);
     ActivityCheckMap checkMap = activityStoreHandler.getActivityCheckMap(userId);
+    List<PlusActivity> activities = googleApi.getPlusActivies(userId);
     for (PlusActivity activity : activities) {
       if (noImages(activity)) {
         continue;

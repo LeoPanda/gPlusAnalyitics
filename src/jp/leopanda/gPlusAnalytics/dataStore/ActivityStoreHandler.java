@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
@@ -24,7 +23,6 @@ import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -57,29 +55,29 @@ public class ActivityStoreHandler {
    */
   public void putActivity(PlusActivity activity, List<PlusPeople> plusOners, Key entityKey)
       throws HostGateException {
-    Entity activityEntity;
+    DataStoreEntity activityEntity;
     if (entityKey != null) {
       try {
-        activityEntity = ds.get(entityKey);
+        activityEntity = new DataStoreEntity(ds.get(entityKey));
       } catch (EntityNotFoundException e) {
         throw new HostGateException(e.toString());
       }
     } else {
-      activityEntity = new Entity(ActivityEntity.KIND.val);
+      activityEntity = new DataStoreEntity(ActivityProperty.KIND);
     }
-    activityEntity.setProperty(ActivityEntity.ID.val, activity.getId());
-    activityEntity.setProperty(ActivityEntity.ACTOR_ID.val, activity.getActorId());
-    activityEntity.setProperty(ActivityEntity.PUBLISHED.val, activity.getPublished());
-    activityEntity.setProperty(ActivityEntity.NUM_OF_PLUSONERS.val, activity.getNumOfPlusOners());
+    activityEntity.setProperty(ActivityProperty.ID, activity.getId());
+    activityEntity.setProperty(ActivityProperty.ACTOR_ID, activity.getActorId());
+    activityEntity.setProperty(ActivityProperty.PUBLISHED, activity.getPublished());
+    activityEntity.setProperty(ActivityProperty.NUM_OF_PLUSONERS, activity.getNumOfPlusOners());
 
     Serializer serializer = new Serializer();
-    activityEntity.setProperty(ActivityEntity.ACTIVITY_ITEM.val, serializer.encode(activity));
-    activityEntity.setProperty(ActivityEntity.PLUSONER_ITEMS.val, serializer.encode(plusOners));
-    ds.put(activityEntity);
+    activityEntity.setProperty(ActivityProperty.ACTIVITY_ITEM, serializer.encode(activity));
+    activityEntity.setProperty(ActivityProperty.PLUSONER_ITEMS, serializer.encode(plusOners));
+    ds.put(activityEntity.getEntity());
   }
 
   /**
-   * データストアのアクテビティをAPIを読み直して再更新する。
+   * データストア上のアクテビティをGoogle+から読み直して再更新する。
    * 
    * @param actorId
    * @param googleApi
@@ -88,37 +86,39 @@ public class ActivityStoreHandler {
    */
   public void updateActivies(String actorId, PlusApiService googleApi)
       throws HostGateException, IOException {
-    PreparedQuery pq = ds.prepare(getActivityQuery(actorId));
+    PreparedQuery pq = ds.prepare(getAllActivitiesQuery(actorId));
     for (Entity entity : pq.asIterable()) {
-      PlusActivity oldActivity = getOldActivity(entity);
+      DataStoreEntity newEntity = new DataStoreEntity(entity);
+      String activityId = (String) newEntity.getProperty(ActivityProperty.ID);
+      loger.info("activityID=" + activityId);
+      PlusActivity newActivity = googleApi.getPlusActiviy(activityId);
+      if (newActivity == null) {
+        ds.delete(entity.getKey());
+        loger.info("entity removed.");
+        continue;
+      }
+      PlusActivity oldActivity = getOldActivity(newEntity);
       if (oldActivity == null) {
         continue;
       }
-      PlusActivity newActivity = googleApi.getPlusActiviy(oldActivity.getId());
-      if (newActivity == null) {
-        ds.delete(entity.getKey());
-        loger.info("entity deleted.");
-        continue;
-      }
-      entity.setProperty(ActivityEntity.ACTIVITY_ITEM.val, new Serializer().encode(newActivity));
-      ds.put(entity);
+      newEntity.setProperty(ActivityProperty.ACTIVITY_ITEM, new Serializer().encode(newActivity));
+      ds.put(newEntity.getEntity());
       loger.info("entity updated.");
     }
 
   }
 
   /**
-   * データストア上の更新対象アクテビティを取得する。
-   * すでに更新が完了している場合はNullを返す。
+   * データストア上の更新対象アクテビティを取得する。 すでに更新が完了している場合はNullを返す。
+   * 
    * @param entity
    * @return
    * @throws HostGateException
    */
-  private PlusActivity getOldActivity(Entity entity) throws HostGateException {
+  private PlusActivity getOldActivity(DataStoreEntity entity) throws HostGateException {
     PlusActivity oldActivity = new Serializer()
-        .decodeAsPlusActivity((Blob) entity.getProperty(ActivityEntity.ACTIVITY_ITEM.val));
-    loger.info("entity key=" + entity.getKey().toString());
-    loger.info("activityID=" + oldActivity.id);
+        .decodeAsPlusActivity((Blob) entity.getProperty(ActivityProperty.ACTIVITY_ITEM));
+    loger.info("entity key=" + entity.getEntity().getKey().toString());
     if (oldActivity.object.attachments != null) {
       if (oldActivity.object.attachments.get(0).getImageHeight() != null) {
         loger.info("has been updated. skip process.");
@@ -137,12 +137,15 @@ public class ActivityStoreHandler {
    */
   public ActivityCheckMap getActivityCheckMap(String actorId) {
     ActivityCheckMap checkMap = new ActivityCheckMap();
-    PreparedQuery pq = ds.prepare(getActivityQuery(actorId).addProjection(
-        new PropertyProjection(ActivityEntity.ID.val, String.class)).addProjection(
-            new PropertyProjection(ActivityEntity.NUM_OF_PLUSONERS.val, Integer.class)));
+    PreparedQuery pq = ds.prepare(
+        getAllActivitiesQuery(actorId)
+            .addProjection(ActivityProperty.ID.getProjection())
+            .addProjection(ActivityProperty.NUM_OF_PLUSONERS.getProjection()));
     for (Entity entity : pq.asIterable()) {
-      checkMap.put((String) entity.getProperty(ActivityEntity.ID.val),
-          (int) (long) entity.getProperty(ActivityEntity.NUM_OF_PLUSONERS.val), entity.getKey());
+      DataStoreEntity activityEntity = new DataStoreEntity(entity);
+      checkMap.put((String) activityEntity.getProperty(ActivityProperty.ID),
+          (int) (long) activityEntity.getProperty(ActivityProperty.NUM_OF_PLUSONERS),
+          entity.getKey());
     }
     return checkMap;
   }
@@ -157,22 +160,23 @@ public class ActivityStoreHandler {
    *           例外スロー
    */
   public StoredItems getItems(String actorId) throws HostGateException {
-    PlusOnerHandler plusOnerHandler = new PlusOnerHandler();
+    AllPlusOnersMap plusOnersMap = new AllPlusOnersMap();
     List<PlusActivity> activities = new ArrayList<PlusActivity>();
     Serializer serializer = new Serializer();
-    PreparedQuery pq = ds.prepare(getActivityQuery(actorId));
+    PreparedQuery pq = ds.prepare(getAllActivitiesQuery(actorId));
     for (Entity entity : pq.asIterable()) {
-      PlusActivity activity = serializer.decodeAsPlusActivity((Blob) entity
-          .getProperty(ActivityEntity.ACTIVITY_ITEM.val));
-      activities.add(activity);
+      DataStoreEntity activityEntity = new DataStoreEntity(entity);
+      PlusActivity activity = serializer
+          .decodeAsPlusActivity((Blob) activityEntity.getProperty(ActivityProperty.ACTIVITY_ITEM));
       List<PlusPeople> plusOners = serializer
-          .decodeAsPlusOners((Blob) entity.getProperty(ActivityEntity.PLUSONER_ITEMS.val));
+          .decodeAsPlusOners((Blob) activityEntity.getProperty(ActivityProperty.PLUSONER_ITEMS));
       activity.setPlusOnerIds(getPlusOnerIds(plusOners));// アクテビティに+1ユーザーIDリストをセット
-      plusOnerHandler.aggregatePlusOnes(plusOners); // +1情報を集計
+      activities.add(activity);
+      plusOnersMap.addToMap(plusOners); // +1ers情報の集計
     }
     // アクテビティに統計情報をセット
     for (PlusActivity activity : activities) {
-      activity = setDistributionInfo(activity, plusOnerHandler.getNumOfPlusOneMap());
+      activity = setDistributionInfo(activity, plusOnersMap.getNumOfPlusOneMap());
     }
     // アクティビティを最新日付順にソート
     Collections.sort(activities, new Comparator<PlusActivity>() {
@@ -181,17 +185,10 @@ public class ActivityStoreHandler {
         return o2.getPublished().compareTo(o1.getPublished());
       }
     });
-    // +1ersを+1数降順にソート
-    List<PlusPeople> plusOners = plusOnerHandler.getPlusOners();
-    Collections.sort(plusOners, new Comparator<PlusPeople>() {
-      @Override
-      public int compare(PlusPeople o1, PlusPeople o2) {
-        return o2.getNumOfPlusOne() - o1.getNumOfPlusOne();
-      }
-    });
+    //結果内容のセット
     StoredItems result = new StoredItems();
     result.setActivities(activities);
-    result.setPlusOners(plusOners);
+    result.setPlusOners(plusOnersMap.getPlusOners());
     return result;
   }
 
@@ -211,13 +208,13 @@ public class ActivityStoreHandler {
   }
 
   /**
-   * エンティティを削除する
+   * 特定オーナーのエンティティをすべて削除する
    * 
    * @param actorId
    *          アクティビティのオーナーID
    */
-  public void remove(String actorId) {
-    PreparedQuery pq = ds.prepare(getActivityQuery(actorId).setKeysOnly());
+  public void removeAllActivities(String actorId) {
+    PreparedQuery pq = ds.prepare(getAllActivitiesQuery(actorId).setKeysOnly());
     for (Entity entity : pq.asIterable()) {
       ds.delete(entity.getKey());
     }
@@ -231,14 +228,15 @@ public class ActivityStoreHandler {
    * @return データストア上の最新のアクテビティエンティティの作成日付
    */
   public Date getLatestActivityPublished(String actorId) {
-    PreparedQuery pq = ds.prepare(getActivityQuery(actorId).addProjection(
-        new PropertyProjection(ActivityEntity.PUBLISHED.val, Date.class)).addSort(
-            ActivityEntity.PUBLISHED.val, SortDirection.DESCENDING));
+    PreparedQuery pq = ds.prepare(getAllActivitiesQuery(actorId)
+        .addProjection(ActivityProperty.PUBLISHED.getProjection())
+        .addSort(ActivityProperty.PUBLISHED.getName(), SortDirection.DESCENDING));
     List<Entity> entities = pq.asList(FetchOptions.Builder.withLimit(1));
     if (entities.size() == 0) {
       return null;
     }
-    return (Date) entities.get(0).getProperty(ActivityEntity.PUBLISHED.val);
+    DataStoreEntity activityEntity = new DataStoreEntity(entities.get(0));
+    return (Date) activityEntity.getProperty(ActivityProperty.PUBLISHED);
   }
 
   /**
@@ -283,10 +281,9 @@ public class ActivityStoreHandler {
    *          アクティビティのオーナーID
    * @return アクティビティエンティティを取り出す基本Query
    */
-  private Query getActivityQuery(String actorId) {
+  private Query getAllActivitiesQuery(String actorId) {
 
-    return new Query(ActivityEntity.KIND.val).setFilter(new FilterPredicate(
-        ActivityEntity.ACTOR_ID.val, FilterOperator.EQUAL, actorId));
+    return new Query(ActivityProperty.KIND.getName()).setFilter(new FilterPredicate(
+        ActivityProperty.ACTOR_ID.getName(), FilterOperator.EQUAL, actorId));
   }
-
 }

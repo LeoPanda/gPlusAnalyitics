@@ -1,6 +1,8 @@
 package jp.leopanda.gPlusAnalytics.dataStore;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,21 +15,25 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
  * @author LeoPanda
  *
  */
-public class PlusOnerHandler {
-  //ID,アイテムオブジェクトの+1ersメモリーマップ
+public class AllPlusOnersMap {
+  //PlusOnerID,アイテムオブジェクトの+1ersメモリーマップ
   Map<String, PlusPeople> plusOnersMap = new HashMap<String, PlusPeople>();
-  //ID,+1数の+1ersメモリーマップ
+  //PlusOnerID,+1数の+1ersメモリーマップ
   Map<String, Integer> numOfPlusOneMap = new HashMap<String, Integer>();
 
+  /**
+   * PlusOner毎の+1数マップを返す
+   * @return
+   */
   public Map<String, Integer> getNumOfPlusOneMap() {
     return numOfPlusOneMap;
   }
 
   /**
-   * アクティビティ毎に散らばる+1ersをメモリーマップ上に集計する
+   * 全+1ersをメモリーマップに集約する
    * @param plusOners 集計前の+1ersアイテムオブジェクトリスト
    */
-  public void aggregatePlusOnes(List<PlusPeople> plusOners) {
+  public void addToMap(List<PlusPeople> plusOners) {
     for (PlusPeople plusOner : plusOners) {
       String plusOneId = plusOner.getId();
       if (plusOnersMap.get(plusOneId) == null) {
@@ -46,12 +52,19 @@ public class PlusOnerHandler {
    * @return +1ersのアイテムオブジェクトリスト
    */
   public List<PlusPeople> getPlusOners() {
-    List<PlusPeople> results = new ArrayList<PlusPeople>();
+    List<PlusPeople> plusOners = new ArrayList<PlusPeople>();
     for (PlusPeople plusOner : plusOnersMap.values()) {
       plusOner.setNumOfPlusOne(numOfPlusOneMap.get(plusOner.getId()));
-      results.add(plusOner);
+      plusOners.add(plusOner);
     }
-    return results;
+    // +1ersを+1数降順にソート
+    Collections.sort(plusOners, new Comparator<PlusPeople>() {
+      @Override
+      public int compare(PlusPeople o1, PlusPeople o2) {
+        return o2.getNumOfPlusOne() - o1.getNumOfPlusOne();
+      }
+    });
+    return plusOners;
   }
 
 }

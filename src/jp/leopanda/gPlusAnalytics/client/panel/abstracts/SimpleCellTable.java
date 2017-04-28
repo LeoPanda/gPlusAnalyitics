@@ -13,7 +13,7 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 
-import jp.leopanda.gPlusAnalytics.client.Unit;
+import jp.leopanda.gPlusAnalytics.client.Statics;
 
 /**
  * cellTableの基本クラス
@@ -87,7 +87,7 @@ public abstract class SimpleCellTable<I> extends CellTable<I> {
     for (ColumnSet columSet : columSets) {
       // カラムの表示位置と表示幅を指定する
       columSet.colum.setHorizontalAlignment(columSet.alignment);
-      this.setColumnWidth(columSet.colum, Unit.getStringWithLength(columSet.columWidth));
+      this.setColumnWidth(columSet.colum, Statics.getLengthWithUnit(columSet.columWidth));
       // 表示カラムをテーブルに追加する
       this.addColumn(columSet.colum, columSet.columName);
     }
@@ -150,7 +150,7 @@ public abstract class SimpleCellTable<I> extends CellTable<I> {
     for (ColumnSet columSet : columSets) {
       result += columSet.columWidth;
     }
-    return Unit.getStringWithLength(result);
+    return Statics.getLengthWithUnit(result);
   }
 
   /*

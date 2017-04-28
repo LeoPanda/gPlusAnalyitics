@@ -5,7 +5,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -121,8 +120,12 @@ public class ActivityDetailPop extends PopupPanel {
    * @param posX
    * @param posY
    */
-  private void setPosition(int posX, int posY) {
-    this.setPopupPosition(posX - 150, posY - 200);
+  private void setPosition(int clickedPosX, int clickedPosY) {
+    int tryRePosX = clickedPosX - 150;
+    int tryRePosY = clickedPosY - 100;
+    int rePosX = tryRePosX > 0 ? tryRePosX : 10;
+    int rePosY = tryRePosY > 0 ? tryRePosY : 10;
+    this.setPopupPosition(rePosX, rePosY);
   }
 
 }
