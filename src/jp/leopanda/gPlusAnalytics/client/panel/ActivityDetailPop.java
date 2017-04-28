@@ -10,8 +10,11 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+import jp.leopanda.gPlusAnalytics.client.Statics;
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.util.Formatter;
+import jp.leopanda.gPlusAnalytics.client.util.PhotoCalcUtil;
+import jp.leopanda.gPlusAnalytics.client.util.SquareDimensions;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
@@ -21,7 +24,13 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
  *
  */
 public class ActivityDetailPop extends PopupPanel {
-  PlusActivity activity;
+  Label published = new Label();
+  Label accessDescription = new Label();
+  Label title = new Label();
+  Image image;
+
+  PhotoCalcUtil calcUtil = new PhotoCalcUtil();
+  SquareDimensions parentPanelDimensions;
 
   /**
    * コンストラクタ
@@ -30,17 +39,16 @@ public class ActivityDetailPop extends PopupPanel {
    * @param posX
    * @param posY
    */
-  public ActivityDetailPop(PlusActivity activity, int posX, int posY) {
+  public ActivityDetailPop(SquareDimensions parentPanelDimensions) {
     super();
-    this.activity = activity;
-    setPosition(posX, posY);
+    this.parentPanelDimensions = parentPanelDimensions;
+    published.addStyleName(MyStyle.DETAIL_POPLINE.getStyle());
+    accessDescription.addStyleName(MyStyle.DETAIL_POPLINE.getStyle());
+    this.addStyleName(MyStyle.DETAIL_POPWINDOW.getStyle());
     sinkEvents(Event.ONCLICK);
     sinkEvents(Event.ONMOUSEOUT);
     addDomHandler(setMouseOutHanlder(), MouseOutEvent.getType());
-    setClickHandler(activity);
-
-    setPanel(activity);
-    show();
+    setClickHandler();
   }
 
   /**
@@ -48,7 +56,7 @@ public class ActivityDetailPop extends PopupPanel {
    * 
    * @param activity
    */
-  private void setClickHandler(final PlusActivity activity) {
+  private void setClickHandler() {
     this.addHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -77,17 +85,16 @@ public class ActivityDetailPop extends PopupPanel {
    * @param activity
    */
   private void setPanel(PlusActivity activity) {
-    Label published = new Label(Formatter.getYYMDString(activity.getPublished()));
-    Label accessDescription = new Label(activity.getAccessDescription());
-    Label title = new Label(activity.getTitle());
+    this.clear();
+    published.setText(Formatter.getYYMDString(activity.getPublished()));
+    accessDescription.setText(activity.getAccessDescription());
+    title.setText(activity.getTitle());
     VerticalPanel innerPanel = new VerticalPanel();
-    innerPanel.add(getImage(activity));
+    image = getImage(activity);
+    innerPanel.add(image);
     innerPanel.add(published);
     innerPanel.add(accessDescription);
     innerPanel.add(title);
-    published.addStyleName(MyStyle.DETAIL_POPLINE.getStyle());
-    accessDescription.addStyleName(MyStyle.DETAIL_POPLINE.getStyle());
-    this.addStyleName(MyStyle.DETAIL_POPWINDOW.getStyle());
     this.add(innerPanel);
   }
 
@@ -98,10 +105,9 @@ public class ActivityDetailPop extends PopupPanel {
    * @return
    */
   private Image getImage(PlusActivity activity) {
-    Image image = new Image();
+    image = new Image();
     if (activity.getAttachmentImageUrls().size() > 0) {
       image.setUrl(activity.getAttachmentImageUrls().get(0));
-      image.setWidth("300px");
     }
     return image;
   }
@@ -109,23 +115,26 @@ public class ActivityDetailPop extends PopupPanel {
   /**
    * ウィンドウの再表示
    */
-  public void reShow(int posX, int posY) {
-    setPosition(posX, posY);
-    show();
+  public void show(PlusActivity activity, SquareDimensions photoDimensions) {
+    setPanel(activity);
+    setPosition(activity, photoDimensions);
+    super.show();
   }
 
   /**
    * 表示位置を設定する
    * 
-   * @param posX
-   * @param posY
+   * @param activity
    */
-  private void setPosition(int clickedPosX, int clickedPosY) {
-    int tryRePosX = clickedPosX - 150;
-    int tryRePosY = clickedPosY - 100;
-    int rePosX = tryRePosX > 0 ? tryRePosX : 10;
-    int rePosY = tryRePosY > 0 ? tryRePosY : 10;
-    this.setPopupPosition(rePosX, rePosY);
+  private void setPosition(PlusActivity activity, SquareDimensions photoDimensions) {
+    int posX, posY;
+    photoDimensions = calcUtil.optimizeDetailPhotoDimensions(parentPanelDimensions,
+        photoDimensions);
+    image.setWidth(Statics.getLengthWithUnit((int) photoDimensions.getWidth()));
+    image.setHeight(Statics.getLengthWithUnit((int) photoDimensions.getHeight()));
+    posX = (int) (parentPanelDimensions.getWidth() / 2 - photoDimensions.getWidth() / 2);
+    posY = (int) (parentPanelDimensions.getHeight() / 2 - photoDimensions.getHeight() / 2);
+    this.setPopupPosition(posX, posY);
   }
 
 }

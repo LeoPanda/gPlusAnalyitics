@@ -50,20 +50,18 @@ color: #73807b;
 }
 
 .detailPopWindow {
-	opacity: 0.9;
+	opacity: 1.0;
 	background: black;
 	font-weight: normal;
 	color: white;
-	width: 300px;
 }
 
 .detailPopLine {
 	color: white;
 	border: white;
 	font-weight: bold;
-	width: 300px;
 	border-bottom-style: ridge;
-	opacity: 0.8;
+	opacity: 1;
 }
 
 .countLabel {

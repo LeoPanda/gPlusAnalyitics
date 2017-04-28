@@ -11,10 +11,12 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import jp.leopanda.gPlusAnalytics.client.Statics;
 import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PageControlLine;
 import jp.leopanda.gPlusAnalytics.client.util.PhotoCalcUtil;
+import jp.leopanda.gPlusAnalytics.client.util.SquareDimensions;
 import jp.leopanda.gPlusAnalytics.client.util.Divider;
 import jp.leopanda.gPlusAnalytics.client.util.Formatter;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
+import jp.leopanda.gPlusAnalytics.interFace.DetailPopRequestListener;
 
 /**
  * 投稿写真をグリッド表示するパネル
@@ -27,6 +29,8 @@ public class PhotoGridPanel extends VerticalPanel {
   final int maxCols = 6;// １行に表示するグリッドのカラム数
   final int panelWidth = 1150;
   final int gridHeight = 120;
+
+  ActivityDetailPop activityDetailPop;
 
   PageControlPanel pageControlPanel = new PageControlPanel(
       Statics.getLengthWithUnit((int) panelWidth));
@@ -82,15 +86,17 @@ public class PhotoGridPanel extends VerticalPanel {
   private void displayPage(int page) {
     gridLinePanel.clear();
     setPageLabel(page);
+    String lineWidth = Statics.getLengthWithUnit((int) panelWidth);
     Divider divider = new Divider();
     for (int row = 0; row < maxPageRows; row++) {
       int currentIndex = row + page * maxPageRows;
       if (currentIndex < gridLines.size()) {
         PhotoGridLine currentGrid = gridLines.get(currentIndex);
         if (divider.checkLabel(currentGrid.getGroupBy())) {
-          gridLinePanel.add(divider.getLabel(Statics.getLengthWithUnit((int) panelWidth)));
+          gridLinePanel.add(divider.getLabel(lineWidth));
         }
         Grid grid = currentGrid.getGrid();
+        grid.setWidth(lineWidth);
         gridLinePanel.add(grid);
       }
     }
@@ -114,12 +120,12 @@ public class PhotoGridPanel extends VerticalPanel {
    */
   private List<PhotoGridLine> getAllGridLines(List<PlusActivity> activities) {
     List<PhotoGridLine> allGridLines = new ArrayList<PhotoGridLine>();
-    PhotoGridLine gridLine = new PhotoGridLine(gridHeight);
+    PhotoGridLine gridLine = getGridLine();
     PhotoCalcUtil calcUtil = new PhotoCalcUtil();
     double gridWidth = 0;
     boolean divided;
     for (PlusActivity activity : activities) {
-      gridWidth += calcUtil.getPhotoWidthOnGrid(activity,gridHeight);
+      gridWidth += calcUtil.getPhotoWidthOnGrid(activity, gridHeight);
       if (gridWidth > panelWidth) {
         divided = true;
       } else {
@@ -128,8 +134,8 @@ public class PhotoGridPanel extends VerticalPanel {
       }
       if (divided) {
         allGridLines.add(gridLine);
-        gridLine = new PhotoGridLine(gridHeight);
-        gridWidth = calcUtil.getPhotoWidthOnGrid(activity,gridHeight);
+        gridLine = getGridLine();
+        gridWidth = calcUtil.getPhotoWidthOnGrid(activity, gridHeight);
         gridLine.addGridByDivider(activity, Formatter.getYYMString(activity.getPublished()));
       }
     }
@@ -139,6 +145,34 @@ public class PhotoGridPanel extends VerticalPanel {
     return allGridLines;
   }
 
+  /**
+   * グリッドラインの生成
+   * 
+   * @return
+   */
+  private PhotoGridLine getGridLine() {
+    PhotoGridLine gridLine;
+    gridLine = new PhotoGridLine(gridHeight);
+    gridLine.addDetailPopRequestListener(new DetailPopRequestListener() {
+      @Override
+      public void request(PlusActivity activity,SquareDimensions photoDimensions) {
+        popActivityDetail(activity,photoDimensions);
+      }
+    });
+    return gridLine;
+  }
+
+  /**
+   * アクテビティ詳細ウィンドウの表示
+   * 
+   * @param activity
+   */
+  private void popActivityDetail(PlusActivity activity,SquareDimensions photoDimensions) {
+    if (activityDetailPop == null) {
+      activityDetailPop = new ActivityDetailPop(new SquareDimensions(panelWidth, gridHeight * maxPageRows));
+    }
+    activityDetailPop.show(activity,photoDimensions);
+  }
 
   /**
    * 最大ページ番号を取得する
