@@ -32,6 +32,8 @@ public class ActivityDetailPop extends PopupPanel {
   PhotoCalcUtil calcUtil = new PhotoCalcUtil();
   SquareDimensions parentPanelDimensions;
 
+  final double ajustY = 0.6;
+
   /**
    * コンストラクタ
    * 
@@ -113,11 +115,12 @@ public class ActivityDetailPop extends PopupPanel {
   }
 
   /**
-   * ウィンドウの再表示
+   * ウィンドウの表示
    */
-  public void show(PlusActivity activity, SquareDimensions photoDimensions) {
+  public void show(PlusActivity activity, SquareDimensions photoDimensions,
+      SquareDimensions clickPosition) {
     setPanel(activity);
-    setPosition(activity, photoDimensions);
+    setPosition(activity, photoDimensions, clickPosition);
     super.show();
   }
 
@@ -126,14 +129,16 @@ public class ActivityDetailPop extends PopupPanel {
    * 
    * @param activity
    */
-  private void setPosition(PlusActivity activity, SquareDimensions photoDimensions) {
+  private void setPosition(PlusActivity activity, SquareDimensions photoDimensions,
+      SquareDimensions clickPosition) {
     int posX, posY;
     photoDimensions = calcUtil.optimizeDetailPhotoDimensions(parentPanelDimensions,
         photoDimensions);
     image.setWidth(Statics.getLengthWithUnit((int) photoDimensions.getWidth()));
     image.setHeight(Statics.getLengthWithUnit((int) photoDimensions.getHeight()));
     posX = (int) (parentPanelDimensions.getWidth() / 2 - photoDimensions.getWidth() / 2);
-    posY = (int) (parentPanelDimensions.getHeight() / 2 - photoDimensions.getHeight() / 2);
+    posY = (int) (clickPosition.getHeight());
+    this.setWidth(Statics.getLengthWithUnit((int) photoDimensions.getWidth()));
     this.setPopupPosition(posX, posY);
   }
 

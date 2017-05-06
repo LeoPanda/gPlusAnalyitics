@@ -13,18 +13,18 @@ public class PhotoCalcUtil {
   final double lengthOcupancy = 0.6;
 
   /**
-   * グリッド上での単体写真幅を計算する
+   * 単体写真の仮幅を計算する
    * 
    * @param activity
    * @param gridHeight
    * @return
    */
-  public double getPhotoWidthOnGrid(PlusActivity activity, long gridHeight) {
+  public double getTemporarryPhotoWidth(PlusActivity activity, long gridHeight) {
     return (double) (getActivityPhotoRatio(activity) * gridHeight);
   }
 
   /**
-   * 写真オブジェクトの横縦比率を取得する
+   * アクテビティに登録されている写真オブジェクトの横縦比率を取得する
    * 
    * @param activity
    * @return

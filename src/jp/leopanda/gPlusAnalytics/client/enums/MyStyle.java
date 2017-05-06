@@ -11,9 +11,11 @@ import jp.leopanda.gPlusAnalytics.client.cssResource.CssStyle;
 public enum MyStyle {
   PAGE_BUTTON(CssStyle.INSTANCE.style().pageButton()),
   TITLE_LABEL(CssStyle.INSTANCE.style().titleLabel()),
+  PHOTO_CELL(CssStyle.INSTANCE.style().photoCell()),
   CHECKBOX_LABEL(CssStyle.INSTANCE.style().cehckBoxLabel()),
   RESET_BUTTON(CssStyle.INSTANCE.style().resetButton()),
-  DIVIDER_LABEL(CssStyle.INSTANCE.style().dividerLabel()),
+  YEAR_LABEL(CssStyle.INSTANCE.style().yearLabel()),
+  MONTH_LABEL(CssStyle.INSTANCE.style().monthLabel()),
   COUNT_LABLEL(CssStyle.INSTANCE.style().countLabel()),
   TABLE_TEXT(CssStyle.INSTANCE.style().tableText()),
   TABLE_PHOTO(CssStyle.INSTANCE.style().tablePhoto()),

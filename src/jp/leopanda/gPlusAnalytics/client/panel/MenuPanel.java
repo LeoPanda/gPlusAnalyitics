@@ -4,7 +4,8 @@ import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.gPlusAnalytics.interFace.ItemClickListener;
 
-
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.TabPanel;
 
 /**
@@ -15,7 +16,7 @@ import com.google.gwt.user.client.ui.TabPanel;
  */
 public class MenuPanel extends TabPanel {
   private TableLaunchPanel tablePanel; // リスト表パネル
-  private PhotoGridPanel photoPanel; //写真一覧パネル
+  private PhotoPanel photoPanel; // 写真パネル
   private ChartMenuPanel chartPanel;// 図表パネル
   private MaintenancePanel mentePanel; // データメンテナンスパネル
   private ItemClickListener<PlusItem> itemClickListener;
@@ -24,9 +25,9 @@ public class MenuPanel extends TabPanel {
    * コンストラクタ
    */
   public MenuPanel(FilterableSourceItems sourceItems) {
- 
+
     tablePanel = new TableLaunchPanel(sourceItems);
-    photoPanel = new PhotoGridPanel(sourceItems);
+    photoPanel = new PhotoPanel(sourceItems);
     chartPanel = new ChartMenuPanel(sourceItems);
     mentePanel = new MaintenancePanel();
 
@@ -34,6 +35,14 @@ public class MenuPanel extends TabPanel {
       @Override
       public void onClick(PlusItem item) {
         itemClickListener.onClick(item);
+      }
+    });
+    this.addSelectionHandler(new SelectionHandler<Integer>() {
+      @Override
+      public void onSelection(SelectionEvent<Integer> event) {
+        if (event.getSelectedItem() == 1) {
+          photoPanel.reload();
+        }
       }
     });
 
@@ -54,12 +63,11 @@ public class MenuPanel extends TabPanel {
   }
 
   /**
-   * パネルのリロード 
+   * パネルのリロード
    */
-  public void reloadItems(){
+  public void reloadItems() {
     tablePanel.reloadItems();
     chartPanel.reloadChartDataTables();
     photoPanel.reload();
   }
-  
 }

@@ -18,6 +18,8 @@ public interface CssStyle extends ClientBundle {
 
     String countLabel();
 
+    String photoCell();
+
     String filterButton();
 
     String filterLogCard();
@@ -32,7 +34,9 @@ public interface CssStyle extends ClientBundle {
 
     String tablePhoto();
 
-    String dividerLabel();
+    String yearLabel();
+
+    String monthLabel();
 
     String detailPopWindow();
 

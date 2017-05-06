@@ -8,14 +8,28 @@
 	text-align: center;
 }
 
-.dividerLabel {
-color: #73807b;
-    border-bottom-style: groove;
-    border-bottom-color: #f6fffc;
-    font-size: 11px;
-    font-style: italic;
-    font-weight: bolder;
-    padding: 0px 2px;
+.yearLabel {
+	color: #73807b;
+	border-bottom-style: groove;
+	border-bottom-color: #f6fffc;
+	font-size: 11px;
+	font-style: italic;
+	font-weight: bolder;
+	padding: 0px 2px;
+}
+
+.monthLabel {
+	background-color: #fffbf8;
+	font-size: 18px;
+	font-family: inherit;
+	font-style: italic;
+	text-align: center;
+	color: #9b7b39;
+}
+
+.photoCell {
+	padding: 3px 3px;
+	text-align: center;
 }
 
 .filterLabel {

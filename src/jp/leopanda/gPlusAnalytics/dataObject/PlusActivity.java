@@ -85,8 +85,8 @@ public class PlusActivity extends PlusItem implements Serializable {
    */
   public String getAccessDescription() {
     String result = this.access.getDescription();
-    if (result.equals("Public")) {
-      result = "コレクション";
+    if (result.equals("Public")||result.equals("Collection")) {
+      result = "日本の絶景";
     }
     return result;
   }
