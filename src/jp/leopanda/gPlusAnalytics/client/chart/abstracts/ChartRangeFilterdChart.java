@@ -11,7 +11,7 @@ import com.googlecode.gwt.charts.client.options.Options;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 
 /**
- * チャートレンジフィルター付きチャート
+ * 全体表示用サブチャート付きチャート
  * 
  * @author LeoPanda
  *

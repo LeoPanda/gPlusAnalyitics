@@ -7,6 +7,7 @@ import java.util.Map;
 
 import jp.leopanda.gPlusAnalytics.client.chart.ActivityCalendarChart;
 import jp.leopanda.gPlusAnalytics.client.chart.ActivityColumnChart;
+import jp.leopanda.gPlusAnalytics.client.chart.ActivityLineChart;
 import jp.leopanda.gPlusAnalytics.client.chart.NumOfPlusOnePieChart;
 import jp.leopanda.gPlusAnalytics.client.chart.PlusOnersPieChart;
 import jp.leopanda.gPlusAnalytics.client.chart.PostCirclePieChart;
@@ -115,6 +116,9 @@ public class ChartMenuPanel extends HorizontalPanel {
     switch (chartType) {
     case ACTIVIY_COLUMN:
       chartInstance = newChart(new ActivityColumnChart(), chartType);
+      break;
+    case ACTIVIY_LINE:
+      chartInstance = newChart(new ActivityLineChart(), chartType);
       break;
 
     case ACTIVITY_CALENDAR:

@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.ChartRangeFilterdChart;
@@ -19,45 +18,38 @@ import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.ChartWrapper;
 import com.googlecode.gwt.charts.client.ColumnType;
 import com.googlecode.gwt.charts.client.DataTable;
-import com.googlecode.gwt.charts.client.corechart.ColumnChartOptions;
-import com.googlecode.gwt.charts.client.corechart.ComboChartOptions;
+import com.googlecode.gwt.charts.client.corechart.LineChartOptions;
 import com.googlecode.gwt.charts.client.event.SelectEvent;
 import com.googlecode.gwt.charts.client.event.SelectHandler;
-import com.googlecode.gwt.charts.client.options.Bar;
 import com.googlecode.gwt.charts.client.options.HAxis;
 import com.googlecode.gwt.charts.client.options.Legend;
 import com.googlecode.gwt.charts.client.options.LegendPosition;
-import com.googlecode.gwt.charts.client.options.SeriesType;
 import com.googlecode.gwt.charts.client.options.TextPosition;
 import com.googlecode.gwt.charts.client.options.VAxis;
 
 /**
- * アクテビティへの＋１数をグラフ化する
+ * リピーター比率の変化トレンドをグラフ化する
  * 
  * @author LeoPanda
  *
  */
-public class ActivityColumnChart extends
-    ChartRangeFilterdChart<PlusActivity, ColumnChartOptions> {
+public class ActivityLineChart extends
+    ChartRangeFilterdChart<PlusActivity, LineChartOptions> {
   private Map<Integer, String> activityUrls = new HashMap<Integer, String>();
-  private Bar columnBar; // カラムのバー設定
-  Logger logger = Logger.getLogger("ActivityColumnChart");
+  Logger logger = Logger.getLogger("ActivityLineChart");
 
   /**
    * コンストラクタ
    */
-  public ActivityColumnChart() {
-    super(ChartType.COLUMN);
-    logger.log(Level.INFO, "ActivityColumnChart.constractor:");
-    columnBar = Bar.create();
-    columnBar.setGroupWidth("98%");
+  public ActivityLineChart() {
+    super(ChartType.LINE);
   }
 
   /*
    * チャートの生成
    */
   @Override
-  protected ChartWrapper<ColumnChartOptions> getChart(ChartType chartType) {
+  protected ChartWrapper<LineChartOptions> getChart(ChartType chartType) {
     chart = super.getChart(chartType);
     chart.addSelectHandler(new SelectHandler() {
       @Override
@@ -74,18 +66,14 @@ public class ActivityColumnChart extends
    * チャートのオプションを生成する
    */
   @Override
-  protected ColumnChartOptions getChartOptions() {
+  protected LineChartOptions getChartOptions() {
     chartOptions = super.getChartOptions();
     chartOptions.setTitle(getChartTitle());
     chartOptions.setLegend(Legend.create(LegendPosition.TOP));
     HAxis haxis = HAxis.create("アクテビティ");
     haxis.setTextPosition(TextPosition.NONE);
     chartOptions.setHAxis(haxis);
-    chartOptions.setVAxes(VAxis.create("+1数"));
-    // バーの設定
-    chartOptions.setBar(columnBar);
-    // 積み上げカラムに設定
-    chartOptions.setIsStacked(true);
+    chartOptions.setVAxes(VAxis.create("リピータの＋１数比率"));
     return chartOptions;
 
   }
@@ -97,29 +85,25 @@ public class ActivityColumnChart extends
   protected void setRangeFilter() {
     setMaxRangeValue(sourceData.size());
     setMiniRangeWidth(5);
-    setDefaultRangeWidth(10);
+    setDefaultRangeWidth(50);
     super.setRangeFilter();
     // 日付でフィルター
     filterOptions.setFilterColumnIndex(0);
     // フィルターチャートの外形設定
-    filterUi.setChartType(ChartType.COMBO);
-    filterUi.setChartOptions(presetFilterChartOptions());
+    filterUi.setChartType(ChartType.LINE);
+    filterUi.setChartOptions(getFilterChartOptions());
   }
 
   /*
-   * レンジフィルターのチャートオプションをカラムチャート用にセットする
+   * フィルターチャートのオプションを生成する
    */
-  private ComboChartOptions presetFilterChartOptions() {
-    ComboChartOptions filterChartOptions = ComboChartOptions.create();
-    filterChartOptions.setWidth(getChartWidth());
-    filterChartOptions.setSeriesType(SeriesType.BARS);
+  private LineChartOptions getFilterChartOptions() {
+    LineChartOptions filterChartOptions = LineChartOptions.create();
     filterChartOptions.setHeight(100);
     HAxis haxis = HAxis.create();
     haxis.setTextPosition(TextPosition.NONE);
     filterChartOptions.setHAxis(haxis);
-    filterChartOptions.setIsStacked(true);
-    // フィルターチャートのカラムバーをチャートと同一に設定
-    filterChartOptions.setBar(columnBar);
+    filterChartOptions.setVAxes(VAxis.create(""));
     return filterChartOptions;
   }
 
@@ -146,13 +130,28 @@ public class ActivityColumnChart extends
     for (PlusActivity activity : activities) {
       activityUrls.put(row, activity.getUrl());
       dataTable.setValue(row, 0, row);
-      dataTable.setValue(row, 1, activity.getFirstLookers());
-      dataTable.setValue(row, 2, activity.getLowMiddleLookers());
-      dataTable.setValue(row, 3, activity.getHighMiddleLookers());
-      dataTable.setValue(row, 4, activity.getHighLookers());
+      dataTable.setValue(row, 1,
+          getPercentage(activity.getNumOfPlusOners(), activity.getFirstLookers()));
+      dataTable.setValue(row, 2,
+          getPercentage(activity.getNumOfPlusOners(), activity.getLowMiddleLookers()));
+      dataTable.setValue(row, 3,
+          getPercentage(activity.getNumOfPlusOners(), activity.getHighMiddleLookers()));
+      dataTable.setValue(row, 4,
+          getPercentage(activity.getNumOfPlusOners(), activity.getHighLookers()));
       row += 1;
     }
     return dataTable;
+  }
+
+  /**
+   * リピーター比率を求める
+   * 
+   * @param numOfPlusOners
+   * @param numOfRepeaters
+   * @return
+   */
+  private double getPercentage(int numOfPlusOners, int numOfRepeaters) {
+    return 100 * (double) numOfRepeaters / (double) numOfPlusOners;
   }
 
 }
