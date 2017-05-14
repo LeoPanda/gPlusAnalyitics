@@ -40,7 +40,7 @@ public class MainPanel extends VerticalPanel {
     menuPanel = new MenuPanel(sourceItems);
 
     filterInputPanel.addFilterRequestListener(getFilterInputPanelRequestListener());
-    menuPanel.addItemClickListener(getMenuPanelClickListener());
+    menuPanel.addItemClickListener(getTablePanelClickListener());
 
     setupPanel();
 
@@ -65,14 +65,10 @@ public class MainPanel extends VerticalPanel {
       @Override
       public void request(FilterType filterType, String keyword) {
 
-        if (!filterInputPanel.getIncrimentalFilterCheck()) {
+        if (!filterInputPanel.isIncrimentalChecked()) {
           resetFilter();
         }
-        if (filterType == FilterType.RESET_ITEMS) {
-          resetFilter();
-        } else {
-          addFilterLog(filterType,keyword);
-        }
+        addFilterLog(filterType, keyword);
         reloadPanel();
 
       }
@@ -80,34 +76,19 @@ public class MainPanel extends VerticalPanel {
   }
 
   /**
-   * ログパネルでカードのチェックボックスが変更された場合の処理
+   * テーブルパネルでフィルターボタンが押された場合の処理
    * 
    * @return
    */
-  private CheckBoxListener getCheckBoxListener() {
-    return new CheckBoxListener() {
-
-      @Override
-      public void onValueChange(boolean value) {
-        reloadPanel();
-      }
-    };
-  }
-
-  /**
-   * メニューパネルでフィルターボタンが押された場合の処理
-   * 
-   * @return
-   */
-  private ItemClickListener<PlusItem> getMenuPanelClickListener() {
+  private ItemClickListener<PlusItem> getTablePanelClickListener() {
     return new ItemClickListener<PlusItem>() {
       @Override
       public void onClick(PlusItem item) {
 
-        if (!filterInputPanel.getIncrimentalFilterCheck()) {
+        if (!filterInputPanel.isIncrimentalChecked()) {
           resetFilter();
         }
-        addFilterLog(null,item);
+        addFilterLog(null, item);
         reloadPanel();
       }
     };
@@ -118,8 +99,8 @@ public class MainPanel extends VerticalPanel {
    */
   private void resetFilter() {
     sourceItems.resetItems();
-    filterInputPanel.resetFields();
     filterLogPanel.clear();
+    filterInputPanel.resetIncrementalCheckBox();
   }
 
   /**
@@ -127,6 +108,7 @@ public class MainPanel extends VerticalPanel {
    */
   private void reloadPanel() {
     sourceItems.doFilter(filterLogPanel);
+    filterInputPanel.resetFields();
     menuPanel.reloadItems();
   }
 
@@ -145,6 +127,40 @@ public class MainPanel extends VerticalPanel {
     } else {
       return;
     }
-    filterLogPanel.addCardCheckBoxListerer(getCheckBoxListener());
+    filterLogPanel.addCardCheckBoxListerer(getCardCheckBoxListener());
+    filterLogPanel.addRestButtonListener(getResetButtonListener());
+  }
+
+  /**
+   * ログパネルでカードのチェックボックスが変更された場合の処理
+   * 
+   * @return
+   */
+  private CheckBoxListener getCardCheckBoxListener() {
+    return new CheckBoxListener() {
+
+      @Override
+      public void onValueChange(boolean value) {
+        reloadPanel();
+      }
+    };
+  }
+
+  /**
+   * ログパネルでリセットボタンが押された時の処理
+   * 
+   * @return
+   */
+  private FilterRequestListener getResetButtonListener() {
+    return new FilterRequestListener() {
+
+      @Override
+      public void request(FilterType filterType, String keyword) {
+        if (filterType == FilterType.RESET_ITEMS) {
+          resetFilter();
+          reloadPanel();
+        }
+      }
+    };
   }
 }
