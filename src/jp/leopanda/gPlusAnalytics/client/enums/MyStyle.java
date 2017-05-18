@@ -23,6 +23,7 @@ public enum MyStyle {
   FILTER_DISABLE(CssStyle.INSTANCE.style().filterDisable()),
   FILTER_CARD(CssStyle.INSTANCE.style().filterLogCard()),
   FILTER_LABEL(CssStyle.INSTANCE.style().filterLabel()),
+  FILTER_BOOLEAN(CssStyle.INSTANCE.style().filterBoolean()),
   DETAIL_POPWINDOW(CssStyle.INSTANCE.style().detailPopWindow()),
   DETAIL_POPLINE(CssStyle.INSTANCE.style().detailPopLine()),
   GRID_IMAGE("gridImage");

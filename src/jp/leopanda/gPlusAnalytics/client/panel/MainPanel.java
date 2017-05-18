@@ -23,7 +23,7 @@ public class MainPanel extends VerticalPanel {
   FilterableSourceItems sourceItems;
   FilterInputPanel filterInputPanel;
   FilterLogPanel filterLogPanel;
-  MenuPanel menuPanel;
+  MenuTabPanel menuTabPanel;
 
   /**
    * コンストラクタ
@@ -37,10 +37,10 @@ public class MainPanel extends VerticalPanel {
 
     filterInputPanel = new FilterInputPanel(sourceItems);
     filterLogPanel = new FilterLogPanel();
-    menuPanel = new MenuPanel(sourceItems);
+    menuTabPanel = new MenuTabPanel(sourceItems);
 
     filterInputPanel.addFilterRequestListener(getFilterInputPanelRequestListener());
-    menuPanel.addItemClickListener(getTablePanelClickListener());
+    menuTabPanel.addItemClickListener(getTablePanelClickListener());
 
     setupPanel();
 
@@ -52,7 +52,7 @@ public class MainPanel extends VerticalPanel {
   private void setupPanel() {
     this.add(filterInputPanel);
     this.add(filterLogPanel);
-    this.add(menuPanel);
+    this.add(menuTabPanel);
   }
 
   /**
@@ -92,24 +92,6 @@ public class MainPanel extends VerticalPanel {
         reloadPanel();
       }
     };
-  }
-
-  /**
-   * フィルターをリセットする
-   */
-  private void resetFilter() {
-    sourceItems.resetItems();
-    filterLogPanel.clear();
-    filterInputPanel.resetIncrementalCheckBox();
-  }
-
-  /**
-   * メインパネルのリロード
-   */
-  private void reloadPanel() {
-    sourceItems.doFilter(filterLogPanel);
-    filterInputPanel.resetFields();
-    menuPanel.reloadItems();
   }
 
   /**
@@ -163,4 +145,23 @@ public class MainPanel extends VerticalPanel {
       }
     };
   }
+
+  /**
+   * フィルターをリセットする
+   */
+  private void resetFilter() {
+    sourceItems.resetItems();
+    filterLogPanel.clear();
+    filterInputPanel.resetIncrementalCheckBox();
+  }
+
+  /**
+   * メインパネルのリロード
+   */
+  private void reloadPanel() {
+    sourceItems.doFilter(filterLogPanel);
+    filterInputPanel.resetFields();
+    menuTabPanel.reloadItems();
+  }
+
 }

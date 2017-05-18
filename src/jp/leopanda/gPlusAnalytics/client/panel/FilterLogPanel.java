@@ -20,10 +20,11 @@ import jp.leopanda.gPlusAnalytics.interFace.FilterRequestListener;
  *
  */
 public class FilterLogPanel extends HorizontalPanel {
-  private CheckBoxListener checkListener;   //各カードのチェックボックス状態変更リスナー 
-  private FilterRequestListener resetButtonListener; //リセットボタンリスナー
+  private CheckBoxListener checkListener; // 各カードのチェックボックス状態変更リスナー
+  private FilterRequestListener resetButtonListener; // リセットボタンリスナー
   private Button resetButton;
   private Label titleLabel = new Label("フィルター:");
+  private int logCardCounter = 0;
 
   /**
    * コンストラクタ
@@ -36,6 +37,7 @@ public class FilterLogPanel extends HorizontalPanel {
     titleLabel.setVisible(false);
     titleLabel.addStyleName(MyStyle.FILTER_LABEL.getStyle());
   }
+
   /**
    * リセットボタンの生成
    * 
@@ -52,13 +54,16 @@ public class FilterLogPanel extends HorizontalPanel {
     });
     return resetButton;
   }
+
   /**
    * リセットボタンのリスナーを設定する
+   * 
    * @param listener
    */
-  public void addRestButtonListener(FilterRequestListener listener){
+  public void addRestButtonListener(FilterRequestListener listener) {
     this.resetButtonListener = listener;
   }
+
   /**
    * 表示されたログカードにチェックボックスの動作リスナーを追加する
    * 
@@ -69,9 +74,29 @@ public class FilterLogPanel extends HorizontalPanel {
     new ChildCardsProcesser(this) {
       @Override
       public void cardProcess(FilterLogCard card) {
+        cardBooleansVisibler(card);
         card.addCheckBoxListener(getCheckBoxListener());
       }
     }.processAll();
+  }
+
+  /**
+   * 先頭のログカードは論理和チェックの表示をしない
+   * 
+   * @param card
+   * @param logCardCounter
+   */
+  private void cardBooleansVisibler(FilterLogCard card) {
+    if (logCardCounter == 0) {
+      card.setBooleansVisible(false);
+    } else {
+      card.setBooleansVisible(true);
+    }
+    if (card.getEnableCheck()) {
+      logCardCounter++;
+    }else{
+      card.setBooleansVisible(false);
+    }
   }
 
   /**
@@ -84,6 +109,13 @@ public class FilterLogPanel extends HorizontalPanel {
       @Override
       public void onValueChange(boolean value) {
         checkListener.onValueChange(value);
+        logCardCounter = 0;
+        new ChildCardsProcesser(FilterLogPanel.this) {
+          @Override
+          public void cardProcess(FilterLogCard card) {
+            cardBooleansVisibler(card);
+          }
+        }.processAll();
       }
     };
   }
@@ -97,6 +129,7 @@ public class FilterLogPanel extends HorizontalPanel {
   public void add(Widget widget) {
     resetButton.setVisible(true);
     titleLabel.setVisible(true);
+    logCardCounter = 0; 
     super.add(widget);
   }
 
@@ -106,6 +139,7 @@ public class FilterLogPanel extends HorizontalPanel {
   @Override
   public void clear() {
     super.clear();
+    this.logCardCounter = 0;
     this.add(resetButton);
     this.add(titleLabel);
     resetButton.setVisible(false);

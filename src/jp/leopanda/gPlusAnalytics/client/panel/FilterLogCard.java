@@ -1,16 +1,20 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 
+import jp.leopanda.gPlusAnalytics.client.enums.BOOLEANS;
 import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.interFace.CheckBoxListener;
+import jp.leopanda.panelFrame.filedParts.ListBoxField;
 
 /**
  * フィルター履歴を記録するカード
@@ -23,6 +27,7 @@ public class FilterLogCard extends HorizontalPanel {
   private String keyword = null;
   private FilterType filterType = null;
   private CheckBox enableCheck = new CheckBox();
+  private ListBoxField booleans;
   private CheckBoxListener checkBoxListener = null;
 
   /**
@@ -37,7 +42,7 @@ public class FilterLogCard extends HorizontalPanel {
   }
 
   /**
-   * コンストラクタ
+   * コンストラクタ(アクテビティ用)
    * 
    * @param filterType
    * @param activity
@@ -49,7 +54,7 @@ public class FilterLogCard extends HorizontalPanel {
   }
 
   /**
-   * コンストラクタ
+   * コンストラクタ(＋１er用)
    * 
    * @param filterType
    * @param plusOner
@@ -61,7 +66,7 @@ public class FilterLogCard extends HorizontalPanel {
   }
 
   /**
-   * コンストラクタ
+   * コンストラクタ（キーワード用）
    * 
    * @param filterType
    * @param keyword
@@ -78,10 +83,30 @@ public class FilterLogCard extends HorizontalPanel {
    * @param filterType
    */
   public void setPanel(FilterType filterType) {
+    this.booleans = getBooleansField();
+    this.add(booleans);
     this.enableCheck = getEnableCheckBox();
     this.add(enableCheck);
     this.add(new Label(setLabelString(filterType)));
     this.setStyleName(MyStyle.FILTER_CARD.getStyle());
+  }
+
+  /**
+   * 論理結合子選択フィールドを提供する
+   * 
+   * @return
+   */
+  private ListBoxField getBooleansField() {
+    ListBoxField booleans = new ListBoxField("", null, BOOLEANS.values());
+    booleans.getBasicField().addStyleName(MyStyle.FILTER_BOOLEAN.getStyle());
+    booleans.getBasicField().addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        checkBoxListener.onValueChange(getEnableCheck());
+      }
+    });
+    return booleans;
+
   }
 
   /**
@@ -138,6 +163,24 @@ public class FilterLogCard extends HorizontalPanel {
   }
 
   /**
+   * 結合論理演算子 getter
+   * 
+   * @return
+   */
+  public BOOLEANS getBooleansValue() {
+    return BOOLEANS.values()[(booleans.getSelectedIndex())];
+  }
+
+  /**
+   * 論理和子セッターの可視性を設定する
+   * 
+   * @param visible
+   */
+  public void setBooleansVisible(boolean visible) {
+    this.booleans.getBasicField().setVisible(visible);
+  }
+
+  /**
    * activity getter
    * 
    * @return
@@ -189,9 +232,11 @@ public class FilterLogCard extends HorizontalPanel {
     if (enableCheck.getValue()) {
       FilterLogCard.this.removeStyleName(MyStyle.FILTER_DISABLE.getStyle());
       FilterLogCard.this.addStyleName(MyStyle.FILTER_CARD.getStyle());
+      setBooleansVisible(true);
     } else {
       FilterLogCard.this.removeStyleName(MyStyle.FILTER_CARD.getStyle());
       FilterLogCard.this.addStyleName(MyStyle.FILTER_DISABLE.getStyle());
+      setBooleansVisible(false);
     }
   }
 }

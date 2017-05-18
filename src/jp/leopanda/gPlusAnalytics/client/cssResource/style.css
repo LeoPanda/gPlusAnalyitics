@@ -83,6 +83,17 @@
 	padding: 5px;
 }
 
+.filterBoolean {
+	background: #a0a099;
+	font-size: 8px;
+	font-family: "nyt-cheltenham-sh", georgia, "times new roman", times,
+		serif;
+	color: #eef8ff;
+	font-weight: bold;
+	border-color: #f5f5dc;
+	margin: 3px 0.5ex;
+}
+
 .filterButton {
 	font-size: 10px;
 	font-family: Arial;

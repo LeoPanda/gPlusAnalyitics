@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.TabPanel;
  * @author LeoPanda
  *
  */
-public class MenuPanel extends TabPanel {
+public class MenuTabPanel extends TabPanel {
   private TableLaunchPanel tablePanel; // リスト表パネル
   private PhotoPanel photoPanel; // 写真パネル
   private ChartMenuPanel chartPanel;// 図表パネル
@@ -24,7 +24,7 @@ public class MenuPanel extends TabPanel {
   /**
    * コンストラクタ
    */
-  public MenuPanel(FilterableSourceItems sourceItems) {
+  public MenuTabPanel(FilterableSourceItems sourceItems) {
 
     tablePanel = new TableLaunchPanel(sourceItems);
     photoPanel = new PhotoPanel(sourceItems);

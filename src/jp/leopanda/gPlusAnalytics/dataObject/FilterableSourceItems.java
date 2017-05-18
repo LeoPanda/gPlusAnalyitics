@@ -1,15 +1,17 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-
 
 import jp.leopanda.gPlusAnalytics.client.enums.ItemType;
 import jp.leopanda.gPlusAnalytics.client.panel.FilterLogCard;
 import jp.leopanda.gPlusAnalytics.client.panel.FilterLogPanel;
 import jp.leopanda.gPlusAnalytics.client.util.ChildCardsProcesser;
 import jp.leopanda.gPlusAnalytics.client.util.FilterActivities;
+import jp.leopanda.gPlusAnalytics.client.util.FilterAndCombineItems;
 import jp.leopanda.gPlusAnalytics.client.util.FilterPlusOners;
+import jp.leopanda.gPlusAnalytics.client.util.TransItemList;
 
 /**
  * ソースデータアイテムオブジェクトの記憶域とフィルター機能を提供する
@@ -27,7 +29,6 @@ public class FilterableSourceItems {
   // フィルタメソッドオブジェクト
   FilterActivities filterActivities = new FilterActivities();
   FilterPlusOners filterPlusOners = new FilterPlusOners();
-
 
   /**
    * コンストラクタ
@@ -62,46 +63,79 @@ public class FilterableSourceItems {
   }
 
   /**
-   * フィルタリングを実行する
+   * カード１枚分のフィルタリングを実行する
    * 
    * @param card
    */
   private void doFilterIndivisual(FilterLogCard card) {
     switch (card.getFilterType()) {
     case ACTIVITIES_PLUSONER:
-      currentPlusActivities = filterActivities.byPlusOner(currentPlusActivities, card.getPlusOner());
+      currentPlusActivities = new FilterAndCombineItems<PlusActivity>() {
+        @Override
+        public List<PlusActivity> getFilterdItems(List<PlusActivity> items, FilterLogCard card) {
+          return filterActivities.byPlusOner(items, card.getPlusOner());
+        }
+      }.doFilter(originalPlusActivities, currentPlusActivities, card);
       syncPlusOners();
       break;
     case ACTIVITIES_KEYWORD:
-      currentPlusActivities = filterActivities.byKeyword(currentPlusActivities, card.getKeyword());
+      currentPlusActivities = new FilterAndCombineItems<PlusActivity>() {
+        @Override
+        public List<PlusActivity> getFilterdItems(List<PlusActivity> items, FilterLogCard card) {
+          return filterActivities.byKeyword(items, card.getKeyword());
+        }
+      }.doFilter(originalPlusActivities, currentPlusActivities, card);
       syncPlusOners();
       break;
     case ACTIVITIES_ACCESSDESCRIPTION:
-      currentPlusActivities = filterActivities.byAccessDescription(currentPlusActivities,
-          card.getKeyword());
+      currentPlusActivities = new FilterAndCombineItems<PlusActivity>() {
+        @Override
+        public List<PlusActivity> getFilterdItems(List<PlusActivity> items, FilterLogCard card) {
+          return filterActivities.byAccessDescription(items, card.getKeyword());
+        }
+      }.doFilter(originalPlusActivities, currentPlusActivities, card);
       syncPlusOners();
       break;
     case ACTIVITIES_PUBLISHED_YEAR:
-      currentPlusActivities = filterActivities.byPublishedYear(currentPlusActivities,
-          card.getKeyword());
+      currentPlusActivities = new FilterAndCombineItems<PlusActivity>() {
+        @Override
+        public List<PlusActivity> getFilterdItems(List<PlusActivity> items, FilterLogCard card) {
+          return filterActivities.byPublishedYear(items, card.getKeyword());
+        }
+      }.doFilter(originalPlusActivities, currentPlusActivities, card);
       syncPlusOners();
       break;
     case ACTIVITIES_PUBLISHED_MONTH:
-      currentPlusActivities = filterActivities.byPublishedMonth(currentPlusActivities,
-          card.getKeyword());
+      currentPlusActivities = new FilterAndCombineItems<PlusActivity>() {
+        @Override
+        public List<PlusActivity> getFilterdItems(List<PlusActivity> items, FilterLogCard card) {
+          return filterActivities.byPublishedMonth(items, card.getKeyword());
+        }
+      }.doFilter(originalPlusActivities, currentPlusActivities, card);
       syncPlusOners();
       break;
     case PLUSONER_ACTIVITY:
-      currentPlusOners = filterPlusOners.byActivity(currentPlusOners, card.getActivity());
+      currentPlusOners = new FilterAndCombineItems<PlusPeople>() {
+        @Override
+        public List<PlusPeople> getFilterdItems(List<PlusPeople> items, FilterLogCard card) {
+          return filterPlusOners.byActivity(items, card.getActivity());
+        }
+      }.doFilter(originalPlusOners, currentPlusOners, card);
       syncActivities();
       break;
     case PLUSONER_KEYWORD:
-      currentPlusOners = filterPlusOners.byKeyword(currentPlusOners, card.getKeyword());
+      currentPlusOners = new FilterAndCombineItems<PlusPeople>() {
+        @Override
+        public List<PlusPeople> getFilterdItems(List<PlusPeople> items, FilterLogCard card) {
+          return filterPlusOners.byKeyword(items, card.getKeyword());
+        }
+      }.doFilter(originalPlusOners, currentPlusOners, card);
       syncActivities();
       break;
     default:
       break;
     }
+    sortActivites();
   }
 
   /**
@@ -116,6 +150,18 @@ public class FilterableSourceItems {
    */
   private void syncActivities() {
     currentPlusActivities = filterActivities.byPlusOners(currentPlusActivities, currentPlusOners);
+  }
+
+  /**
+   * カレントアクティビティのソート
+   */
+  private void sortActivites() {
+    Collections.sort(currentPlusActivities, new Comparator<PlusActivity>() {
+      @Override
+      public int compare(PlusActivity o1, PlusActivity o2) {
+        return o2.getPublished().compareTo(o1.getPublished());
+      }
+    });
   }
 
   /**
@@ -165,22 +211,5 @@ public class FilterableSourceItems {
     }.execute(originalPlusActivities);
     currentPlusOners = new TransItemList<PlusPeople>() {
     }.execute(originalPlusOners);
-  }
-
-  /**
-   * アイテムリストを別記憶域に移送する
-   * 
-   * @author LeoPanda
-   *
-   * @param <I>
-   */
-  private abstract class TransItemList<I extends PlusItem> {
-    public List<I> execute(List<I> inputItems) {
-      List<I> outputItems = new ArrayList<I>();
-      for (I i : inputItems) {
-        outputItems.add(i);
-      }
-      return outputItems;
-    }
   }
 }

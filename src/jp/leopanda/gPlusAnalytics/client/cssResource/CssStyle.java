@@ -26,6 +26,8 @@ public interface CssStyle extends ClientBundle {
 
     String filterLabel();
 
+    String filterBoolean();
+
     String filterDisable();
 
     String resetButton();
