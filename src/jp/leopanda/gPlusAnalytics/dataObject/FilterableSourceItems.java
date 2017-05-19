@@ -1,7 +1,6 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import jp.leopanda.gPlusAnalytics.client.enums.ItemType;
@@ -11,6 +10,7 @@ import jp.leopanda.gPlusAnalytics.client.util.ChildCardsProcesser;
 import jp.leopanda.gPlusAnalytics.client.util.FilterActivities;
 import jp.leopanda.gPlusAnalytics.client.util.FilterAndCombineItems;
 import jp.leopanda.gPlusAnalytics.client.util.FilterPlusOners;
+import jp.leopanda.gPlusAnalytics.client.util.SortComparator;
 import jp.leopanda.gPlusAnalytics.client.util.TransItemList;
 
 /**
@@ -135,7 +135,7 @@ public class FilterableSourceItems {
     default:
       break;
     }
-    sortActivites();
+    Collections.sort(currentPlusActivities, new SortComparator().getLatestActivitesOrder());
   }
 
   /**
@@ -150,18 +150,6 @@ public class FilterableSourceItems {
    */
   private void syncActivities() {
     currentPlusActivities = filterActivities.byPlusOners(currentPlusActivities, currentPlusOners);
-  }
-
-  /**
-   * カレントアクティビティのソート
-   */
-  private void sortActivites() {
-    Collections.sort(currentPlusActivities, new Comparator<PlusActivity>() {
-      @Override
-      public int compare(PlusActivity o1, PlusActivity o2) {
-        return o2.getPublished().compareTo(o1.getPublished());
-      }
-    });
   }
 
   /**
@@ -189,16 +177,13 @@ public class FilterableSourceItems {
    *          取得したいアイテムリストのタイプ
    * @return
    */
-  public PlusItemList<?> getItemList(ItemType itemType) {
-    PlusItemList<?> itemList = null;
+  @SuppressWarnings("unchecked")
+  public <I extends PlusItem> List<I> getItemList(ItemType itemType) {
+    List<I> itemList = null;
     if (itemType == ItemType.ACTIVITIES) {
-      PlusActivityList activityList = new PlusActivityList();
-      activityList.setItems(this.currentPlusActivities);
-      itemList = activityList;
+      itemList = (List<I>) currentPlusActivities;
     } else if (itemType == ItemType.PLUSONERS) {
-      PlusPeopleList plusPeopleList = new PlusPeopleList();
-      plusPeopleList.setItems(this.currentPlusOners);
-      itemList = plusPeopleList;
+      itemList = (List<I>) currentPlusOners;
     }
     return itemList;
   }

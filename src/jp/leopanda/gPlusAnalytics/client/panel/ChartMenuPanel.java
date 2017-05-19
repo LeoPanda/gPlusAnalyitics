@@ -38,7 +38,7 @@ public class ChartMenuPanel extends HorizontalPanel {
 
   private FilterableSourceItems sourceItems;
 
-  private Map<ChartType, ChartBase<?>> chartInstances = new HashMap<ChartType, ChartBase<?>>(); // チャートのインスタンス
+  private Map<ChartType, ChartBase<PlusItem>> chartInstances = new HashMap<ChartType, ChartBase<PlusItem>>(); // チャートのインスタンス
   private List<ChartType> launchingChartTypes = new ArrayList<ChartType>(); // 現在表示中のチャート種類
 
   private final int chartPanelMaxColumn = 2; // チャートパネルの最大カラム数
@@ -111,8 +111,8 @@ public class ChartMenuPanel extends HorizontalPanel {
   /*
    * チャートを生成する
    */
-  private ChartBase<?> getChartInstance(ChartType chartType) {
-    ChartBase<?> chartInstance = null;
+  private ChartBase<PlusItem> getChartInstance(ChartType chartType) {
+    ChartBase<PlusItem> chartInstance = null;
     switch (chartType) {
     case ACTIVIY_COLUMN:
       chartInstance = newChart(new ActivityColumnChart(), chartType);
@@ -146,19 +146,20 @@ public class ChartMenuPanel extends HorizontalPanel {
   /*
    * チャートを生成し描画する
    */
-  private <I extends PlusItem> ChartBase<I> newChart(ChartBase<I> chartInstance, ChartType chartType) {
+  @SuppressWarnings("unchecked")
+  private <I extends PlusItem> ChartBase<PlusItem> newChart(ChartBase<I> chartInstance, ChartType chartType) {
     chartInstance.setChartType(chartType);
     chartInstance.setSourceData(sourceItems.getItemList(chartType.getItemType()));
     chartInstance.draw();
-    return chartInstance;
+    return (ChartBase<PlusItem>) chartInstance;
   }
 
   /**
    * インスタンス化されたチャートを現在データで再描画する
    */
-  public void reloadChartDataTables() {
-    for (Map.Entry<ChartType, ChartBase<?>> entry : chartInstances.entrySet()) {
-      ChartBase<?> chartInstance = entry.getValue();
+  public void  reloadChartDataTables() {
+    for (Map.Entry<ChartType, ChartBase<PlusItem>> entry : chartInstances.entrySet()) {
+      ChartBase<PlusItem> chartInstance = entry.getValue();
       chartInstance.setSourceData(sourceItems.getItemList(entry.getKey().getItemType()));
       chartInstance.reDraw();
     }

@@ -2,11 +2,11 @@ package jp.leopanda.gPlusAnalytics.dataStore;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jp.leopanda.gPlusAnalytics.client.util.SortComparator;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
 /**
@@ -58,12 +58,7 @@ public class AllPlusOnersMap {
       plusOners.add(plusOner);
     }
     // +1ersを+1数降順にソート
-    Collections.sort(plusOners, new Comparator<PlusPeople>() {
-      @Override
-      public int compare(PlusPeople o1, PlusPeople o2) {
-        return o2.getNumOfPlusOne() - o1.getNumOfPlusOne();
-      }
-    });
+    Collections.sort(plusOners, new SortComparator().getPlusOnerDecendingOrder());
     return plusOners;
   }
 

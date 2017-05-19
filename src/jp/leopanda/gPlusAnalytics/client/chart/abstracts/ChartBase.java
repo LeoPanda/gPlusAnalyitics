@@ -5,7 +5,6 @@ import java.util.List;
 import jp.leopanda.gPlusAnalytics.client.Statics;
 import jp.leopanda.gPlusAnalytics.client.enums.ChartType;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItemList;
 
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -33,8 +32,8 @@ public abstract class ChartBase<I extends PlusItem> extends VerticalPanel {
    * @param plusItemList
    */
   @SuppressWarnings("unchecked")
-  public void setSourceData(PlusItemList<?> plusItemList) {
-    this.sourceData = (List<I>) plusItemList.getItems();
+  public void setSourceData(List<PlusItem> plusItemList) {
+    this.sourceData = (List<I>) plusItemList;
   }
 
   /**

@@ -3,13 +3,13 @@ package jp.leopanda.gPlusAnalytics.dataStore;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
+import jp.leopanda.gPlusAnalytics.client.util.SortComparator;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
@@ -179,12 +179,7 @@ public class ActivityStoreHandler {
       activity = setDistributionInfo(activity, plusOnersMap.getNumOfPlusOneMap());
     }
     // アクティビティを最新日付順にソート
-    Collections.sort(activities, new Comparator<PlusActivity>() {
-      @Override
-      public int compare(PlusActivity o1, PlusActivity o2) {
-        return o2.getPublished().compareTo(o1.getPublished());
-      }
-    });
+    Collections.sort(activities, new SortComparator().getLatestActivitesOrder());
     //結果内容のセット
     StoredItems result = new StoredItems();
     result.setActivities(activities);
