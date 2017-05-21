@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.Label;
 import jp.leopanda.gPlusAnalytics.client.enums.BOOLEANS;
 import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
+import jp.leopanda.gPlusAnalytics.client.util.NumOfPlusOneFilterKeyword;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.interFace.CheckBoxListener;
@@ -29,6 +30,7 @@ public class FilterLogCard extends HorizontalPanel {
   private CheckBox enableCheck = new CheckBox();
   private ListBoxField booleans;
   private CheckBoxListener checkBoxListener = null;
+  private NumOfPlusOneFilterKeyword numOfPlusOneKeyword;
 
   /**
    * チェックボックス変更リスナーの設定
@@ -78,6 +80,18 @@ public class FilterLogCard extends HorizontalPanel {
   }
 
   /**
+   * コンストラクター（＋１数フィルター用）
+   * 
+   * @param filterType
+   * @param numOfPlusOneFilterKeyword
+   */
+  public FilterLogCard(FilterType filterType, NumOfPlusOneFilterKeyword numOfPlusOneFilterKeyword) {
+    this.filterType = filterType;
+    this.numOfPlusOneKeyword = numOfPlusOneFilterKeyword;
+    setPanel(filterType);
+  }
+
+  /**
    * パネルのセットアップ
    * 
    * @param filterType
@@ -117,7 +131,7 @@ public class FilterLogCard extends HorizontalPanel {
   private String setLabelString(FilterType filterType) {
     String labelString = "";
     switch (filterType) {
-    case ACTIVITIES_PLUSONER:
+    case ACTIVITY_TABLE_PLUSONER:
       labelString = "+1er=" + plusOner.getDisplayName();
       break;
     case ACTIVITIES_ACCESSDESCRIPTION:
@@ -132,11 +146,15 @@ public class FilterLogCard extends HorizontalPanel {
     case ACTIVITIES_KEYWORD:
       labelString = "アクティビティ:" + keyword;
       break;
-    case PLUSONER_ACTIVITY:
+    case PLUSONER_TABLE_ACTIVITY:
       labelString = "アクティビティ=" + activity.getTitle().substring(0, 6);
       break;
     case PLUSONER_KEYWORD:
       labelString = "+1er:" + keyword;
+      break;
+    case PLUSONER_NUMOFPLUSONE:
+      labelString = "+1er:+1数" + numOfPlusOneKeyword.getComparator().getName()
+          + String.valueOf(numOfPlusOneKeyword.getNumOfPlusOne());
       break;
     default:
       break;
@@ -178,6 +196,15 @@ public class FilterLogCard extends HorizontalPanel {
    */
   public void setBooleansVisible(boolean visible) {
     this.booleans.getBasicField().setVisible(visible);
+  }
+
+  /**
+   * ＋１数フィルターキーワードgetter
+   * 
+   * @return
+   */
+  public NumOfPlusOneFilterKeyword getNumOfPlusOneKeyword() {
+    return numOfPlusOneKeyword;
   }
 
   /**

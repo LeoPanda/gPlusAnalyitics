@@ -20,9 +20,9 @@ import jp.leopanda.panelFrame.panelParts.PanelBase;
  *
  */
 public class FilterInputPanel extends PanelBase {
-  //フィールド定義
+  // フィールド定義
   FilterInputPanelFields fields;
-  CheckBox incrementalFilterCheck= new CheckBox();
+  CheckBox incrementalFilterCheck = new CheckBox();
 
   /**
    * コンストラクター
@@ -39,12 +39,16 @@ public class FilterInputPanel extends PanelBase {
    */
   private void setUpFields() {
     TextBoxField plusOnerFilter = fields.getPlusOnerFilter();
+    ListBoxField compOperator = fields.getCompOperator();
+    TextBoxField numOfPlusOneFilter = fields.getNumOfPlusOneFilter();
     TextBoxField activityFilter = fields.getActivityFilter();
     PostCategoryListBox postCategory = fields.getPostCategory();
     PublishedYearListBox publishedYear = fields.getPublishedYear();
     ListBoxField publishedMonth = fields.getPublishedMonth();
 
     fieldMap.add(plusOnerFilter);
+    fieldMap.add(compOperator);
+    fieldMap.add(numOfPlusOneFilter);
     fieldMap.add(activityFilter);
     fieldMap.add(postCategory.getField());
     fieldMap.add(publishedYear.getField());
@@ -52,6 +56,9 @@ public class FilterInputPanel extends PanelBase {
 
     HorizontalPanel filterLine = new HorizontalPanel();
     filterLine.add(plusOnerFilter);
+    filterLine.add(new HTML(FixedString.BLANK_CELL.getValue()));
+    filterLine.add(compOperator);
+    filterLine.add(numOfPlusOneFilter);
     filterLine.add(new HTML(FixedString.BLANK_CELL.getValue()));
     filterLine.add(activityFilter);
     filterLine.add(new HTML(FixedString.BLANK_CELL.getValue()));
@@ -63,7 +70,8 @@ public class FilterInputPanel extends PanelBase {
     filterLine.add(getCheckBoxArea());
 
     this.add(filterLine);
-    
+
+    numOfPlusOneFilter.addStyleName(MyStyle.FILTER_NUMERIC.getStyle());
     plusOnerFilter.addLabelStyle(MyStyle.FILTER_LABEL.getStyle());
     activityFilter.addLabelStyle(MyStyle.FILTER_LABEL.getStyle());
     plusOnerFilter.addLabelStyle(MyStyle.FILTER_LABEL.getStyle());
@@ -71,6 +79,7 @@ public class FilterInputPanel extends PanelBase {
 
   /**
    * フィルター累積チェックボックスの入力領域を作成する
+   * 
    * @return
    */
   private HorizontalPanel getCheckBoxArea() {
@@ -99,11 +108,12 @@ public class FilterInputPanel extends PanelBase {
   }
 
   /**
-   *累積フィルターチェックをリセットする 
+   * 累積フィルターチェックをリセットする
    */
-  public void resetIncrementalCheckBox(){
+  public void resetIncrementalCheckBox() {
     incrementalFilterCheck.setValue(false);
   }
+
   /**
    * 累積フィルターチェックの有無を取得する
    * 

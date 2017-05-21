@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
@@ -80,5 +79,35 @@ public class FilterPlusOners {
         return plusOnerIds.contains(sourceItem.getId());
       }
     }.doFilter(plusOners, plusOnerIds);
+  }
+
+  /**
+   * +1数でフィルタする
+   * 
+   * @param plusOners
+   * @param keyword
+   * @return
+   */
+  public List<PlusPeople> byNumOfPlusOne(List<PlusPeople> plusOners, NumOfPlusOneFilterKeyword keyword) {
+    return new ItemFilter<PlusPeople, NumOfPlusOneFilterKeyword>() {
+
+      @Override
+      public boolean compare(PlusPeople sourceItem, NumOfPlusOneFilterKeyword keyword) {
+        boolean checker = false;
+        switch (keyword.getComparator()) {
+        case EQ:
+          checker = sourceItem.getNumOfPlusOne() == keyword.getNumOfPlusOne();
+          break;
+        case LT:
+          checker = sourceItem.getNumOfPlusOne() < keyword.getNumOfPlusOne();
+          break;
+        case GT:
+          checker = sourceItem.getNumOfPlusOne() > keyword.getNumOfPlusOne();
+          break;
+        }
+        return checker;
+      }
+
+    }.doFilter(plusOners, keyword);
   }
 }

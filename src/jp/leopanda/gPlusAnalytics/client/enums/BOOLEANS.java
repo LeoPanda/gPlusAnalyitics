@@ -4,7 +4,7 @@ import jp.leopanda.panelFrame.filedParts.ListElement;
 
 /**
  * フィルター論理結合子
- * @author LeoPanda
+ * @author 
  *
  */
 public enum BOOLEANS implements ListElement{

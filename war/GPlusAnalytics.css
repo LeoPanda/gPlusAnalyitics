@@ -9,6 +9,17 @@ h1 {
 table {
 	border-spacing: 0px;
 }
+.gwt-TextBox {
+	height: 12px;
+	width: 120px;
+	padding: 3px 1px;
+	border: 1px solid #ccc;
+	border-top: 1px solid #999;
+	font-size: small;
+	font-family: "ƒƒCƒŠƒI", Meiryo, Verdana, Helvetica, "ƒqƒ‰ƒMƒmŠpƒS Pro W3",
+		"Hiragino Kaku Gothic Pro", "‚l‚r ‚oƒSƒVƒbƒN", sans-serif;
+}
+
 /** button */
 button {
 	-moz-border-radius: 42px;
@@ -28,6 +39,7 @@ button {
 	display: inline-block;
 }
 
+}
 button:hover {
 	background: -moz-linear-gradient(center top, #dfdfdf 17%, #ededed 88%);
 	background: -ms-linear-gradient(top, #dfdfdf 17%, #ededed 88%);

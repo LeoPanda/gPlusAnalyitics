@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
+import jp.leopanda.gPlusAnalytics.client.util.NumOfPlusOneFilterKeyword;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
@@ -52,6 +53,7 @@ public class MainPanel extends VerticalPanel {
   private void setupPanel() {
     this.add(filterInputPanel);
     this.add(filterLogPanel);
+    filterLogPanel.addRestButtonListener(getResetButtonListener());
     this.add(menuTabPanel);
   }
 
@@ -63,7 +65,7 @@ public class MainPanel extends VerticalPanel {
   private FilterRequestListener getFilterInputPanelRequestListener() {
     return new FilterRequestListener() {
       @Override
-      public void request(FilterType filterType, String keyword) {
+      public void request(FilterType filterType, Object keyword) {
 
         if (!filterInputPanel.isIncrimentalChecked()) {
           resetFilter();
@@ -100,17 +102,22 @@ public class MainPanel extends VerticalPanel {
    * @param keyword
    */
   private void addFilterLog(FilterType filterType, Object keyword) {
+    // 一覧テーブルでフィルターボタンが押された場合
     if (keyword instanceof PlusActivity) {
-      filterLogPanel.add(new FilterLogCard(FilterType.PLUSONER_ACTIVITY, (PlusActivity) keyword));
+      filterLogPanel
+          .add(new FilterLogCard(FilterType.PLUSONER_TABLE_ACTIVITY, (PlusActivity) keyword));
     } else if (keyword instanceof PlusPeople) {
-      filterLogPanel.add(new FilterLogCard(FilterType.ACTIVITIES_PLUSONER, (PlusPeople) keyword));
+      filterLogPanel
+          .add(new FilterLogCard(FilterType.ACTIVITY_TABLE_PLUSONER, (PlusPeople) keyword));
+      // フィルター入力パネルからのリクエスト
     } else if (keyword instanceof String) {
       filterLogPanel.add(new FilterLogCard(filterType, (String) keyword));
+    } else if (keyword instanceof NumOfPlusOneFilterKeyword) {
+      filterLogPanel.add(new FilterLogCard(filterType, (NumOfPlusOneFilterKeyword) keyword));
     } else {
       return;
     }
     filterLogPanel.addCardCheckBoxListerer(getCardCheckBoxListener());
-    filterLogPanel.addRestButtonListener(getResetButtonListener());
   }
 
   /**
@@ -137,7 +144,7 @@ public class MainPanel extends VerticalPanel {
     return new FilterRequestListener() {
 
       @Override
-      public void request(FilterType filterType, String keyword) {
+      public void request(FilterType filterType, Object keyword) {
         if (filterType == FilterType.RESET_ITEMS) {
           resetFilter();
           reloadPanel();

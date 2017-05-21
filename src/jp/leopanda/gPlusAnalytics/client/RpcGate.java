@@ -3,15 +3,11 @@ package jp.leopanda.gPlusAnalytics.client;
 import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
 import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
 import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
-import jp.leopanda.googleAuthorization.client.ForbiddenException;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateService;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateServiceAsync;
-import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 
-import java.io.IOException;
 
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -80,51 +76,4 @@ public class RpcGate<R> {
     }
   }
 
-  /*
-   * googleAsync 戻り値の総称化クラス
-   */
-  private class GenAsync<R1> {
-    AsyncCallback<R1> callbackR;
-    RpcGateListener<R1> listenerR;
-
-    public void addListener(RpcGateListener<R1> listener) {
-      this.listenerR = listener;
-    }
-
-    public GenAsync() {
-      callbackR = new AsyncCallback<R1>() {
-        @Override
-        // Callback取得成功
-        public void onSuccess(R1 result) {
-          listenerR.onCallback(result);
-        }
-
-        @Override
-        // 取得失敗
-        public void onFailure(Throwable caught) {
-          asyncErrorHandler(caught);
-        }
-      };
-    }
-  }
-
-  /**
-   * エラー時の処理ハンドラ
-   * 
-   * @param caught
-   *          スローオブジェクト
-   */
-  private void asyncErrorHandler(Throwable caught) {
-    if (caught instanceof HostGateException) {
-      Window.alert("RPCエラー:" + ((HostGateException) caught).getStatus());
-    } else if (caught instanceof IOException) {
-      Window.alert("RPC IOエラー:" + (caught.getMessage()));
-    } else if (caught instanceof ForbiddenException) {
-      if (Window.confirm("アクセス権が不足しています。リロードして認証を取得し直しますか？")) {
-        Window.Location.reload();
-      }
-    } else {
-      Window.alert("RPCエラー:" + caught.toString());
-    }
-  }
 }

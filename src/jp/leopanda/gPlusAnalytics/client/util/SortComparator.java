@@ -23,7 +23,7 @@ public class SortComparator {
 
       @Override
       public int compare(PlusActivity o1, PlusActivity o2) {
-        return o2.getPublished().compareTo(o2.getPublished());
+        return o2.getPublished().compareTo(o1.getPublished());
       }
     };
   }
@@ -38,7 +38,7 @@ public class SortComparator {
 
       @Override
       public int compare(PlusActivity o1, PlusActivity o2) {
-        return o2.getPublished().compareTo(o2.getPublished());
+        return o1.getPublished().compareTo(o2.getPublished());
       }
     };
   }

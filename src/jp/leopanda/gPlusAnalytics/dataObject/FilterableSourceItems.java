@@ -60,6 +60,7 @@ public class FilterableSourceItems {
         }
       }
     }.processAll();
+    sortItems();
   }
 
   /**
@@ -69,7 +70,7 @@ public class FilterableSourceItems {
    */
   private void doFilterIndivisual(FilterLogCard card) {
     switch (card.getFilterType()) {
-    case ACTIVITIES_PLUSONER:
+    case ACTIVITY_TABLE_PLUSONER:
       currentPlusActivities = new FilterAndCombineItems<PlusActivity>() {
         @Override
         public List<PlusActivity> getFilterdItems(List<PlusActivity> items, FilterLogCard card) {
@@ -114,7 +115,7 @@ public class FilterableSourceItems {
       }.doFilter(originalPlusActivities, currentPlusActivities, card);
       syncPlusOners();
       break;
-    case PLUSONER_ACTIVITY:
+    case PLUSONER_TABLE_ACTIVITY:
       currentPlusOners = new FilterAndCombineItems<PlusPeople>() {
         @Override
         public List<PlusPeople> getFilterdItems(List<PlusPeople> items, FilterLogCard card) {
@@ -132,10 +133,19 @@ public class FilterableSourceItems {
       }.doFilter(originalPlusOners, currentPlusOners, card);
       syncActivities();
       break;
+    case PLUSONER_NUMOFPLUSONE:
+      currentPlusOners = new FilterAndCombineItems<PlusPeople>() {
+        @Override
+        public List<PlusPeople> getFilterdItems(List<PlusPeople> items, FilterLogCard card) {
+          return filterPlusOners.byNumOfPlusOne(items, card.getNumOfPlusOneKeyword());
+        }
+      }.doFilter(originalPlusOners, currentPlusOners, card);
+      syncActivities();
+      break;
     default:
+
       break;
     }
-    Collections.sort(currentPlusActivities, new SortComparator().getLatestActivitesOrder());
   }
 
   /**
@@ -187,7 +197,10 @@ public class FilterableSourceItems {
     }
     return itemList;
   }
-
+private void sortItems(){
+  Collections.sort(currentPlusActivities, new SortComparator().getLatestActivitesOrder());
+  Collections.sort(currentPlusOners,new SortComparator().getPlusOnerDecendingOrder());
+}
   /**
    * アイテムリストを初期状態に戻す
    */
@@ -196,5 +209,6 @@ public class FilterableSourceItems {
     }.execute(originalPlusActivities);
     currentPlusOners = new TransItemList<PlusPeople>() {
     }.execute(originalPlusOners);
+    sortItems();
   }
 }
