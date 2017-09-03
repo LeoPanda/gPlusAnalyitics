@@ -13,6 +13,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
  * @author LeoPanda
  *
  */
+@Deprecated
 public enum ActivityProperty implements DataStoreProperty{
   KIND("Activity",String.class),ID("id", String.class), ACTOR_ID("actorId", String.class),
   PUBLISHED("published", Date.class), UPDATED("updated", Date.class),
@@ -33,6 +34,7 @@ public enum ActivityProperty implements DataStoreProperty{
     this.clazz = clazz;
   }
 
+  
   /*
    * Query結果に反映させるフィールドプロジェクションを返す
    */
@@ -55,6 +57,15 @@ public enum ActivityProperty implements DataStoreProperty{
   @Override
   public Class<?> getClazz() {
     return  clazz;
+  }
+
+
+  /* 
+   * 
+   */
+  @Override
+  public String getKind() {
+    return null;
   }
 
 }

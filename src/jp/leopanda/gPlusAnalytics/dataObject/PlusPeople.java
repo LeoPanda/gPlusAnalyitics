@@ -10,7 +10,7 @@ public class PlusPeople extends PlusItem implements Serializable {
   public String gender;
   public String language;
 
-  private int numOfPlusOne = 0;
+  public int numOfPlusOne = 0;
 
   public String displayName;
   public AttachmentImage image;

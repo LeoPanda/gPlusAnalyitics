@@ -11,6 +11,7 @@ import com.google.appengine.api.datastore.Key;
  * @author LeoPanda
  *
  */
+@Deprecated
 public class ActivityCheckMap {
   Map<String, Elements> map;
 

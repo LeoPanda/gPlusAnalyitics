@@ -10,4 +10,5 @@ package jp.leopanda.gPlusAnalytics.dataObject;
  */
 public abstract class PlusItem {
   public abstract String getUrl();
+  public abstract String getId();
 }

@@ -12,7 +12,7 @@ import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.client.util.SortComparator;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
-import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
+import jp.leopanda.gPlusAnalytics.dataObject.SourceItems;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 import jp.leopanda.gPlusAnalytics.server.PlusApiService;
 
@@ -34,6 +34,7 @@ import com.google.appengine.api.datastore.Query.SortDirection;
  * @author LeoPanda
  *
  */
+@Deprecated
 public class ActivityStoreHandler {
   DatastoreService ds;
 
@@ -53,27 +54,28 @@ public class ActivityStoreHandler {
    * @throws HostGateException
    *           例外スロー
    */
+  @Deprecated
   public void putActivity(PlusActivity activity, List<PlusPeople> plusOners, Key entityKey)
       throws HostGateException {
-    DataStoreEntity activityEntity;
-    if (entityKey != null) {
-      try {
-        activityEntity = new DataStoreEntity(ds.get(entityKey));
-      } catch (EntityNotFoundException e) {
-        throw new HostGateException(e.toString());
-      }
-    } else {
-      activityEntity = new DataStoreEntity(ActivityProperty.KIND);
-    }
-    activityEntity.setProperty(ActivityProperty.ID, activity.getId());
-    activityEntity.setProperty(ActivityProperty.ACTOR_ID, activity.getActorId());
-    activityEntity.setProperty(ActivityProperty.PUBLISHED, activity.getPublished());
-    activityEntity.setProperty(ActivityProperty.NUM_OF_PLUSONERS, activity.getNumOfPlusOners());
-
-    Serializer serializer = new Serializer();
-    activityEntity.setProperty(ActivityProperty.ACTIVITY_ITEM, serializer.encode(activity));
-    activityEntity.setProperty(ActivityProperty.PLUSONER_ITEMS, serializer.encode(plusOners));
-    ds.put(activityEntity.getEntity());
+//    DataStoreEntity activityEntity;
+//    if (entityKey != null) {
+//      try {
+//        activityEntity = new DataStoreEntity(ds.get(entityKey));
+//      } catch (EntityNotFoundException e) {
+//        throw new HostGateException(e.toString());
+//      }
+//    } else {
+//      activityEntity = new DataStoreEntity(ActivityProperty.KIND);
+//    }
+//    activityEntity.setProperty(ActivityProperty.ID, activity.getId());
+//    activityEntity.setProperty(ActivityProperty.ACTOR_ID, activity.getActorId());
+//    activityEntity.setProperty(ActivityProperty.PUBLISHED, activity.getPublished());
+//    activityEntity.setProperty(ActivityProperty.NUM_OF_PLUSONERS, activity.getNumOfPlusOners());
+//
+//    Serializer serializer = new Serializer();
+//    activityEntity.setProperty(ActivityProperty.ACTIVITY_ITEM, serializer.encode(activity));
+//    activityEntity.setProperty(ActivityProperty.PLUSONER_ITEMS, serializer.encode(plusOners));
+//    ds.put(activityEntity.getEntity());
   }
 
   /**
@@ -84,27 +86,28 @@ public class ActivityStoreHandler {
    * @throws HostGateException
    * @throws IOException
    */
+  @Deprecated
   public void updateActivies(String actorId, PlusApiService googleApi)
       throws HostGateException, IOException {
-    PreparedQuery pq = ds.prepare(getAllActivitiesQuery(actorId));
-    for (Entity entity : pq.asIterable()) {
-      DataStoreEntity newEntity = new DataStoreEntity(entity);
-      String activityId = (String) newEntity.getProperty(ActivityProperty.ID);
-      loger.info("activityID=" + activityId);
-      PlusActivity newActivity = googleApi.getPlusActiviy(activityId);
-      if (newActivity == null) {
-        ds.delete(entity.getKey());
-        loger.info("entity removed.");
-        continue;
-      }
-      PlusActivity oldActivity = getOldActivity(newEntity);
-      if (oldActivity == null) {
-        continue;
-      }
-      newEntity.setProperty(ActivityProperty.ACTIVITY_ITEM, new Serializer().encode(newActivity));
-      ds.put(newEntity.getEntity());
-      loger.info("entity updated.");
-    }
+//    PreparedQuery pq = ds.prepare(getAllActivitiesQuery(actorId));
+//    for (Entity entity : pq.asIterable()) {
+//      DataStoreEntity newEntity = new DataStoreEntity(entity);
+//      String activityId = (String) newEntity.getProperty(ActivityProperty.ID);
+//      loger.info("activityID=" + activityId);
+//      PlusActivity newActivity = googleApi.getPlusActiviy(activityId);
+//      if (newActivity == null) {
+//        ds.delete(entity.getKey());
+//        loger.info("entity removed.");
+//        continue;
+//      }
+//      PlusActivity oldActivity = getOldActivity(newEntity);
+//      if (oldActivity == null) {
+//        continue;
+//      }
+//      newEntity.setProperty(ActivityProperty.ACTIVITY_ITEM, new Serializer().encode(newActivity));
+//      ds.put(newEntity.getEntity());
+//      loger.info("entity updated.");
+//    }
 
   }
 
@@ -115,8 +118,9 @@ public class ActivityStoreHandler {
    * @return
    * @throws HostGateException
    */
+  @Deprecated
   private PlusActivity getOldActivity(DataStoreEntity entity) throws HostGateException {
-    PlusActivity oldActivity = new Serializer()
+    PlusActivity oldActivity = new Serializer<PlusActivity>(){}
         .decodeAsPlusActivity((Blob) entity.getProperty(ActivityProperty.ACTIVITY_ITEM));
     loger.info("entity key=" + entity.getEntity().getKey().toString());
     if (oldActivity.object.attachments != null) {
@@ -135,6 +139,7 @@ public class ActivityStoreHandler {
    *          アクティビティのオーナーID
    * @return アクティビティチェックマップ
    */
+  @Deprecated
   public ActivityCheckMap getActivityCheckMap(String actorId) {
     ActivityCheckMap checkMap = new ActivityCheckMap();
     PreparedQuery pq = ds.prepare(
@@ -159,10 +164,11 @@ public class ActivityStoreHandler {
    * @throws HostGateException
    *           例外スロー
    */
-  public StoredItems getItems(String actorId) throws HostGateException {
+  @Deprecated
+  public SourceItems getItems(String actorId) throws HostGateException {
     AllPlusOnersMap plusOnersMap = new AllPlusOnersMap();
     List<PlusActivity> activities = new ArrayList<PlusActivity>();
-    Serializer serializer = new Serializer();
+    Serializer<PlusActivity> serializer = new Serializer<PlusActivity>(){};
     PreparedQuery pq = ds.prepare(getAllActivitiesQuery(actorId));
     for (Entity entity : pq.asIterable()) {
       DataStoreEntity activityEntity = new DataStoreEntity(entity);
@@ -181,7 +187,7 @@ public class ActivityStoreHandler {
     // アクティビティを最新日付順にソート
     Collections.sort(activities, new SortComparator().getLatestActivitesOrder());
     //結果内容のセット
-    StoredItems result = new StoredItems();
+    SourceItems result = new SourceItems();
     result.setActivities(activities);
     result.setPlusOners(plusOnersMap.getPlusOners());
     return result;

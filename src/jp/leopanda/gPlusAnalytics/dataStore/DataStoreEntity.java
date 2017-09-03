@@ -7,6 +7,7 @@ import com.google.appengine.api.datastore.Entity;
  * @author LeoPanda
  *
  */
+@Deprecated
 public class DataStoreEntity {
   
   Entity entity;

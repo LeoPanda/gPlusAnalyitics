@@ -15,6 +15,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
  * @author LeoPanda
  *
  */
+@Deprecated
 public class AllPlusOnersMap {
   //PlusOnerID,アイテムオブジェクトの+1ersメモリーマップ
   Map<String, PlusPeople> plusOnersMap = new HashMap<String, PlusPeople>();

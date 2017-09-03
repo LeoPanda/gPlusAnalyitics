@@ -1,6 +1,7 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,13 +10,21 @@ import java.util.List;
  * @author LeoPanda
  *
  */
-public class StoredItems implements Serializable {
+public class SourceItems implements Serializable {
   private static final long serialVersionUID = 1L;
   public List<PlusActivity> activities;
   public List<PlusPeople> plusOners;
 
-  public void setActivities(List<PlusActivity> activties) {
-    this.activities = activties;
+  /**
+   * コンストラクタ
+   */
+  public SourceItems() {
+    this.activities = new ArrayList<PlusActivity>();
+    this.plusOners = new ArrayList<PlusPeople>();
+  }
+
+  public void setActivities(List<PlusActivity> activities) {
+    this.activities = activities;
   }
 
   public void setPlusOners(List<PlusPeople> plusOners) {

@@ -3,10 +3,18 @@ package jp.leopanda.gPlusAnalytics.server;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
+import javax.activation.DataHandler;
+
+import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
+import jp.leopanda.gPlusAnalytics.dataObject.SourceItems;
+import jp.leopanda.gPlusAnalytics.dataStore.DataStoreHandler;
+import jp.leopanda.gPlusAnalytics.dataStore.DataStoreHandlerOld;
 import jp.leopanda.gPlusAnalytics.dataStore.DataStoreHandler;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateService;
+import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 import jp.leopanda.googleAuthorization.client.NoCredentialException;
 import jp.leopanda.googleAuthorization.server.CatchException;
 import jp.leopanda.googleAuthorization.server.CredentialUtils;
@@ -20,7 +28,7 @@ import jp.leopanda.googleAuthorization.server.CredentialUtils;
 public class GoogleGateServiceImpl extends RemoteServiceServlet implements GoogleGateService {
   private static final long serialVersionUID = 1L;
 
-  DataStoreHandler dataHandler = new DataStoreHandler();
+  DataStoreHandlerOld dataHandlerOld = new DataStoreHandlerOld();
 
   /**
    * データストアの内容を最新状態に更新する
@@ -33,7 +41,8 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
 
       @Override
       public String tryApiCall() throws Exception {
-        return dataHandler.updateBrandNew(getCurrentUserId(), getApiService());
+//        return dataHandlerOld.updateBrandNew(getCurrentUserId(), getApiService());
+        return new DataConductor(getStoreHandler(), getApiService()).updateDataStore();
       }
     }.execute();
   }
@@ -48,7 +57,7 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
 
       @Override
       public String tryApiCall() throws Exception {
-        dataHandler.clearDataStore(getCurrentUserId());
+        dataHandlerOld.clearDataStore(getCurrentUserId());
         return null;
       }
     }.execute();
@@ -64,26 +73,42 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
 
       @Override
       public String tryApiCall() throws Exception {
-        return dataHandler.initialLoadToStore(getCurrentUserId(), getApiService());
+        SourceItems items = getItemsFromOldStore();
+        Map<String, Integer> activityMap = new HashMap<String, Integer>();
+        for (PlusActivity activity : items.activities) {
+          activityMap.put(activity.getId(), activity.getNumOfPlusOners());
+        }
+        new DataStoreHandler(getCurrentUserId()).putItems(items);
+        return "";
       }
     }.execute();
   }
 
   /**
-   * データストアからactivityとplusOnersを得る
+   * データストアからソースアイテムを読み込む
+   * 
+   * @return
+   * @throws Exception
+   */
+  public SourceItems getItems() throws Exception {
+    return new CatchException<SourceItems>() {
+
+      @Override
+      public SourceItems tryApiCall() throws Exception {
+        return getStoreHandler().getItems();
+      }
+
+    }.execute();
+  }
+
+  /**
+   * 旧型データストアからactivityとplusOnersを得る
    * 
    * @throws Exception
    */
-  public StoredItems getItems() throws Exception {
-    return new CatchException<StoredItems>() {
-
-      @Override
-      public StoredItems tryApiCall() throws Exception {
-        String userId = getApiService().getGplusUserId();
-        return dataHandler.getActivityStoreHandler().getItems(userId);
-
-      }
-    }.execute();
+  private SourceItems getItemsFromOldStore() throws Exception {
+    String userId = getApiService().getGplusUserId();
+    return dataHandlerOld.getActivityStoreHandler().getItems(userId);
   }
 
   /**
@@ -97,9 +122,32 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
 
       @Override
       public String tryApiCall() throws Exception {
-        return dataHandler.updateActivities(getCurrentUserId(), getApiService());
+        return dataHandlerOld.updateActivities(getCurrentUserId(), getApiService());
       }
     }.execute();
+  }
+
+  /**
+   * データコンダクタの取得
+   * 
+   * @return
+   * @throws IOException
+   * @throws NoCredentialException
+   * @throws HostGateException
+   */
+  private DataConductor getDataConductor() throws Exception {
+    return new DataConductor(getStoreHandler(), getApiService());
+  }
+
+  /**
+   * データストアハンドラの取得
+   * 
+   * @return
+   * @throws NoCredentialException
+   * @throws IOException
+   */
+  private DataStoreHandler getStoreHandler() throws IOException, NoCredentialException {
+    return new DataStoreHandler(getCurrentUserId());
   }
 
   /**

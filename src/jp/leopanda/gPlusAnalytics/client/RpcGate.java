@@ -1,7 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client;
 
 import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
-import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
+import jp.leopanda.gPlusAnalytics.dataObject.SourceItems;
 import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateService;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateServiceAsync;
@@ -49,7 +49,7 @@ public class RpcGate<R> {
     genAsync.addListener((RpcGateListener<R>) this.listener);
     switch (function) {
     case GET_STOREDITEMS: {
-      googleAsync.getItems((AsyncCallback<StoredItems>) genAsync.callbackR);
+      googleAsync.getItems((AsyncCallback<SourceItems>) genAsync.callbackR);
     }
       break;
     case INITIAL_ITEMSTORE: {

@@ -30,9 +30,12 @@ import com.google.api.services.plus.model.PeopleFeed;
  *
  */
 public class PlusApiService {
-  private static final String collectionPublic = "public";
-  private static final String collectionPlusoners = "plusoners";
+  private final String collectionPublic = "public";
+  private final String collectionPlusoners = "plusoners";
   private Plus plus;
+  private final String activityFields = "items(access/description,actor(id,displayName,url),id,kind,title,updated,url,object(attachments,content,plusoners))";
+  private final String personFields = "items(displayName,gender,id,image/url,language,url)";
+  private final String nextPageToken = ",nextPageToken";
 
   /**
    * コンストラクタ クライアントサイドでoauthToken取得
@@ -89,7 +92,7 @@ public class PlusApiService {
     PlusActivityMaker activityMaker = new PlusActivityMaker();
     Plus.Activities.List listActivities = null;
     listActivities = plus.activities().list(userId, collectionPublic)
-        .setMaxResults(40L);
+        .setFields(activityFields + nextPageToken).setMaxResults(40L);
     ActivityFeed feed = null;
     String nextPageToken = "";
     while (nextPageToken != null) {
@@ -102,17 +105,18 @@ public class PlusApiService {
     }
     return activities;
   }
-  
+
   /**
    * Google Plus 単一アクテビティの取得
+   * 
    * @param activityId
    * @return
    * @throws IOException
    */
-  public PlusActivity getPlusActiviy(String activityId) throws IOException{
+  public PlusActivity getPlusActiviy(String activityId) throws IOException {
     Activity activity = null;
     try {
-      activity = plus.activities().get(activityId).execute();
+      activity = plus.activities().get(activityId).setFields(activityFields).execute();
     } catch (IOException e) {
       if (e instanceof GoogleJsonResponseException) {
         int statusCode = ((GoogleJsonResponseException) e).getStatusCode();
@@ -125,10 +129,39 @@ public class PlusApiService {
         }
       }
     }
-    if(activity == null){
+    if (activity == null) {
       return null;
     }
-    return  new PlusActivityMaker().generate(activity);
+    return new PlusActivityMaker().generate(activity);
+  }
+
+  /**
+   * Google Plus 単一ユーザーの取得
+   * 
+   * @param activityId
+   * @return
+   * @throws IOException
+   */
+  public PlusPeople getOner(String userId) throws IOException {
+    Person plusOner = null;
+    try {
+      plusOner = plus.people().get(userId).setFields(personFields).execute();
+    } catch (IOException e) {
+      if (e instanceof GoogleJsonResponseException) {
+        int statusCode = ((GoogleJsonResponseException) e).getStatusCode();
+        if (statusCode == HttpStatus.SC_NOT_FOUND) {
+          loger.info("plusoner not exist.");
+          return null;
+        } else {
+          e.printStackTrace();
+          throw new IOException(e);
+        }
+      }
+    }
+    if (plusOner == null) {
+      return null;
+    }
+    return new PlusPeopleMaker().get(plusOner);
   }
 
   /**
@@ -145,7 +178,7 @@ public class PlusApiService {
     List<PlusPeople> plusPeople = new ArrayList<PlusPeople>();
     PlusPeopleMaker plusPeopleMaker = new PlusPeopleMaker();
     ListByActivity listPeople = plus.people().listByActivity(activityId, collectionPlusoners)
-        .setMaxResults(40L);
+        .setMaxResults(40L).setFields(personFields + nextPageToken);
     PeopleFeed feed = null;
     String nextPageToken = "";
     while (nextPageToken != null) {
@@ -157,6 +190,31 @@ public class PlusApiService {
       listPeople.setPageToken(nextPageToken);
     }
     return plusPeople;
+  }
+
+  /**
+   * 特定アクテビティに+1したユーザーのIDリストを取得する
+   * 
+   * @param activityId
+   * @return
+   * @throws IOException
+   */
+  public List<String> getPlusOnerIdByActivity(String activityId)
+      throws IOException {
+    List<String> ides = new ArrayList<String>();
+    ListByActivity listPeople = plus.people().listByActivity(activityId, collectionPlusoners)
+        .setFields("items/id").setMaxResults(40L);
+    PeopleFeed feed = null;
+    String nextPageToken = "";
+    while (nextPageToken != null) {
+      feed = listPeople.execute();
+      for (Person person : feed.getItems()) {
+        ides.add(person.getId());
+      }
+      nextPageToken = feed.getNextPageToken();
+      listPeople.setPageToken(nextPageToken);
+    }
+    return ides;
   }
 
 }

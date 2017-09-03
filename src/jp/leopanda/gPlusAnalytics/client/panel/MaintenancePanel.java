@@ -23,8 +23,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class MaintenancePanel extends VerticalPanel {
 
   Button updateButton = new Button("データストア更新");
-  Button clearDataButton = new Button("データクリア");
-  Button initialButton = new Button("データストア初期ロード");
+  Button clearDataButton = new Button("旧データストアを削除する");
+  Button initialButton = new Button("旧データストアからのコンバート");
   Button updateActivityButton = new Button("アクテビティ再設定");
   VerticalPanel buttonPanel;
 

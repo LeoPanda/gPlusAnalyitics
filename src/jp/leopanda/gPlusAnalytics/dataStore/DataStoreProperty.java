@@ -7,8 +7,10 @@ import com.google.appengine.api.datastore.PropertyProjection;
  * @author LeoPanda
  *
  */
+@Deprecated
 public interface DataStoreProperty {
   
+  public String getKind();
   public String getName();
   public Class<?> getClazz();
   public PropertyProjection getProjection();

@@ -11,7 +11,7 @@ import java.util.List;
  * @author LeoPanda
  *
  */
-public class PlusActivity extends PlusItem implements Serializable {
+public class PlusActivity extends PlusItem implements Serializable{
   private static final long serialVersionUID = 1L;
   public String kind;
   public String title;
@@ -24,11 +24,11 @@ public class PlusActivity extends PlusItem implements Serializable {
   public ItemObject object;
   public ItemAccess access;
 
-  private List<String> plusOnerIds;
-  private int firstLookers = 0;
-  private int lowMiddleLookers = 0;
-  private int highMiddleLookers = 0;
-  private int highLookers = 0;
+  public List<String> plusOnerIds;
+  public int firstLookers = 0;
+  public int lowMiddleLookers = 0;
+  public int highMiddleLookers = 0;
+  public int highLookers = 0;
 
 
   /**

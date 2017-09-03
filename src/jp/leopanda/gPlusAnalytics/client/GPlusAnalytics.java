@@ -2,7 +2,7 @@ package jp.leopanda.gPlusAnalytics.client;
 
 import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
 import jp.leopanda.gPlusAnalytics.client.panel.MainPanel;
-import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
+import jp.leopanda.gPlusAnalytics.dataObject.SourceItems;
 import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
 import jp.leopanda.googleAuthorization.client.Auth;
 
@@ -47,7 +47,8 @@ public class GPlusAnalytics implements EntryPoint {
   private void requestDataLoad() {
     outerPanel.clear();
     outerPanel.add(new Label("データロード中..."));
-    new RpcGate<StoredItems>(CallFunction.GET_STOREDITEMS, new OnDataLoad()) {
+    
+    new RpcGate<SourceItems>(CallFunction.GET_STOREDITEMS, new OnDataLoad()) {
     }.request();
   }
 
@@ -57,9 +58,9 @@ public class GPlusAnalytics implements EntryPoint {
    * @author LeoPanda
    *
    */
-  private class OnDataLoad implements RpcGateListener<StoredItems> {
+  private class OnDataLoad implements RpcGateListener<SourceItems> {
     @Override
-    public void onCallback(StoredItems result) {
+    public void onCallback(SourceItems result) {
       outerPanel.clear();
       outerPanel.add(new MainPanel(result.activities, result.plusOners));
     }

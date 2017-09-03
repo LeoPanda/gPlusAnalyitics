@@ -4,10 +4,10 @@ package jp.leopanda.gPlusAnalytics.interFace;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import jp.leopanda.gPlusAnalytics.dataObject.StoredItems;
+import jp.leopanda.gPlusAnalytics.dataObject.SourceItems;
 
 public interface GoogleGateServiceAsync {
-  void getItems(AsyncCallback<StoredItems> callback);
+  void getItems(AsyncCallback<SourceItems> callback);
 
   void initialLoadToStore(AsyncCallback<String> callback);
 
