@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.logging.Logger;
-
-import org.mortbay.log.Log;
 
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
@@ -28,16 +25,10 @@ public class DataConductor {
 
   DataStoreHandler storeHandler;
   PlusApiService apiService;
+  List<PlusActivity> newActivites; // 処理対象のアクテビティリスト
   List<PlusPeople> plusOnersForUpdate; // 変更のあったアクテビティに＋１したユーザーのアイテムリスト
 
-  int addedActivities = 0;
-  int updatedActivities = 0;
-  int updatedPlusOners = 0;
-  int addedPlusOners = 0;
-  int deletedPlusOners = 0;
-  
-  
-  Logger loger = Logger.getLogger("DataConductor");
+  LoggerWidhConter logger = new LoggerWidhConter(DataConductor.class.getName());
 
   /**
    * コンストラクタ
@@ -59,7 +50,19 @@ public class DataConductor {
    * @throws Exception
    */
   public String updateDataStore() throws Exception {
-    storeHandler.putItems(updateSouceItems());
+    SourceItems sourceItems = storeHandler.getItems();
+    // 実行時間超過時の割り込み処理
+    new DeadlineInterrupter<PlusActivity, SourceItems>(newActivites, sourceItems) {
+      @Override
+      public void whenExceeded(List<PlusActivity> unprocessedItems, SourceItems sourceItems)
+          throws Exception {
+        putInterruptedList(unprocessedItems);
+        storeHandler.putItems(sourceItems);
+      }
+    }.setInterruptTask();
+    // 通常処理
+    storeHandler.putItems(updateSouceItems(sourceItems));
+    logger.writeLog();
     return "";
   }
 
@@ -69,29 +72,53 @@ public class DataConductor {
    * @return
    * @throws Exception
    */
-  private SourceItems updateSouceItems() throws Exception {
+  private SourceItems updateSouceItems(SourceItems sourceItems) throws Exception {
     PlusOneCounter plusOneCounter = new PlusOneCounter();
     this.plusOnersForUpdate = new ArrayList<PlusPeople>();
-
-    SourceItems sourceItems = storeHandler.getItems();
-    List<PlusActivity> newActivites = apiService.getPlusActivies(storeHandler.getActorId());// アクテビティは全件読み込む
-    newActivites = removeNoImageActivity(newActivites);
-
-    sourceItems.activities = updatePlusActivities(newActivites, sourceItems.activities);
-    sourceItems.activities = removeInvalidActivities(newActivites, sourceItems.activities);
+    List<PlusActivity> interruptedActivites = storeHandler.getInterrupted();
+    if (interruptedActivites.size() > 0) {
+      //前回処理が途中で中断されていた場合は残りのアクテビティを処理する
+      newActivites = interruptedActivites;
+    } else {
+      //通常時はG+APIから写真付き投稿アクテビティをすべて読み出す
+      newActivites = getNewActivitiesFromAPI();
+      sourceItems.activities = removeInvalidActivities(newActivites, sourceItems.activities);
+    }
+    // アクテビティリストの処理
+    sourceItems.activities = updatePlusActivitiesAndStackPlusOners(newActivites,
+        sourceItems.activities);
     sourceItems.activities = setStatisticsInfo(
         plusOneCounter.aggregatePlusOneCount(sourceItems.activities), sourceItems.activities);
-
+    // +1erリストの処理
     sourceItems.plusOners = addNewPlusOners(plusOnersForUpdate, sourceItems.plusOners);
     sourceItems.plusOners = updatePlusOners(plusOneCounter, sourceItems.plusOners);
+    // 中断時未処理アクテビティリストをクリアする
+    putInterruptedList(newActivites);
 
-    loger.info("追加アクテビティ数:" + String.valueOf(addedActivities));
-    loger.info("更新アクテビティ数:" + String.valueOf(updatedActivities));
-    loger.info("追加ユーザー数:" + String.valueOf(addedPlusOners));
-    loger.info("更新ユーザー数:" + String.valueOf(plusOnersForUpdate.size()-addedPlusOners));
-    loger.info("削除ユーザー数:" + String.valueOf(deletedPlusOners));
-    
     return sourceItems;
+  }
+
+  /**
+   * 中断時未処理アクテビティリストをデータストアに書き込む
+   * 
+   * @throws Exception
+   */
+  private void putInterruptedList(List<PlusActivity> unprocessedActivities) throws Exception {
+    storeHandler.putInterrupted(unprocessedActivities);
+
+  }
+
+  /**
+   * 処理対象のアクテビティをG+APIから新規読み込みする
+   * 
+   * @return
+   * @throws Exception
+   */
+  private List<PlusActivity> getNewActivitiesFromAPI() throws Exception {
+    List<PlusActivity> newActivites = apiService.getPlusActivies(storeHandler.getActorId());// アクテビティは全件読み込む
+    newActivites = removeNoImageActivity(newActivites);
+    return newActivites;
+
   }
 
   /**
@@ -106,12 +133,12 @@ public class DataConductor {
     for (ListIterator<PlusPeople> iterator = sourceItems.listIterator(); iterator.hasNext();) {
       PlusPeople plusOner = iterator.next();
       if (!counter.containsKey(plusOner.getId())) {
-        deletedPlusOners ++;
+        logger.plusOnerDeleted();
         iterator.remove();
       } else {
         int numOfPlusOne = counter.get(plusOner.getId());
         if (numOfPlusOne == 0) {
-          deletedPlusOners ++;
+          logger.plusOnerDeleted();
           iterator.remove();
         } else {
           plusOner.setNumOfPlusOne(numOfPlusOne);
@@ -151,7 +178,7 @@ public class DataConductor {
     activity.highMiddleLookers = 0;
     activity.lowMiddleLookers = 0;
     activity.firstLookers = 0;
-    
+
     for (String plusOnerId : activity.plusOnerIds) {
       int numOfPlusOne = plusOneCounter.get(plusOnerId);
       if (numOfPlusOne > Distribution.HIGH_LOOKER.threshold) {
@@ -235,7 +262,7 @@ public class DataConductor {
   }
 
   /**
-   * 変更のあったアクテビティを更新する
+   * 変更のあったアクテビティを更新し、処理対象の+1リストを作成する 処理の終わったnewItemはリストから削除される
    * 
    * @param newActivity
    * @param sourceActivities
@@ -243,14 +270,14 @@ public class DataConductor {
    * @throws Exception
    * @throws IOException
    */
-  private List<PlusActivity> updatePlusActivities(List<PlusActivity> newItems,
+  private List<PlusActivity> updatePlusActivitiesAndStackPlusOners(List<PlusActivity> newItems,
       List<PlusActivity> sourceItems) throws Exception {
     return new CompareItemsForUpdate<PlusActivity>() {
       @Override
       PlusActivity setItemForNewAdd(PlusActivity newItem) throws Exception {
         newItem.setPlusOnerIds(
             stackPlusOnersForUpdate(apiService.getPlusOnersByActivity(newItem.getId())));
-        addedActivities++;
+        logger.activitiesAdded();
         return newItem;
       }
 
@@ -260,8 +287,7 @@ public class DataConductor {
         if (sourceItem.getNumOfPlusOners().equals(newItem.getNumOfPlusOners())) {
           return null; // 更新しない
         }
-        updatedActivities++;
-        addedActivities--;
+        logger.activitiesUpdated();
         return setItemForNewAdd(newItem); // 新規アイテムで置き換え
       }
     }.update(newItems, sourceItems);
@@ -298,7 +324,7 @@ public class DataConductor {
 
       @Override
       PlusPeople setItemForNewAdd(PlusPeople newItem) throws Exception {
-        addedPlusOners++;
+        logger.plusOnerAdded();
         return newItem;
       }
 
@@ -307,40 +333,6 @@ public class DataConductor {
         return null;
       }
     }.update(newItems, sourceItems);
-  }
-
-  /**
-   * ソースアイテムリストを最新のアイテムリストと比較しアップデートする抽象クラス
-   * 
-   * @param <I>
-   */
-  private abstract class CompareItemsForUpdate<I extends PlusItem> {
-    List<I> update(List<I> newItems, List<I> sourceItems) throws Exception {
-      for (I newItem : newItems) {
-        sourceItems = updateItems(newItem, sourceItems);
-      }
-      return sourceItems;
-    }
-
-    private List<I> updateItems(I newItem, List<I> sourceItems) throws Exception {
-
-      for (ListIterator<I> iterator = sourceItems.listIterator(); iterator.hasNext();) {
-        I sourceItem = iterator.next();
-        if (newItem.getId().equals(sourceItem.getId())) {
-          I modifiedItem = setItemForUpdate(newItem, sourceItem);
-          if (modifiedItem != null) {
-            iterator.set(modifiedItem);
-          }
-          return sourceItems;
-        }
-      }
-      sourceItems.add(setItemForNewAdd(newItem));
-      return sourceItems;
-    }
-
-    abstract I setItemForNewAdd(I newItem) throws Exception;
-
-    abstract I setItemForUpdate(I newItem, I sourceItem) throws Exception;
   }
 
 }

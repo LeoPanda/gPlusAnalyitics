@@ -34,7 +34,7 @@ public class PlusApiService {
   private final String collectionPlusoners = "plusoners";
   private Plus plus;
   private final String activityFields = "items(access/description,actor(id,displayName,url),id,kind,title,updated,url,object(attachments,content,plusoners))";
-  private final String personFields = "items(displayName,gender,id,image/url,language,url)";
+  private final String personFields = "items(displayName,id,image/url,url)";
   private final String nextPageToken = ",nextPageToken";
 
   /**
@@ -49,7 +49,7 @@ public class PlusApiService {
     this.plus = getPlus(transport, jsonFactory, credential);
   }
 
-  Logger loger = Logger.getLogger("PlusApiService");
+  Logger logger = Logger.getLogger("PlusApiService");
 
   /**
    * Google Plus APIオブジェクト取得
@@ -121,7 +121,7 @@ public class PlusApiService {
       if (e instanceof GoogleJsonResponseException) {
         int statusCode = ((GoogleJsonResponseException) e).getStatusCode();
         if (statusCode == HttpStatus.SC_NOT_FOUND) {
-          loger.info("activity not exist in google+ any more.");
+          logger.info("activity not exist in google+ any more.");
           return null;
         } else {
           e.printStackTrace();
@@ -150,7 +150,7 @@ public class PlusApiService {
       if (e instanceof GoogleJsonResponseException) {
         int statusCode = ((GoogleJsonResponseException) e).getStatusCode();
         if (statusCode == HttpStatus.SC_NOT_FOUND) {
-          loger.info("plusoner not exist.");
+          logger.info("plusoner not exist.");
           return null;
         } else {
           e.printStackTrace();
@@ -178,7 +178,7 @@ public class PlusApiService {
     List<PlusPeople> plusPeople = new ArrayList<PlusPeople>();
     PlusPeopleMaker plusPeopleMaker = new PlusPeopleMaker();
     ListByActivity listPeople = plus.people().listByActivity(activityId, collectionPlusoners)
-        .setMaxResults(40L).setFields(personFields + nextPageToken);
+        .setMaxResults(100L).setFields(personFields + nextPageToken);
     PeopleFeed feed = null;
     String nextPageToken = "";
     while (nextPageToken != null) {
@@ -203,7 +203,7 @@ public class PlusApiService {
       throws IOException {
     List<String> ides = new ArrayList<String>();
     ListByActivity listPeople = plus.people().listByActivity(activityId, collectionPlusoners)
-        .setFields("items/id").setMaxResults(40L);
+        .setFields("items/id").setMaxResults(100L);
     PeopleFeed feed = null;
     String nextPageToken = "";
     while (nextPageToken != null) {

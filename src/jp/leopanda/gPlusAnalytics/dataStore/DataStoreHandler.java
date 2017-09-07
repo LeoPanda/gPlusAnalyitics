@@ -1,6 +1,7 @@
 package jp.leopanda.gPlusAnalytics.dataStore;
 
 import java.util.Collections;
+import java.util.List;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -20,6 +21,7 @@ import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 public class DataStoreHandler {
 
   private DatastoreService ds;
+  SourceItemHandler<PlusActivity> interruptedActivitiesHandler;
   SourceItemHandler<PlusActivity> activitiesHandler;
   SourceItemHandler<PlusPeople> plusOnersHandler;
   String actorId;
@@ -30,6 +32,10 @@ public class DataStoreHandler {
   public DataStoreHandler(String actorId) {
     this.actorId = actorId;
     this.ds = DatastoreServiceFactory.getDatastoreService();
+
+    interruptedActivitiesHandler = new SourceItemHandler<PlusActivity>("interruptedActivities", ds,
+        actorId) {
+    };
     activitiesHandler = new SourceItemHandler<PlusActivity>("Activities", ds, actorId) {
     };
     plusOnersHandler = new SourceItemHandler<PlusPeople>("PlusOners", ds, actorId) {
@@ -38,12 +44,36 @@ public class DataStoreHandler {
 
   /**
    * カレントのActorIDを返す
+   * 
    * @return
    */
-  public String getActorId(){
+  public String getActorId() {
     return this.actorId;
   }
-  
+
+  /**
+   * 中断時未処理アクテビティリストを取得する
+   * 
+   * @return
+   * @throws HostGateException
+   */
+  public List<PlusActivity> getInterrupted() throws HostGateException {
+    interruptedActivitiesHandler.setClass(PlusActivity.class);
+    List<PlusActivity> items = activitiesHandler.getItems();
+    return items;
+  }
+
+  /**
+   * 未処理のアクテビティリストをデータストアに書き込む
+   * 
+   * @param interruptedActivities
+   * @throws HostGateException
+   */
+  public void putInterrupted(List<PlusActivity> interruptedActivities) throws HostGateException {
+    interruptedActivitiesHandler.setListLimit(200);
+    interruptedActivitiesHandler.putItems(interruptedActivities);
+  }
+
   /**
    * ソースアイテムをデータストアから取得する
    * 
@@ -52,15 +82,15 @@ public class DataStoreHandler {
    */
   public SourceItems getItems() throws HostGateException {
     SourceItems items = new SourceItems();
-    //Jsonからデコード
+    // Jsonからデコード
     activitiesHandler.setClass(PlusActivity.class);
     plusOnersHandler.setClass(PlusPeople.class);
     items.activities = activitiesHandler.getItems();
     items.plusOners = plusOnersHandler.getItems();
     // ソート
     Collections.sort(items.activities, new SortComparator().getLatestActivitesOrder());
-    Collections.sort(items.plusOners,new SortComparator().getPlusOnerDecendingOrder());
- 
+    Collections.sort(items.plusOners, new SortComparator().getPlusOnerDecendingOrder());
+
     return items;
   }
 

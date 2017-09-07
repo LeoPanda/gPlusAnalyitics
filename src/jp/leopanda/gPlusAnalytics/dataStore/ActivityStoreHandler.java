@@ -42,7 +42,7 @@ public class ActivityStoreHandler {
     this.ds = ds;
   }
 
-  Logger loger = Logger.getLogger("ActivityStoreHandlerLogger");
+  Logger logger = Logger.getLogger("ActivityStoreHandlerLogger");
 
   /**
    * データストアへActivity Entityを書き込む
@@ -57,25 +57,25 @@ public class ActivityStoreHandler {
   @Deprecated
   public void putActivity(PlusActivity activity, List<PlusPeople> plusOners, Key entityKey)
       throws HostGateException {
-//    DataStoreEntity activityEntity;
-//    if (entityKey != null) {
-//      try {
-//        activityEntity = new DataStoreEntity(ds.get(entityKey));
-//      } catch (EntityNotFoundException e) {
-//        throw new HostGateException(e.toString());
-//      }
-//    } else {
-//      activityEntity = new DataStoreEntity(ActivityProperty.KIND);
-//    }
-//    activityEntity.setProperty(ActivityProperty.ID, activity.getId());
-//    activityEntity.setProperty(ActivityProperty.ACTOR_ID, activity.getActorId());
-//    activityEntity.setProperty(ActivityProperty.PUBLISHED, activity.getPublished());
-//    activityEntity.setProperty(ActivityProperty.NUM_OF_PLUSONERS, activity.getNumOfPlusOners());
-//
-//    Serializer serializer = new Serializer();
-//    activityEntity.setProperty(ActivityProperty.ACTIVITY_ITEM, serializer.encode(activity));
-//    activityEntity.setProperty(ActivityProperty.PLUSONER_ITEMS, serializer.encode(plusOners));
-//    ds.put(activityEntity.getEntity());
+    DataStoreEntity activityEntity;
+    if (entityKey != null) {
+      try {
+        activityEntity = new DataStoreEntity(ds.get(entityKey));
+      } catch (EntityNotFoundException e) {
+        throw new HostGateException(e.toString());
+      }
+    } else {
+      activityEntity = new DataStoreEntity(ActivityProperty.KIND);
+    }
+    activityEntity.setProperty(ActivityProperty.ID, activity.getId());
+    activityEntity.setProperty(ActivityProperty.ACTOR_ID, activity.getActorId());
+    activityEntity.setProperty(ActivityProperty.PUBLISHED, activity.getPublished());
+    activityEntity.setProperty(ActivityProperty.NUM_OF_PLUSONERS, activity.getNumOfPlusOners());
+
+    SerializerOld serializer = new SerializerOld();
+    activityEntity.setProperty(ActivityProperty.ACTIVITY_ITEM, serializer.encode(activity));
+    activityEntity.setProperty(ActivityProperty.PLUSONER_ITEMS, serializer.encode(plusOners));
+    ds.put(activityEntity.getEntity());
   }
 
   /**
@@ -89,25 +89,25 @@ public class ActivityStoreHandler {
   @Deprecated
   public void updateActivies(String actorId, PlusApiService googleApi)
       throws HostGateException, IOException {
-//    PreparedQuery pq = ds.prepare(getAllActivitiesQuery(actorId));
-//    for (Entity entity : pq.asIterable()) {
-//      DataStoreEntity newEntity = new DataStoreEntity(entity);
-//      String activityId = (String) newEntity.getProperty(ActivityProperty.ID);
-//      loger.info("activityID=" + activityId);
-//      PlusActivity newActivity = googleApi.getPlusActiviy(activityId);
-//      if (newActivity == null) {
-//        ds.delete(entity.getKey());
-//        loger.info("entity removed.");
-//        continue;
-//      }
-//      PlusActivity oldActivity = getOldActivity(newEntity);
-//      if (oldActivity == null) {
-//        continue;
-//      }
-//      newEntity.setProperty(ActivityProperty.ACTIVITY_ITEM, new Serializer().encode(newActivity));
-//      ds.put(newEntity.getEntity());
-//      loger.info("entity updated.");
-//    }
+    PreparedQuery pq = ds.prepare(getAllActivitiesQuery(actorId));
+    for (Entity entity : pq.asIterable()) {
+      DataStoreEntity newEntity = new DataStoreEntity(entity);
+      String activityId = (String) newEntity.getProperty(ActivityProperty.ID);
+      logger.info("activityID=" + activityId);
+      PlusActivity newActivity = googleApi.getPlusActiviy(activityId);
+      if (newActivity == null) {
+        ds.delete(entity.getKey());
+        logger.info("entity removed.");
+        continue;
+      }
+      PlusActivity oldActivity = getOldActivity(newEntity);
+      if (oldActivity == null) {
+        continue;
+      }
+      newEntity.setProperty(ActivityProperty.ACTIVITY_ITEM, new SerializerOld().encode(newActivity));
+      ds.put(newEntity.getEntity());
+      logger.info("entity updated.");
+    }
 
   }
 
@@ -122,10 +122,10 @@ public class ActivityStoreHandler {
   private PlusActivity getOldActivity(DataStoreEntity entity) throws HostGateException {
     PlusActivity oldActivity = new Serializer<PlusActivity>(){}
         .decodeAsPlusActivity((Blob) entity.getProperty(ActivityProperty.ACTIVITY_ITEM));
-    loger.info("entity key=" + entity.getEntity().getKey().toString());
+    logger.info("entity key=" + entity.getEntity().getKey().toString());
     if (oldActivity.object.attachments != null) {
       if (oldActivity.object.attachments.get(0).getImageHeight() != null) {
-        loger.info("has been updated. skip process.");
+        logger.info("has been updated. skip process.");
         return null;
       }
     }

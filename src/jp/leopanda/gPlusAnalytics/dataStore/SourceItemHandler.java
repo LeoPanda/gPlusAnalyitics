@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 public abstract class SourceItemHandler<T extends PlusItem> {
 
-  int listLimit = 200;
+  int listLimit = 200;// set Default;
   DatastoreService ds;
   SourceItemProperty entityProperty;
   EntityOperator sourceItemEntity;
@@ -94,7 +94,9 @@ public abstract class SourceItemHandler<T extends PlusItem> {
    * @throws HostGateException
    */
   public void putItems(List<T> items) throws HostGateException {
+    // 既存のデータストアをクリア
     sourceItemEntity.removeAllEntites();
+
     List<T> partItems = new ArrayList<T>();
     int counter = 0;
     int sequence = 0;
