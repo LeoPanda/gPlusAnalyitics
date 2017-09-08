@@ -13,6 +13,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.QueryResultList;
 
 /**
  * DataStore操作クラス 各エンティティはひとつのActorIDに対して１レコードのみ生成されることを前提としています。
@@ -66,67 +67,41 @@ public class EntityOperator {
   }
 
   /**
-   * Entityを単独で取得する
-   * 
-   * @return
-   */
-  public Entity getEntity() {
-    this.isNew = false;
-    PreparedQuery pq = getPreparedQuery();
-    int countEntites = getEntityCount(pq);
-    if (countEntites == 0) {
-      newEntity();
-    } else if (countEntites == 1) {
-      entity = pq.asSingleEntity();
-    } else { // 同一ActorIDのエンティティが複数生成されている状態はイレギュラーなので初期化する
-      for (Entity entity : pq.asIterable()) {
-        ds.delete(entity.getKey());
-      }
-      newEntity();
-    }
-    return entity;
-  }
-
-  /**
    * EntityをListで取得する
    * 
    * @return
    */
   public List<Entity> getEntityAsList() {
     this.isNew = false;
-    List<Entity> entities = new ArrayList<Entity>();
-    PreparedQuery pq = getPreparedQuery();
-    if (getEntityCount(pq) == 0) {
-      entities.add(newEntity());
-    } else {
-      for (Entity entity : pq.asIterable()) {
+    List<Entity> entities = new EntitiesProceccer<List<Entity>>(new ArrayList<Entity>()) {
+      @Override
+      void whenNoEntity() {
+        entities.add(newEntity());
+      }
+      @Override
+      void doEachEntity(Entity entity) {
         entities.add(entity);
       }
-    }
+    }.exec().getEntities();
+
     return entities;
   }
+
 
   /**
    * データストアからEntityを削除する
    */
   public void removeAllEntites() {
-    PreparedQuery pq = getPreparedQuery();
-    if (getEntityCount(pq) > 0) {
-      for (Entity entity : pq.asIterable()) {
-        ds.delete(entity.getKey());
-      }
-    }
     this.isNew = true;
-  }
-
-  /**
-   * ストアされているエンティティの数を取得する
-   * 
-   * @param pq
-   * @return
-   */
-  private int getEntityCount(PreparedQuery pq) {
-    return pq.countEntities(FetchOptions.Builder.withDefaults());
+    new EntitiesProceccer<Void>() {
+      @Override
+      void doEachEntity(Entity entity) {
+        ds.delete(entity.getKey());        
+      }
+      @Override
+      void whenNoEntity() {
+      }
+    }.exec();
   }
 
   /**
@@ -188,6 +163,65 @@ public class EntityOperator {
     SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
     formatter.setTimeZone(timezone);
     return formatter.format(new Date());
+  }
+  /**
+   * Queryを実行してデータストアからEntityのリストを取得し
+   * 各Entity毎に処理を行わせるための抽象クラス
+   * @author LeoPanda
+   *
+   * @param <I>
+   */
+  private abstract class EntitiesProceccer<I> {
+    PreparedQuery pq = getPreparedQuery();
+    QueryResultList<Entity> resultList = pq.asQueryResultList(FetchOptions.Builder.withDefaults());
+    I entities; //ループ内処理の結果を保持するためのスタックエリア
+
+    /**
+     * ループ内の処理結果を出力する場合のコンストラクタ
+     * @param entities
+     */
+    EntitiesProceccer(I entities) {
+      this.entities = entities;
+    }
+
+    /**
+     * コンストラクタ
+     */
+    EntitiesProceccer() {
+    }
+
+    /**
+     * 処理の実行
+     * @return
+     */
+    EntitiesProceccer<I> exec() {
+      if (resultList.size() > 0) {
+        for (Entity entity : resultList) {
+          doEachEntity(entity);
+        }
+      } else {
+        whenNoEntity();
+      }
+      return this;
+    }
+
+    /**
+     * 処理結果を取り出す
+     * @return
+     */
+    I getEntities() {
+      return this.entities;
+    }
+    /**
+     * 取得した各Entity毎の処理
+     * @param entity
+     */
+    abstract void doEachEntity(Entity entity);
+
+    /**
+     *Entityがない場合の処理 
+     */
+    abstract void whenNoEntity();
   }
 
 }

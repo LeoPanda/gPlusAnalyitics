@@ -2,6 +2,7 @@ package jp.leopanda.gPlusAnalytics.dataStore;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -24,8 +25,12 @@ public class DataStoreHandler {
   SourceItemHandler<PlusActivity> interruptedActivitiesHandler;
   SourceItemHandler<PlusActivity> activitiesHandler;
   SourceItemHandler<PlusPeople> plusOnersHandler;
-  String actorId;
 
+  String actorId;
+  SourceItems items = null;
+
+  Logger logger = Logger.getLogger(DataStoreHandler.class.getName());
+  
   /**
    * コンストラクタ
    */
@@ -59,7 +64,7 @@ public class DataStoreHandler {
    */
   public List<PlusActivity> getInterrupted() throws HostGateException {
     interruptedActivitiesHandler.setClass(PlusActivity.class);
-    List<PlusActivity> items = activitiesHandler.getItems();
+    List<PlusActivity> items = interruptedActivitiesHandler.getItems();
     return items;
   }
 
@@ -81,7 +86,11 @@ public class DataStoreHandler {
    * @throws HostGateException
    */
   public SourceItems getItems() throws HostGateException {
-    SourceItems items = new SourceItems();
+    if (items != null) {
+      logger.info("Items are returned from server memory.");
+      return items;
+    }
+    items = new SourceItems();
     // Jsonからデコード
     activitiesHandler.setClass(PlusActivity.class);
     plusOnersHandler.setClass(PlusPeople.class);
@@ -90,7 +99,6 @@ public class DataStoreHandler {
     // ソート
     Collections.sort(items.activities, new SortComparator().getLatestActivitesOrder());
     Collections.sort(items.plusOners, new SortComparator().getPlusOnerDecendingOrder());
-
     return items;
   }
 

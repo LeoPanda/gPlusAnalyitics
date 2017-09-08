@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
 
@@ -108,7 +109,8 @@ class PhotoCell extends FocusPanel {
           PhotoCell.this.detailPopRequestListener.request(activity,
               new SquareDimensions(PhotoImage.this.getWidth(),
                   PhotoImage.this.getHeight()),
-              new SquareDimensions(event.getClientX(), event.getClientY()));
+              Window.getScrollLeft() + event.getClientX(),
+                  Window.getScrollTop() + event.getClientY());
         }
       };
     }

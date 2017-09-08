@@ -3,6 +3,7 @@ package jp.leopanda.gPlusAnalytics.server;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +30,9 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
   private static final long serialVersionUID = 1L;
 
   DataStoreHandlerOld dataHandlerOld = new DataStoreHandlerOld();
+  private Map<String, DataStoreHandler> storeHandlerStocker = new HashMap<String, DataStoreHandler>();
+  private final int stackRefrashIntervalMillsec = 6 * 60 * 60 * 1000;
+  StackTimeChecker stackTimeChecker = new StackTimeChecker(stackRefrashIntervalMillsec);
 
   /**
    * データストアの内容を最新状態に更新する
@@ -41,8 +45,8 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
 
       @Override
       public String tryApiCall() throws Exception {
-//        return dataHandlerOld.updateBrandNew(getCurrentUserId(), getApiService());
-        return new DataConductor(getStoreHandler(), getApiService()).updateDataStore();
+        // return dataHandlerOld.updateBrandNew(getCurrentUserId(), getApiService());
+        return getDataConductor().updateDataStore();
       }
     }.execute();
   }
@@ -146,30 +150,64 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * @throws NoCredentialException
    * @throws IOException
    */
-  private DataStoreHandler getStoreHandler() throws IOException, NoCredentialException {
-    return new DataStoreHandler(getCurrentUserId());
+  private DataStoreHandler getStoreHandler() throws Exception {
+    String userId = getCurrentUserId();
+    DataStoreHandler dataStoreHandler;
+    if (stackTimeChecker.isNeedToRefresh()) {
+      storeHandlerStocker.clear();
+    }
+    if (storeHandlerStocker.containsKey(userId)) {
+      dataStoreHandler = storeHandlerStocker.get(userId);
+    } else {
+      dataStoreHandler = new DataStoreHandler(userId);
+      storeHandlerStocker.put(userId, dataStoreHandler);
+    }
+    return dataStoreHandler;
   }
 
   /**
    * APIサービスの取得
    * 
    * @return
-   * @throws IOException
-   * @throws NoCredentialException
+   * @throws Exception
    */
-  private PlusApiService getApiService() throws IOException, NoCredentialException {
-    CredentialUtils utils = new CredentialUtils();
-    return new PlusApiService(utils.httpTransport, utils.jsonFactory, utils.loadCredential());
+  private PlusApiService getApiService() throws Exception {
+    return new PlusApiService(new CredentialUtils());
   }
 
   /**
    * カレントユーザーIDの取得
    * 
    * @return
-   * @throws IOException
+   * @throws Exception
    * @throws NoCredentialException
    */
-  private String getCurrentUserId() throws IOException, NoCredentialException {
+  private String getCurrentUserId() throws Exception {
     return getApiService().getGplusUserId();
   }
+
+  /**
+   * オンメモリに常駐させているDataStoreのリフレッシュタイムをチェックする
+   * 
+   * @author LeoPanda
+   *
+   */
+  private class StackTimeChecker {
+    Calendar loadedTime = Calendar.getInstance();
+    int intervalTime = 0;
+
+    public StackTimeChecker(int intervalTime) {
+      this.intervalTime = intervalTime;
+    }
+
+    boolean isNeedToRefresh() {
+      Calendar nowTime = Calendar.getInstance();
+      if (intervalTime < nowTime.compareTo(loadedTime)) {
+        loadedTime = nowTime;
+        return true;
+      }
+      return false;
+    }
+  }
+
 }

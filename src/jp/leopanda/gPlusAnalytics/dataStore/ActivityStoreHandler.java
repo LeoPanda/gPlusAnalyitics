@@ -88,7 +88,7 @@ public class ActivityStoreHandler {
    */
   @Deprecated
   public void updateActivies(String actorId, PlusApiService googleApi)
-      throws HostGateException, IOException {
+      throws Exception {
     PreparedQuery pq = ds.prepare(getAllActivitiesQuery(actorId));
     for (Entity entity : pq.asIterable()) {
       DataStoreEntity newEntity = new DataStoreEntity(entity);

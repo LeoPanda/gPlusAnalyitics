@@ -9,6 +9,6 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
  *
  */
 public interface DetailPopRequestListener {
-  void request(PlusActivity activity,SquareDimensions photoDimensions,SquareDimensions clickPosition);
+  void request(PlusActivity activity,SquareDimensions photoDimensions,int clickX,int clickY);
 
 }

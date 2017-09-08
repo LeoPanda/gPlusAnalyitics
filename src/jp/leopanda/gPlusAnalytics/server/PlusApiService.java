@@ -20,6 +20,7 @@ import com.google.appengine.api.utils.SystemProperty;
 
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
+import jp.leopanda.googleAuthorization.server.CredentialUtils;
 
 import com.google.api.services.plus.model.PeopleFeed;
 
@@ -33,20 +34,32 @@ public class PlusApiService {
   private final String collectionPublic = "public";
   private final String collectionPlusoners = "plusoners";
   private Plus plus;
+
+  private DeadLineChecker checker = new DeadLineChecker();
+
   private final String activityFields = "items(access/description,actor(id,displayName,url),id,kind,title,updated,url,object(attachments,content,plusoners))";
   private final String personFields = "items(displayName,id,image/url,url)";
   private final String nextPageToken = ",nextPageToken";
 
   /**
-   * コンストラクタ クライアントサイドでoauthToken取得
+   * コンストラクタ GWT RPC用
    * 
    * @param credential
-   *          credential oAuth認証
-   * @throws IOException
+   * @throws Exception
    */
-  public PlusApiService(HttpTransport transport, JsonFactory jsonFactory,
-      Credential credential) throws IOException {
-    this.plus = getPlus(transport, jsonFactory, credential);
+  public PlusApiService(CredentialUtils credential) throws Exception {
+    this.plus = getPlus(credential.httpTransport, credential.jsonFactory,
+        credential.loadCredential());
+  }
+  /**
+   * コンストラクタ cron用
+   * @param httpTransport
+   * @param jsonFactory
+   * @param credential
+   * @throws Exception
+   */
+  public PlusApiService(HttpTransport httpTransport,JsonFactory jsonFactory,Credential credential) throws Exception {
+    this.plus = getPlus(httpTransport, jsonFactory,credential);
   }
 
   Logger logger = Logger.getLogger("PlusApiService");
@@ -87,15 +100,16 @@ public class PlusApiService {
    * @throws IOException
    *           IO例外
    */
-  public List<PlusActivity> getPlusActivies(String userId) throws IOException {
+  public List<PlusActivity> getPlusActivies(String userId) throws Exception {
     List<PlusActivity> activities = new ArrayList<PlusActivity>();
     PlusActivityMaker activityMaker = new PlusActivityMaker();
     Plus.Activities.List listActivities = null;
     listActivities = plus.activities().list(userId, collectionPublic)
-        .setFields(activityFields + nextPageToken).setMaxResults(40L);
+        .setFields(activityFields + nextPageToken).setMaxResults(100L);
     ActivityFeed feed = null;
     String nextPageToken = "";
     while (nextPageToken != null) {
+      checker.checkRuntimeExceed();
       feed = listActivities.execute();
       for (Activity activity : feed.getItems()) {
         activities.add(activityMaker.generate(activity));
@@ -107,13 +121,42 @@ public class PlusApiService {
   }
 
   /**
+   * 特定アクティビティに＋１した全ユーザーのリスト取得
+   * 
+   * @param activityId
+   *          String アクティビティID
+   * @return List<PlusPeople> ユーザーリスト
+   * @throws IOException
+   *           IO例外
+   */
+  public List<PlusPeople> getPlusOnersByActivity(String activityId)
+      throws Exception {
+    List<PlusPeople> plusPeople = new ArrayList<PlusPeople>();
+    PlusPeopleMaker plusPeopleMaker = new PlusPeopleMaker();
+    ListByActivity listPeople = plus.people().listByActivity(activityId, collectionPlusoners)
+        .setMaxResults(100L).setFields(personFields + nextPageToken);
+    PeopleFeed feed = null;
+    String nextPageToken = "";
+    while (nextPageToken != null) {
+      checker.checkRuntimeExceed();
+      feed = listPeople.execute();
+      for (Person person : feed.getItems()) {
+        plusPeople.add(plusPeopleMaker.get(person));
+      }
+      nextPageToken = feed.getNextPageToken();
+      listPeople.setPageToken(nextPageToken);
+    }
+    return plusPeople;
+  }
+  
+  /**
    * Google Plus 単一アクテビティの取得
    * 
    * @param activityId
    * @return
-   * @throws IOException
+   * @throws Exception
    */
-  public PlusActivity getPlusActiviy(String activityId) throws IOException {
+  public PlusActivity getPlusActiviy(String activityId) throws Exception {
     Activity activity = null;
     try {
       activity = plus.activities().get(activityId).setFields(activityFields).execute();
@@ -133,88 +176,6 @@ public class PlusApiService {
       return null;
     }
     return new PlusActivityMaker().generate(activity);
-  }
-
-  /**
-   * Google Plus 単一ユーザーの取得
-   * 
-   * @param activityId
-   * @return
-   * @throws IOException
-   */
-  public PlusPeople getOner(String userId) throws IOException {
-    Person plusOner = null;
-    try {
-      plusOner = plus.people().get(userId).setFields(personFields).execute();
-    } catch (IOException e) {
-      if (e instanceof GoogleJsonResponseException) {
-        int statusCode = ((GoogleJsonResponseException) e).getStatusCode();
-        if (statusCode == HttpStatus.SC_NOT_FOUND) {
-          logger.info("plusoner not exist.");
-          return null;
-        } else {
-          e.printStackTrace();
-          throw new IOException(e);
-        }
-      }
-    }
-    if (plusOner == null) {
-      return null;
-    }
-    return new PlusPeopleMaker().get(plusOner);
-  }
-
-  /**
-   * 特定アクティビティに＋１した全ユーザーのリスト取得
-   * 
-   * @param activityId
-   *          String アクティビティID
-   * @return List<PlusPeople> ユーザーリスト
-   * @throws IOException
-   *           IO例外
-   */
-  public List<PlusPeople> getPlusOnersByActivity(String activityId)
-      throws IOException {
-    List<PlusPeople> plusPeople = new ArrayList<PlusPeople>();
-    PlusPeopleMaker plusPeopleMaker = new PlusPeopleMaker();
-    ListByActivity listPeople = plus.people().listByActivity(activityId, collectionPlusoners)
-        .setMaxResults(100L).setFields(personFields + nextPageToken);
-    PeopleFeed feed = null;
-    String nextPageToken = "";
-    while (nextPageToken != null) {
-      feed = listPeople.execute();
-      for (Person person : feed.getItems()) {
-        plusPeople.add(plusPeopleMaker.get(person));
-      }
-      nextPageToken = feed.getNextPageToken();
-      listPeople.setPageToken(nextPageToken);
-    }
-    return plusPeople;
-  }
-
-  /**
-   * 特定アクテビティに+1したユーザーのIDリストを取得する
-   * 
-   * @param activityId
-   * @return
-   * @throws IOException
-   */
-  public List<String> getPlusOnerIdByActivity(String activityId)
-      throws IOException {
-    List<String> ides = new ArrayList<String>();
-    ListByActivity listPeople = plus.people().listByActivity(activityId, collectionPlusoners)
-        .setFields("items/id").setMaxResults(100L);
-    PeopleFeed feed = null;
-    String nextPageToken = "";
-    while (nextPageToken != null) {
-      feed = listPeople.execute();
-      for (Person person : feed.getItems()) {
-        ides.add(person.getId());
-      }
-      nextPageToken = feed.getNextPageToken();
-      listPeople.setPageToken(nextPageToken);
-    }
-    return ides;
   }
 
 }

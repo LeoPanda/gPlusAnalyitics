@@ -22,7 +22,6 @@ abstract class CompareItemsForUpdate<I extends PlusItem> {
   }
 
   private List<I> updateItems(I newItem, List<I> sourceItems) throws Exception {
-
     for (ListIterator<I> sourceIterator = sourceItems.listIterator(); sourceIterator.hasNext();) {
       I sourceItem = sourceIterator.next();
       if (newItem.getId().equals(sourceItem.getId())) {

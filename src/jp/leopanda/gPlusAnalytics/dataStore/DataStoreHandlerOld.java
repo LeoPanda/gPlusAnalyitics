@@ -37,7 +37,7 @@ public class DataStoreHandlerOld {
    * RPCのインターフェースに同期するため) @throws HostGateException 処理例外スロー @throws
    */
   public String initialLoadToStore(String userId, PlusApiService googleApi)
-      throws HostGateException, IOException {
+      throws Exception {
     if (activityStoreHandler.getLatestActivityPublished(userId) != null) {
       throw new HostGateException("データストアがすでに存在しています。初期化するためにはいったんデータストアを消去してください。");
     }
@@ -75,7 +75,7 @@ public class DataStoreHandlerOld {
    */
   @Deprecated
   public String updateBrandNew(String userId, PlusApiService googleApi)
-      throws HostGateException, IOException {
+      throws Exception {
     ActivityCheckMap checkMap = activityStoreHandler.getActivityCheckMap(userId);
     List<PlusActivity> activities = googleApi.getPlusActivies(userId);
     for (PlusActivity activity : activities) {
@@ -102,7 +102,7 @@ public class DataStoreHandlerOld {
    * @throws HostGateException
    * @throws IOException
    */
-  public String updateActivities(String userId,PlusApiService googleApi) throws HostGateException, IOException{
+  public String updateActivities(String userId,PlusApiService googleApi) throws Exception{
     activityStoreHandler.updateActivies(userId, googleApi);
     return null;
   }

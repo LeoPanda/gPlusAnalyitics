@@ -125,9 +125,8 @@ public class PhotoPanel extends VerticalPanel {
     for (PlusActivity activity : activities) {
       photoCellList.addCell(activity, pageMaker.getLineHeight(), new DetailPopRequestListener() {
         @Override
-        public void request(PlusActivity activity, SquareDimensions photoDimensions,
-            SquareDimensions clickPosition) {
-          popActivityDetail(activity, photoDimensions, clickPosition);
+        public void request(PlusActivity activity, SquareDimensions photoDimensions,int clickX,int clickY ) {
+          popActivityDetail(activity, photoDimensions, clickX,clickY);
         }
       });
     }
@@ -139,14 +138,13 @@ public class PhotoPanel extends VerticalPanel {
    * 
    * @param activity
    */
-  private void popActivityDetail(PlusActivity activity, SquareDimensions photoDimensions,
-      SquareDimensions clickPosition) {
+  private void popActivityDetail(PlusActivity activity, SquareDimensions photoDimensions,int clickX,int clickY) {
     if (activityDetailPop == null) {
       activityDetailPop = new ActivityDetailPop(
           new SquareDimensions(pageMaker.getPageWidth(),
               pageMaker.getLineHeight() * pageMaker.getPageRowSize()));
     }
-    activityDetailPop.show(activity, photoDimensions, clickPosition);
+    activityDetailPop.show(activity, photoDimensions, clickX,clickY);
   }
 
 }
