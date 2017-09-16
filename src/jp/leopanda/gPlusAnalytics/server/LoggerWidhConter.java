@@ -9,13 +9,7 @@ import java.util.logging.Logger;
  *
  */
 public class LoggerWidhConter {
-  private int numOfNewActivities = 0;
-  private int addedActivities = 0;
-  private int updatedActivities = 0;
-  private int updatedPlusOners = 0;
-  private int addedPlusOners = 0;
-  private int deletedActivities = 0;
-  private int deletedPlusOners = 0;
+  private StatNumbers counter = new StatNumbers();
   private Logger logger;
 
   /**
@@ -27,30 +21,40 @@ public class LoggerWidhConter {
   }
 
   public void setnumOfNewActivities(int numOfNewActivities) {
-    this.numOfNewActivities = numOfNewActivities;
+    counter.numOfNewActivities = numOfNewActivities;
   }
+
   public void activitiesAdded() {
-    addedActivities++;
+    counter.addedActivities++;
   }
 
   public void activitiesUpdated() {
-    updatedActivities++;
-    addedActivities--;
+    counter.updatedActivities++;
+    counter.addedActivities--;
   }
+
   public void activitiesDeleted() {
-    deletedActivities++;
+    counter.deletedActivities++;
   }
 
   public void plusOnerAdded() {
-    addedPlusOners++;
+    counter.addedPlusOners++;
+  }
+
+  public void countUpPlusOne(int numOfPlusOne) {
+    counter.totalPlusOne += numOfPlusOne;
+  }
+
+  public void countUpPlusOners(int numOfPlusOners) {
+    counter.totalPlusOners += numOfPlusOners;
   }
 
   public void setnumOfPlusOnerUpdated(int updatedPlusOners) {
-    this.updatedPlusOners = updatedPlusOners;
+    counter.updatedPlusOners = updatedPlusOners;
   }
 
   public void plusOnerDeleted() {
-    deletedPlusOners++;
+    counter.deletedPlusOners++;
   }
 
   public void info(String msg) {
@@ -66,15 +70,24 @@ public class LoggerWidhConter {
   }
 
   /**
+   * 保存用統計情報を取得する
+   * @return
+   */
+  public DailyStats getDailyStatsItem(){
+    return new DailyStats(ServerUtil.getCurrentDate(),this.counter);
+  }
+  
+  /**
    * 結果ログの書き込み
    */
   public void writeLog() {
-    logger.info("更新対象アクテビティ数:" + String.valueOf(numOfNewActivities));
-    logger.info("追加アクテビティ数:" + String.valueOf(addedActivities));
-    logger.info("更新アクテビティ数:" + String.valueOf(updatedActivities));
-    logger.info("削除アクテビティ数:" + String.valueOf(deletedActivities));
-    logger.info("追加ユーザー数:" + String.valueOf(addedPlusOners));
-    logger.info("更新ユーザー数:" + String.valueOf(updatedPlusOners));
-    logger.info("削除ユーザー数:" + String.valueOf(deletedPlusOners));
+    logger.info("更新対象アクテビティ数:" + String.valueOf(counter.numOfNewActivities));
+    logger.info("追加アクテビティ数:" + String.valueOf(counter.addedActivities));
+    logger.info("更新アクテビティ数:" + String.valueOf(counter.updatedActivities));
+    logger.info("削除アクテビティ数:" + String.valueOf(counter.deletedActivities));
+    logger.info("追加ユーザー数:" + String.valueOf(counter.addedPlusOners));
+    logger.info("更新ユーザー数:" + String.valueOf(counter.updatedPlusOners));
+    logger.info("削除ユーザー数:" + String.valueOf(counter.deletedPlusOners));
+    logger.info("総＋１数:" + String.valueOf(counter.totalPlusOne));
   }
 }

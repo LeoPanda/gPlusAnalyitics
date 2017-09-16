@@ -8,6 +8,7 @@ import com.google.apphosting.api.ApiProxy;
 import com.google.apphosting.api.DeadlineExceededException;
 
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
+import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.dataObject.SourceItems;
 import jp.leopanda.gPlusAnalytics.dataStore.DataStoreHandler;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
@@ -24,6 +25,7 @@ public class DataConductor {
   DataStoreHandler storeHandler;
   PlusApiService apiService;
   List<PlusActivity> newActivities; // 処理対象のアクテビティリスト
+  boolean isCronBatch = false;
 
   LoggerWidhConter logger = new LoggerWidhConter(DataConductor.class.getName());
 
@@ -44,9 +46,12 @@ public class DataConductor {
   /**
    * データストアを最新状態に更新する
    * 
+   * @param isCronBatch　処理をcronバッチから呼び出すならTrueを指定する
+   * @return
    * @throws Exception
    */
-  public String updateDataStore() throws Exception {
+  public String updateDataStore(boolean isCronBatch) throws Exception {
+    this.isCronBatch = isCronBatch;
     SourceItems sourceItems = storeHandler.getItems();
     try {
       storeHandler.putItems(updateSouceItems(sourceItems));
@@ -57,44 +62,75 @@ public class DataConductor {
         throw new Exception(e);
       }
     }
-    logger.writeLog();
+    exitingLogProcess();
     return "";
   }
 
   /**
-   * Google+APIを呼んで最新状態をチェックし、ソースアイテムに反映する。
+   * ソースアイテムを最新状態に更新する
    * 
    * @return
    * @throws Exception
    */
   private SourceItems updateSouceItems(SourceItems sourceItems) throws Exception {
     ActivitiesProcesser activitiesProcesser = new ActivitiesProcesser(apiService, logger);
-    // 処理対象のアクテビティを選択する
-    List<PlusActivity> interruptedActivites = storeHandler.getInterrupted();
-    if (interruptedActivites.size() > 0) {
-      newActivities = interruptedActivites; // 前回処理が途中で中断されていた場合は残りのアクテビティを処理する
+    PlusOneCounter plusOneCounter = new PlusOneCounter();
+    // 処理対象のアクテビティを設定する
+    List<PlusActivity> interruptedActivities = storeHandler.getInterruptedActivities();
+    if (interruptedActivities.size() > 0) {
+      newActivities = interruptedActivities;
     } else {
-      newActivities = getNewActivitiesFromAPI(activitiesProcesser); // 通常時はG+APIから写真付き投稿アクテビティをすべて読み出す
+      newActivities = activitiesProcesser.getNewActivitiesFromAPI(storeHandler);
       sourceItems.activities = activitiesProcesser.removeDisusedActivities(newActivities,
           sourceItems.activities);
     }
-    // アクテビティリストの処理
-    PlusOneCounter plusOneCounter = new PlusOneCounter();
-    sourceItems.activities = activitiesProcesser.updatePlusActivitiesAndStackPlusOners(
-        newActivities,
-        sourceItems.activities);
-    sourceItems.activities = activitiesProcesser.setStatisticsInfo(
-        plusOneCounter.aggregatePlusOneCount(sourceItems.activities), sourceItems.activities);
-    // +1erリストの処理
-    PlusOnersProceccer plusOnerProcesser = new PlusOnersProceccer(logger);
-    sourceItems.plusOners = plusOnerProcesser
-        .addNewPlusOners(activitiesProcesser.getPlusOnersForUpdate(), sourceItems.plusOners);
-    sourceItems.plusOners = plusOnerProcesser.updatePlusOners(plusOneCounter,
-        sourceItems.plusOners);
-    // 中断時未処理アクテビティリストをクリアする
-    putInterruptedList(newActivities);
-
+    // ソースアイテムを更新する
+    sourceItems.activities = updateActivities(newActivities, sourceItems.activities,
+        activitiesProcesser, plusOneCounter);
+    sourceItems.plusOners = updatePlusOners(activitiesProcesser.getPlusOnersForUpdate(),
+        sourceItems.plusOners, plusOneCounter);
+    // 未処理アクテビティリストのクリア
+    putUnprocessedActivities(newActivities);
     return sourceItems;
+  }
+
+  /**
+   * ソースアクテビティリストを更新する
+   * 
+   * @param newActivities
+   *          最新アクテビティリスト
+   * @param sourceActivities
+   *          ソースアクテビティリスト
+   * @param activitiesProcesser
+   * @param plusOneCounter
+   * @return
+   * @throws Exception
+   */
+  private List<PlusActivity> updateActivities(List<PlusActivity> newActivities,
+      List<PlusActivity> sourceActivities, ActivitiesProcesser activitiesProcesser,
+      PlusOneCounter plusOneCounter) throws Exception {
+    sourceActivities = activitiesProcesser.updatePlusActivitiesAndStackPlusOners(
+        newActivities, sourceActivities);
+    sourceActivities = activitiesProcesser.setStatisticsInfo(
+        plusOneCounter.aggregatePlusOneCount(sourceActivities), sourceActivities);
+    return sourceActivities;
+  }
+
+  /**
+   * ソース+1erリストを更新する
+   * 
+   * @param plusOnersForUpdate
+   * @param sourcePlusOners
+   * @param plusOneCounter
+   * @return
+   * @throws Exception
+   */
+  private List<PlusPeople> updatePlusOners(List<PlusPeople> plusOnersForUpdate,
+      List<PlusPeople> sourcePlusOners, PlusOneCounter plusOneCounter) throws Exception {
+    PlusOnersProceccer plusOnerProcesser = new PlusOnersProceccer(logger);
+    sourcePlusOners = plusOnerProcesser.addNewPlusOners(plusOnersForUpdate, sourcePlusOners);
+    sourcePlusOners = plusOnerProcesser.updatePlusOners(plusOneCounter, sourcePlusOners);
+    return sourcePlusOners;
   }
 
   /**
@@ -114,9 +150,9 @@ public class DataConductor {
       logger.warning("newActivies is null whlie doing exceeded interrupt task.");
     } else {
       if (newActivities.size() > 0) {
-        putInterruptedList(newActivities);
         storeHandler.putItems(sourceItems);
-        logger.writeLog();
+        putUnprocessedActivities(newActivities);
+        exitingLogProcess();
         startNewThread();
       } else {
         logger.info("Exceeded process started but newActivities is 0.");
@@ -133,7 +169,7 @@ public class DataConductor {
       @Override
       public void run() {
         try {
-          new DataConductor(storeHandler, apiService).updateDataStore();
+          new DataConductor(storeHandler, apiService).updateDataStore(isCronBatch);
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -146,7 +182,7 @@ public class DataConductor {
    * 
    * @throws Exception
    */
-  private void putInterruptedList(List<PlusActivity> unprocessedActivities) throws Exception {
+  private void putUnprocessedActivities(List<PlusActivity> unprocessedActivities) throws Exception {
     int numOfUnprocessedActivities = unprocessedActivities.size();
     if (numOfUnprocessedActivities > 0) {
       logger.info("Stack unprocessed Activities:" + String.valueOf(numOfUnprocessedActivities));
@@ -158,17 +194,26 @@ public class DataConductor {
   }
 
   /**
-   * 処理対象のアクテビティをG+APIから読み込む
+   * ログの終結処理
    * 
-   * @return
    * @throws Exception
    */
-  private List<PlusActivity> getNewActivitiesFromAPI(ActivitiesProcesser activitiesProcesser)
-      throws Exception {
-    List<PlusActivity> newActivites = apiService.getPlusActivies(storeHandler.getActorId());// アクテビティは全件読み込む
-    newActivites = activitiesProcesser.removeNoImageActivity(newActivites);
-    return newActivites;
+  private void exitingLogProcess() throws Exception {
+    logger.writeLog();
+    if (isCronBatch) {
+      putDailyStats();
+    }
+  }
 
+  /**
+   * ログ統計情報をデータストアに書き込む
+   * 
+   * @throws Exception
+   */
+  public void putDailyStats() throws Exception {
+    List<DailyStats> dailyStats = storeHandler.getDailyStats();
+    dailyStats.add(logger.getDailyStatsItem());
+    storeHandler.putDailyStats(dailyStats);
   }
 
 }

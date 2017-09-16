@@ -1,18 +1,19 @@
 package jp.leopanda.gPlusAnalytics.server;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
+import jp.leopanda.gPlusAnalytics.dataStore.DataStoreHandler;
 
 /**
+ * ソースアクテビティリストの処理クラス
+ * 
  * @author LeoPanda
  *
  */
@@ -39,17 +40,18 @@ public class ActivitiesProcesser {
   }
 
   /**
-   * 変更のあったアクテビティを更新し、処理対象の+1リストを作成する 処理の終わったnewItemはリストから削除される
+   * 変更のあったアクテビティを更新し、処理対象の+1erリストを抽出する 処理の終わったnewActivitiesはリストから削除される
    * 
-   * @param newActivity
+   * @param newActivities
+   *          最新のアクテビティリスト
    * @param sourceActivities
+   *          ソースアクテビティリスト
    * @return
    * @throws Exception
-   * @throws IOException
    */
-  public List<PlusActivity> updatePlusActivitiesAndStackPlusOners(List<PlusActivity> newItems,
-      List<PlusActivity> sourceItems) throws Exception {
-    logger.setnumOfNewActivities(newItems.size());
+  public List<PlusActivity> updatePlusActivitiesAndStackPlusOners(List<PlusActivity> newActivities,
+      List<PlusActivity> sourceActivities) throws Exception {
+    logger.setnumOfNewActivities(newActivities.size());
     return new CompareItemsForUpdate<PlusActivity>() {
       @Override
       PlusActivity setItemForNewAdd(PlusActivity newItem) throws Exception {
@@ -68,7 +70,7 @@ public class ActivitiesProcesser {
         logger.activitiesUpdated();
         return setItemForNewAdd(newItem); // 新規アイテムで置き換え
       }
-    }.update(newItems, sourceItems);
+    }.update(newActivities, sourceActivities);
   }
 
   /**
@@ -132,6 +134,9 @@ public class ActivitiesProcesser {
         activity.firstLookers++;
       }
     }
+    logger.countUpPlusOne(activity.highLookers + activity.highMiddleLookers
+        + activity.lowMiddleLookers + activity.firstLookers);
+    logger.countUpPlusOners(activity.getNumOfPlusOners());
     return activity;
   }
 
@@ -139,19 +144,32 @@ public class ActivitiesProcesser {
    * 最新アクテビティアイテムリストにないアイテムをソースアイテムリストから削除する
    * 
    * @param newActivities
-   * @param sourceItems
+   * @param sourceActivities
    * @return 更新後のソースアイテムリスト
    */
   public List<PlusActivity> removeDisusedActivities(List<PlusActivity> newActivities,
-      List<PlusActivity> sourceItems) {
-    for (Iterator<PlusActivity> iterator = sourceItems.iterator(); iterator.hasNext();) {
+      List<PlusActivity> sourceActivities) {
+    for (Iterator<PlusActivity> iterator = sourceActivities.iterator(); iterator.hasNext();) {
       PlusActivity activity = iterator.next();
       if (!idIsExistIn(newActivities, activity.getId())) {
         logger.activitiesDeleted();
         iterator.remove();
       }
     }
-    return sourceItems;
+    return sourceActivities;
+  }
+
+  /**
+   * 処理対象のアクテビティをG+APIから読み込む
+   * 
+   * @return
+   * @throws Exception
+   */
+  public List<PlusActivity> getNewActivitiesFromAPI(DataStoreHandler storeHandler)
+      throws Exception {
+    List<PlusActivity> newActivites = apiService.getPlusActivies(storeHandler.getActorId());
+    newActivites = removeNoImageActivity(newActivites);
+    return newActivites;
   }
 
   /**
@@ -176,7 +194,7 @@ public class ActivitiesProcesser {
    * @param activities
    * @return
    */
-  List<PlusActivity> removeNoImageActivity(List<PlusActivity> activities) {
+  private List<PlusActivity> removeNoImageActivity(List<PlusActivity> activities) {
     for (Iterator<PlusActivity> iterator = activities.iterator(); iterator.hasNext();) {
       PlusActivity activity = iterator.next();
       if (noImage(activity)) {

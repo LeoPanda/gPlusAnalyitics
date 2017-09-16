@@ -6,7 +6,7 @@ import java.util.ListIterator;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
 /**
- * ソースアイテムの+1erリストを操作する
+ * ソース+1erリストの処理クラス
  * @author LeoPanda
  *
  */

@@ -23,9 +23,6 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class MaintenancePanel extends VerticalPanel {
 
   Button updateButton = new Button("データストア更新");
-  Button clearDataButton = new Button("旧データストアを削除する");
-  Button initialButton = new Button("旧データストアからのコンバート");
-  Button updateActivityButton = new Button("アクテビティ再設定");
   VerticalPanel buttonPanel;
 
   /**
@@ -43,11 +40,6 @@ public class MaintenancePanel extends VerticalPanel {
       buttonPanel = new VerticalPanel();
       buttonPanel.add(updateButton);
       buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
-      buttonPanel.add(initialButton);
-      buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
-      buttonPanel.add(clearDataButton);
-      buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
-      buttonPanel.add(updateActivityButton);
       addClickHandlers();
     }
     return buttonPanel;
@@ -61,24 +53,6 @@ public class MaintenancePanel extends VerticalPanel {
       @Override
       public void onClick(ClickEvent event) {
         confirmClicked(CallFunction.UPDATE＿ITEMSTORE);
-      }
-    });
-    clearDataButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        confirmClicked(CallFunction.CLEAR＿ITEMSTORE);
-      }
-    });
-    initialButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        confirmClicked(CallFunction.INITIAL_ITEMSTORE);
-      }
-    });
-    updateActivityButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        confirmClicked(CallFunction.UPDATE_ACTIVITIES);
       }
     });
   }
@@ -107,9 +81,8 @@ public class MaintenancePanel extends VerticalPanel {
   private class Callback implements RpcGateListener<String> {
     @Override
     public void onCallback(String result) {
-      Window.alert("データストアの更新が完了するまでもうしばらく時間がかかる場合があります。更新データを表示するにはブラウザをリロードしてください。");
-      MaintenancePanel.this.clear();
-      MaintenancePanel.this.add(buttonPanel);
+      Window.alert("更新指示が完了しました。画面をリロードします。");
+      Window.Location.reload();
     }
   }
 }

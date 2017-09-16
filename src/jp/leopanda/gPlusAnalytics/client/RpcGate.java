@@ -52,22 +52,9 @@ public class RpcGate<R> {
       googleAsync.getItems((AsyncCallback<SourceItems>) genAsync.callbackR);
     }
       break;
-    case INITIAL_ITEMSTORE: {
-      googleAsync.initialLoadToStore((AsyncCallback<String>) genAsync.callbackR);
-
-    }
-      break;
     case UPDATE＿ITEMSTORE: {
       googleAsync.updateDataStore((AsyncCallback<String>) genAsync.callbackR);
 
-    }
-      break;
-    case UPDATE_ACTIVITIES: {
-      googleAsync.updateActivities((AsyncCallback<String>) genAsync.callbackR);
-    }
-      break;
-    case CLEAR＿ITEMSTORE: {
-      googleAsync.clearDataStore((AsyncCallback<String>) genAsync.callbackR);
     }
       break;
 

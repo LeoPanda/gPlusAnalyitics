@@ -1,10 +1,7 @@
 package jp.leopanda.gPlusAnalytics.dataStore;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
@@ -15,15 +12,17 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.QueryResultList;
 
+import jp.leopanda.gPlusAnalytics.server.ServerUtil;
+
 /**
- * DataStore操作クラス 各エンティティはひとつのActorIDに対して１レコードのみ生成されることを前提としています。
+ * DataStore Entity操作クラス 
  * 
  * @author LeoPanda
  *
  */
 public class EntityOperator {
   private DatastoreService ds;
-  private CommonProperty property;
+  private StoredItemProperty property;
   private Entity entity;
   private String actorId;
   private boolean isNew = true;
@@ -31,7 +30,7 @@ public class EntityOperator {
   /**
    * コンストラクタ
    */
-  public EntityOperator(DatastoreService ds, CommonProperty property, String actiorId) {
+  public EntityOperator(DatastoreService ds, StoredItemProperty property, String actiorId) {
     this.ds = ds;
     this.property = property;
     this.actorId = actiorId;
@@ -42,7 +41,7 @@ public class EntityOperator {
    * 
    * @return
    */
-  public CommonProperty getPropertyName() {
+  public StoredItemProperty getPropertyName() {
     return this.property;
   }
 
@@ -126,7 +125,7 @@ public class EntityOperator {
    * Entityを書き込む
    */
   public void putEntity() {
-    setProperty(property.PUBLISED, getCurrentDate());
+    setProperty(property.PUBLISED, ServerUtil.getCurrentDate());
     ds.put(this.entity);
   }
 
@@ -151,19 +150,6 @@ public class EntityOperator {
     return ds.prepare(query);
   }
 
-  /**
-   * 当日日付の取得
-   * 
-   * @return
-   */
-  private String getCurrentDate() {
-    final String dateFormat = "yyyy-MM-dd-HH-mm-ss";
-    final String timeZone = "Asia/Tokyo";
-    TimeZone timezone = TimeZone.getTimeZone(timeZone);
-    SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-    formatter.setTimeZone(timezone);
-    return formatter.format(new Date());
-  }
   /**
    * Queryを実行してデータストアからEntityのリストを取得し
    * 各Entity毎に処理を行わせるための抽象クラス

@@ -3,7 +3,6 @@ package jp.leopanda.gPlusAnalytics.dataStore;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 
 import com.google.appengine.api.datastore.Blob;
@@ -13,17 +12,20 @@ import com.google.appengine.api.datastore.Entity;
 import java.util.logging.Logger;
 
 /**
- * データストア上のソースアイテム操作クラス DataStoreには1セッション書き込みに1MBの上限制限があるので アイテムリストを複数のEntityに分割して保存する。
+ * データストア上のアイテムリストを操作するクラス
+ * 
+ * 保管の必要のあるリスト形式のアイテムオブジェクトはJSONに変換しBLOBとしてデータストアに保管する。
+ * BLOBは１MBの上限があるので、listLimitを設け、これを超えるリストは分割して保存する。
  * 
  * @author LeoPanda
  *
  */
-public abstract class SourceItemHandler<T extends PlusItem> {
+public abstract class StoredItemHandler<T> {
 
   int listLimit = 200;// set Default;
   DatastoreService ds;
-  SourceItemProperty entityProperty;
-  EntityOperator sourceItemEntity;
+  StoredItemProperty entityProperty;
+  EntityOperator entityOperator;
   String actorId;
   String kind;
   Class<T> clazz;
@@ -31,12 +33,12 @@ public abstract class SourceItemHandler<T extends PlusItem> {
   /**
    * コンストラクタ
    */
-  public SourceItemHandler(String kind, DatastoreService ds, String actorId) {
+  public StoredItemHandler(String kind, DatastoreService ds, String actorId) {
     this.ds = ds;
     this.actorId = actorId;
     this.kind = kind;
-    this.entityProperty = new SourceItemProperty(kind);
-    sourceItemEntity = new EntityOperator(ds, entityProperty, actorId);
+    this.entityProperty = new StoredItemProperty(kind);
+    entityOperator = new EntityOperator(ds, entityProperty, actorId);
   }
 
   Logger logger = Logger.getLogger(this.kind + " SourceItem Handler");
@@ -58,8 +60,8 @@ public abstract class SourceItemHandler<T extends PlusItem> {
    */
   public List<T> getItems() throws HostGateException {
     List<T> items = new ArrayList<T>();
-    List<Entity> entities = sourceItemEntity.getEntityAsList();
-    if (!sourceItemEntity.isNew()) {
+    List<Entity> entities = entityOperator.getEntityAsList();
+    if (!entityOperator.isNew()) {
       for (Entity entity : entities) {
         List<T> itemsInEntity = decodeItems(entity);
         for (T item : itemsInEntity) {
@@ -82,9 +84,9 @@ public abstract class SourceItemHandler<T extends PlusItem> {
    * @throws HostGateException
    */
   private List<T> decodeItems(Entity entity) throws HostGateException {
-    sourceItemEntity.setEntity(entity);
+    entityOperator.setEntity(entity);
     return new Serializer<T>(this.clazz) {
-    }.decodeAsList((Blob) sourceItemEntity.getProperty(entityProperty.ITEMS));
+    }.decodeAsList((Blob) entityOperator.getProperty(entityProperty.ITEMS));
   }
 
   /**
@@ -95,7 +97,7 @@ public abstract class SourceItemHandler<T extends PlusItem> {
    */
   public void putItems(List<T> items) throws HostGateException {
     // 既存のデータストアをクリア
-    sourceItemEntity.removeAllEntites();
+    entityOperator.removeAllEntites();
 
     List<T> partItems = new ArrayList<T>();
     int counter = 0;
@@ -124,12 +126,12 @@ public abstract class SourceItemHandler<T extends PlusItem> {
    */
   private int putItemsPart(int sequence, List<T> items) throws HostGateException {
     sequence++;
-    sourceItemEntity.newEntity();
-    sourceItemEntity.setProperty(entityProperty.SEQUENCE, String.valueOf(sequence));
-    sourceItemEntity.setProperty(entityProperty.ITEMS,
+    entityOperator.newEntity();
+    entityOperator.setProperty(entityProperty.SEQUENCE, String.valueOf(sequence));
+    entityOperator.setProperty(entityProperty.ITEMS,
         new Serializer<List<T>>() {
         }.encode(items));
-    sourceItemEntity.putEntity();
+    entityOperator.putEntity();
     return sequence;
   }
 }

@@ -12,7 +12,7 @@ import com.google.apphosting.api.DeadlineExceededException;
  */
 public class DeadLineChecker {
 
-  private final long marginMillsec = 10 * 1000;
+  private final long marginMillsec = 12 * 1000;
   private boolean isProductionServer = (SystemProperty.environment
       .value() == SystemProperty.Environment.Value.Production);
 

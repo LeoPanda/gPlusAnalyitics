@@ -12,6 +12,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.dataObject.SourceItems;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
+import jp.leopanda.gPlusAnalytics.server.DailyStats;
 
 /**
  * Actor毎のDataStore Handler
@@ -22,15 +23,16 @@ import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 public class DataStoreHandler {
 
   private DatastoreService ds;
-  SourceItemHandler<PlusActivity> interruptedActivitiesHandler;
-  SourceItemHandler<PlusActivity> activitiesHandler;
-  SourceItemHandler<PlusPeople> plusOnersHandler;
+  StoredItemHandler<PlusActivity> interruptedActivitiesHandler;
+  StoredItemHandler<PlusActivity> activitiesHandler;
+  StoredItemHandler<PlusPeople> plusOnersHandler;
+  StoredItemHandler<DailyStats> dailyStatsHandler;
 
   String actorId;
   SourceItems items = null;
 
   Logger logger = Logger.getLogger(DataStoreHandler.class.getName());
-  
+
   /**
    * コンストラクタ
    */
@@ -38,12 +40,14 @@ public class DataStoreHandler {
     this.actorId = actorId;
     this.ds = DatastoreServiceFactory.getDatastoreService();
 
-    interruptedActivitiesHandler = new SourceItemHandler<PlusActivity>("interruptedActivities", ds,
+    interruptedActivitiesHandler = new StoredItemHandler<PlusActivity>("interruptedActivities", ds,
         actorId) {
     };
-    activitiesHandler = new SourceItemHandler<PlusActivity>("Activities", ds, actorId) {
+    activitiesHandler = new StoredItemHandler<PlusActivity>("Activities", ds, actorId) {
     };
-    plusOnersHandler = new SourceItemHandler<PlusPeople>("PlusOners", ds, actorId) {
+    plusOnersHandler = new StoredItemHandler<PlusPeople>("PlusOners", ds, actorId) {
+    };
+    dailyStatsHandler = new StoredItemHandler<DailyStats>("dailyStats", ds, actorId) {
     };
   }
 
@@ -57,12 +61,34 @@ public class DataStoreHandler {
   }
 
   /**
+   * バッチ統計情報リストを取得する
+   * 
+   * @return
+   * @throws HostGateException
+   */
+  public List<DailyStats> getDailyStats() throws HostGateException {
+    dailyStatsHandler.setClass(DailyStats.class);
+    return dailyStatsHandler.getItems();
+  }
+
+  /**
+   * バッチ統計上リストをデータストアに書き込む
+   * 
+   * @param dailyStatsList
+   * @throws Exception
+   */
+  public void putDailyStats(List<DailyStats> dailyStatsList) throws Exception {
+    dailyStatsHandler.setListLimit(200);
+    dailyStatsHandler.putItems(dailyStatsList);
+  }
+
+  /**
    * 中断時未処理アクテビティリストを取得する
    * 
    * @return
    * @throws HostGateException
    */
-  public List<PlusActivity> getInterrupted() throws HostGateException {
+  public List<PlusActivity> getInterruptedActivities() throws HostGateException {
     interruptedActivitiesHandler.setClass(PlusActivity.class);
     List<PlusActivity> items = interruptedActivitiesHandler.getItems();
     return items;
