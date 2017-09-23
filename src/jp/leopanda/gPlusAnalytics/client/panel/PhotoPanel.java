@@ -16,6 +16,7 @@ import jp.leopanda.gPlusAnalytics.interFace.DetailPopRequestListener;
 
 /**
  * 写真一覧パネル
+ *  PhotoPanel -- PhotoCellList -- PhotoCell
  * 
  * @author LeoPanda
  *
@@ -23,7 +24,7 @@ import jp.leopanda.gPlusAnalytics.interFace.DetailPopRequestListener;
 public class PhotoPanel extends VerticalPanel {
   FilterableSourceItems items;
   PhotoCellList allPhotoCells;
-  ActivityDetailPop activityDetailPop;
+  PhotoDetailPop photoDetailPop;
   Button nextPageButton = new Button("more..");
   Label pageIndexLabel = new Label();
   VerticalPanel listPanel = new VerticalPanel();
@@ -139,12 +140,12 @@ public class PhotoPanel extends VerticalPanel {
    * @param activity
    */
   private void popActivityDetail(PlusActivity activity, SquareDimensions photoDimensions,int clickX,int clickY) {
-    if (activityDetailPop == null) {
-      activityDetailPop = new ActivityDetailPop(
+    if (photoDetailPop == null) {
+      photoDetailPop = new PhotoDetailPop(
           new SquareDimensions(pageMaker.getPageWidth(),
               pageMaker.getLineHeight() * pageMaker.getPageRowSize()));
     }
-    activityDetailPop.show(activity, photoDimensions, clickX,clickY);
+    photoDetailPop.show(activity, photoDimensions, clickX,clickY);
   }
 
 }

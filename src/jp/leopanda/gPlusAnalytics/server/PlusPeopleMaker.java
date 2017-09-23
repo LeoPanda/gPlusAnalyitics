@@ -22,8 +22,6 @@ public class PlusPeopleMaker {
     PlusPeople plusPeople = new PlusPeople();
     plusPeople.id = person.getId();
     plusPeople.url = person.getUrl();
-    plusPeople.gender = person.getGender();
-    plusPeople.language = person.getLanguage();
     plusPeople.displayName = person.getDisplayName();
     if (person.getImage() == null) {
       plusPeople.image = null;

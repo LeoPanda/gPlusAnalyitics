@@ -5,7 +5,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.logging.Logger;
 
 import jp.leopanda.gPlusAnalytics.dataObject.SourceItems;
 import jp.leopanda.gPlusAnalytics.dataStore.DataStoreHandler;
@@ -25,6 +25,7 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
   private static final long serialVersionUID = 1L;
 
   private Map<String, DataStoreHandler> storeHandlerStocker = new HashMap<String, DataStoreHandler>();
+  Logger logger = Logger.getLogger(GoogleGateServiceImpl.class.getName());
 
   /**
    * データストアの内容を最新状態に更新する

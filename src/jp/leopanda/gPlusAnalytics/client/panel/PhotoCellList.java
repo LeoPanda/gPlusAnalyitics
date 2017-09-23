@@ -7,6 +7,8 @@ import jp.leopanda.gPlusAnalytics.interFace.DetailPopRequestListener;
 
 /**
  * アクテビティ写真の全リスト
+ * PhotoPanelのパーツ
+ *  PhotoPanel -- PhotoCellList -- PhotoCell
  * 
  * @author LeoPanda
  *

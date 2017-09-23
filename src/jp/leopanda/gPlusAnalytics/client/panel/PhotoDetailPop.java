@@ -5,6 +5,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -18,21 +20,20 @@ import jp.leopanda.gPlusAnalytics.client.util.SquareDimensions;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
- * アクテビティ詳細ポップアップ画面
+ * 写真詳細ポップアップ画面
  * 
  * @author LeoPanda
  *
  */
-public class ActivityDetailPop extends PopupPanel {
+public class PhotoDetailPop extends PopupPanel {
   Label published = new Label();
-  Label accessDescription = new Label();
+  Label numOfPlusOne = new Label();
   Label title = new Label();
+  Label accessDescription = new Label();
   Image image;
 
   PhotoCalcUtil calcUtil = new PhotoCalcUtil();
   SquareDimensions parentPanelDimensions;
-
-  final double ajustY = 0.6;
 
   /**
    * コンストラクタ
@@ -41,12 +42,10 @@ public class ActivityDetailPop extends PopupPanel {
    * @param posX
    * @param posY
    */
-  public ActivityDetailPop(SquareDimensions parentPanelDimensions) {
+  public PhotoDetailPop(SquareDimensions parentPanelDimensions) {
     super();
     this.parentPanelDimensions = parentPanelDimensions;
-    published.addStyleName(MyStyle.DETAIL_POPLINE.getStyle());
-    accessDescription.addStyleName(MyStyle.DETAIL_POPLINE.getStyle());
-    this.addStyleName(MyStyle.DETAIL_POPWINDOW.getStyle());
+    setStyle();
     sinkEvents(Event.ONCLICK);
     sinkEvents(Event.ONMOUSEOUT);
     addDomHandler(setMouseOutHanlder(), MouseOutEvent.getType());
@@ -89,15 +88,28 @@ public class ActivityDetailPop extends PopupPanel {
   private void setPanel(PlusActivity activity) {
     this.clear();
     published.setText(Formatter.getYYMDString(activity.getPublished()));
-    accessDescription.setText(activity.getAccessDescription());
     title.setText(activity.getTitle());
+    numOfPlusOne.setText("+1:"+ String.valueOf(activity.getNumOfPlusOners()));
+    accessDescription.setText(activity.getAccessDescription());
+    HorizontalPanel publishedLine = new HorizontalPanel();
+    publishedLine.add(published);
+    publishedLine.add(new HTML("<BR>"));
+    publishedLine.add(numOfPlusOne);
     VerticalPanel innerPanel = new VerticalPanel();
-    image = getImage(activity);
-    innerPanel.add(image);
-    innerPanel.add(published);
+    innerPanel.add(getImage(activity));
+    innerPanel.add(publishedLine);
     innerPanel.add(accessDescription);
     innerPanel.add(title);
     this.add(innerPanel);
+  }
+
+  /**
+   * スタイルの設定
+   */
+  private void setStyle() {
+    accessDescription.addStyleName(MyStyle.DETAIL_POPLINE.getStyle());
+    title.addStyleName(MyStyle.DETAIL_POPLINE.getStyle());
+    this.addStyleName(MyStyle.DETAIL_POPWINDOW.getStyle());
   }
 
   /**

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.apache.http.HttpStatus;
+import javax.servlet.http.HttpServletResponse;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -163,7 +163,7 @@ public class PlusApiService {
     } catch (IOException e) {
       if (e instanceof GoogleJsonResponseException) {
         int statusCode = ((GoogleJsonResponseException) e).getStatusCode();
-        if (statusCode == HttpStatus.SC_NOT_FOUND) {
+        if (statusCode == HttpServletResponse.SC_NOT_FOUND) {
           logger.info("activity not exist in google+ any more.");
           return null;
         } else {

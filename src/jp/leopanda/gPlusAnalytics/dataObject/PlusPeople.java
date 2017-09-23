@@ -7,8 +7,6 @@ public class PlusPeople extends PlusItem implements Serializable {
   private static final long serialVersionUID = 1L;
   public String id;
   public String url;
-  public String gender;
-  public String language;
 
   public int numOfPlusOne = 0;
 
@@ -39,14 +37,7 @@ public class PlusPeople extends PlusItem implements Serializable {
     return this.image.getUrl();
   }
 
-  public String getGender() {
-    return gender;
-  }
-
-  public String getLanguage() {
-    return language;
-  }
-
+ 
   /*
    * setter
    */
@@ -71,13 +62,6 @@ public class PlusPeople extends PlusItem implements Serializable {
     this.image.url = url;
   }
 
-  public void setGender(String gender) {
-    this.gender = gender;
-  }
-
-  public void setLanguage(String language) {
-    this.language = language;
-  }
-
+ 
 
 }

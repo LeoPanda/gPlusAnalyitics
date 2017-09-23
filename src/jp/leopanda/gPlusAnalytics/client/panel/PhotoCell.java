@@ -17,6 +17,9 @@ import jp.leopanda.gPlusAnalytics.interFace.DetailPopRequestListener;
 
 /**
  * 写真表示グッリッドセル
+ * PhotoPanelのパーツ
+ *  PhotoPanel -- PhotoCellList -- PhotoCell
+
  * 
  * @author LeoPanda
  *

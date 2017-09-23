@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.appengine.api.ThreadManager;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.apphosting.api.ApiProxy;
 import com.google.apphosting.api.DeadlineExceededException;
 
@@ -46,7 +49,8 @@ public class DataConductor {
   /**
    * データストアを最新状態に更新する
    * 
-   * @param isCronBatch　処理をcronバッチから呼び出すならTrueを指定する
+   * @param isCronBatch
+   *          処理をcronバッチから呼び出すならTrueを指定する
    * @return
    * @throws Exception
    */
@@ -148,15 +152,19 @@ public class DataConductor {
     logger.info("process exceeded:remainSec=" + String.valueOf(remainSec));
     if (newActivities == null) {
       logger.warning("newActivies is null whlie doing exceeded interrupt task.");
+      return;
+    }
+    if (newActivities.size() == 0) {
+      logger.info("Exceeded process started but newActivities is 0.");
+      return;
+    }
+    storeHandler.putItems(sourceItems);
+    putUnprocessedActivities(newActivities);
+    exitingLogProcess();
+    if (isCronBatch) {
+      enqueueNewTask();
     } else {
-      if (newActivities.size() > 0) {
-        storeHandler.putItems(sourceItems);
-        putUnprocessedActivities(newActivities);
-        exitingLogProcess();
-        startNewThread();
-      } else {
-        logger.info("Exceeded process started but newActivities is 0.");
-      }
+      startNewThread();
     }
   }
 
@@ -176,6 +184,14 @@ public class DataConductor {
       }
     }).start();
   };
+
+  /**
+   * タスクキューを作成して継続ジョブを実行する
+   */
+  private void enqueueNewTask() {
+    Queue queue = QueueFactory.getDefaultQueue();
+    queue.add(TaskOptions.Builder.withUrl("/analytics"));
+  }
 
   /**
    * 中断時に未処理だったアクテビティリストをデータストアに書き込む

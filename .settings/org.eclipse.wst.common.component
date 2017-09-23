@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="gPlusAnalytics">
+        <wb-resource deploy-path="/" source-path="/war" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/srcPanelFrame"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/srcAuth"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/test"/>
+        <property name="context-root" value="gPlusAnalytics"/>
+        <property name="java-output-path" value="/gPlusAnalytics/war/WEB-INF/classes"/>
+    </wb-module>
+</project-modules>
