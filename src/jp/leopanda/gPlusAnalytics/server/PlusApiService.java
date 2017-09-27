@@ -51,15 +51,18 @@ public class PlusApiService {
     this.plus = getPlus(credential.httpTransport, credential.jsonFactory,
         credential.loadCredential());
   }
+
   /**
    * コンストラクタ cron用
+   * 
    * @param httpTransport
    * @param jsonFactory
    * @param credential
    * @throws Exception
    */
-  public PlusApiService(HttpTransport httpTransport,JsonFactory jsonFactory,Credential credential) throws Exception {
-    this.plus = getPlus(httpTransport, jsonFactory,credential);
+  public PlusApiService(HttpTransport httpTransport, JsonFactory jsonFactory, Credential credential)
+      throws Exception {
+    this.plus = getPlus(httpTransport, jsonFactory, credential);
   }
 
   Logger logger = Logger.getLogger("PlusApiService");
@@ -111,13 +114,12 @@ public class PlusApiService {
     while (nextPageToken != null) {
       checker.checkRuntimeExceed();
       feed = listActivities.execute();
-      for (Activity activity : feed.getItems()) {
-        activities.add(activityMaker.generate(activity));
-      }
+      feed.getItems().forEach(activity -> activities.add(activityMaker.generate(activity)));
       nextPageToken = feed.getNextPageToken();
       listActivities.setPageToken(nextPageToken);
     }
     return activities;
+
   }
 
   /**
@@ -140,15 +142,13 @@ public class PlusApiService {
     while (nextPageToken != null) {
       checker.checkRuntimeExceed();
       feed = listPeople.execute();
-      for (Person person : feed.getItems()) {
-        plusPeople.add(plusPeopleMaker.get(person));
-      }
+      feed.getItems().forEach(person -> plusPeople.add(plusPeopleMaker.get(person)));
       nextPageToken = feed.getNextPageToken();
       listPeople.setPageToken(nextPageToken);
     }
     return plusPeople;
   }
-  
+
   /**
    * Google Plus 単一アクテビティの取得
    * 

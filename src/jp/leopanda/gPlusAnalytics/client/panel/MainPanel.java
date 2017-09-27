@@ -5,12 +5,10 @@ import java.util.List;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
-import jp.leopanda.gPlusAnalytics.client.util.NumOfPlusOneFilterKeyword;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
-import jp.leopanda.gPlusAnalytics.interFace.CheckBoxListener;
 import jp.leopanda.gPlusAnalytics.interFace.FilterRequestListener;
 import jp.leopanda.gPlusAnalytics.interFace.ItemClickListener;
 
@@ -63,17 +61,12 @@ public class MainPanel extends VerticalPanel {
    * @return
    */
   private FilterRequestListener getFilterInputPanelRequestListener() {
-    return new FilterRequestListener() {
-      @Override
-      public void request(FilterType filterType, Object keyword) {
-
-        if (!filterInputPanel.isIncrimentalChecked()) {
-          resetFilter();
-        }
-        addFilterLog(filterType, keyword);
-        reloadPanel();
-
+    return (filterType, keyword) -> {
+      if (!filterInputPanel.isIncrimentalChecked()) {
+        resetFilter();
       }
+      addFilterLog(filterType, keyword);
+      reloadPanel();
     };
   }
 
@@ -83,16 +76,12 @@ public class MainPanel extends VerticalPanel {
    * @return
    */
   private ItemClickListener<PlusItem> getTablePanelClickListener() {
-    return new ItemClickListener<PlusItem>() {
-      @Override
-      public void onClick(PlusItem item) {
-
-        if (!filterInputPanel.isIncrimentalChecked()) {
-          resetFilter();
-        }
-        addFilterLog(null, item);
-        reloadPanel();
+    return plusItem -> {
+      if (!filterInputPanel.isIncrimentalChecked()) {
+        resetFilter();
       }
+      addFilterLog(null, plusItem);
+      reloadPanel();
     };
   }
 
@@ -102,37 +91,7 @@ public class MainPanel extends VerticalPanel {
    * @param keyword
    */
   private void addFilterLog(FilterType filterType, Object keyword) {
-    // 一覧テーブルでフィルターボタンが押された場合
-    if (keyword instanceof PlusActivity) {
-      filterLogPanel
-          .add(new FilterLogCard(FilterType.PLUSONER_TABLE_ACTIVITY, (PlusActivity) keyword));
-    } else if (keyword instanceof PlusPeople) {
-      filterLogPanel
-          .add(new FilterLogCard(FilterType.ACTIVITY_TABLE_PLUSONER, (PlusPeople) keyword));
-      // フィルター入力パネルからのリクエスト
-    } else if (keyword instanceof String) {
-      filterLogPanel.add(new FilterLogCard(filterType, (String) keyword));
-    } else if (keyword instanceof NumOfPlusOneFilterKeyword) {
-      filterLogPanel.add(new FilterLogCard(filterType, (NumOfPlusOneFilterKeyword) keyword));
-    } else {
-      return;
-    }
-    filterLogPanel.addCardCheckBoxListerer(getCardCheckBoxListener());
-  }
-
-  /**
-   * ログパネルでカードのチェックボックスが変更された場合の処理
-   * 
-   * @return
-   */
-  private CheckBoxListener getCardCheckBoxListener() {
-    return new CheckBoxListener() {
-
-      @Override
-      public void onValueChange(boolean value) {
-        reloadPanel();
-      }
-    };
+    filterLogPanel.addFilterLogCard(filterType, keyword,v -> reloadPanel());
   }
 
   /**
@@ -141,14 +100,10 @@ public class MainPanel extends VerticalPanel {
    * @return
    */
   private FilterRequestListener getResetButtonListener() {
-    return new FilterRequestListener() {
-
-      @Override
-      public void request(FilterType filterType, Object keyword) {
-        if (filterType == FilterType.RESET_ITEMS) {
-          resetFilter();
-          reloadPanel();
-        }
+    return (filterType, keyword) -> {
+      if (filterType == FilterType.RESET_ITEMS) {
+        resetFilter();
+        reloadPanel();
       }
     };
   }
@@ -166,7 +121,7 @@ public class MainPanel extends VerticalPanel {
    * メインパネルのリロード
    */
   private void reloadPanel() {
-    sourceItems.doFilter(filterLogPanel);
+    sourceItems.doFilterEachCards(filterLogPanel);
     filterInputPanel.resetFields();
     menuTabPanel.reloadItems();
   }

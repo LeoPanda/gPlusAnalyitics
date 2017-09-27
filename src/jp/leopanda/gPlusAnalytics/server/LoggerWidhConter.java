@@ -33,8 +33,8 @@ public class LoggerWidhConter {
     counter.addedActivities--;
   }
 
-  public void activitiesDeleted() {
-    counter.deletedActivities++;
+  public void activitiesDeleted(int count) {
+    counter.deletedActivities = count;
   }
 
   public void plusOnerAdded() {

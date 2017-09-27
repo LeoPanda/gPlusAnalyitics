@@ -1,9 +1,9 @@
 package jp.leopanda.gPlusAnalytics.server;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Collectors;
 
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
@@ -40,55 +40,76 @@ public class ActivitiesProcesser {
   }
 
   /**
-   * 変更のあったアクテビティを更新し、処理対象の+1erリストを抽出する 処理の終わったnewActivitiesはリストから削除される
+   * 変更のあったアクテビティを更新し、処理対象の+1erリストを抽出する
    * 
-   * @param newActivities
-   *          最新のアクテビティリスト
-   * @param sourceActivities
-   *          ソースアクテビティリスト
+   * @param newActivities 最新のアクテビティリスト
+   * @param sourceActivities ソースアクテビティリスト
    * @return
    * @throws Exception
    */
   public List<PlusActivity> updatePlusActivitiesAndStackPlusOners(List<PlusActivity> newActivities,
       List<PlusActivity> sourceActivities) throws Exception {
     logger.setnumOfNewActivities(newActivities.size());
-    return new CompareItemsForUpdate<PlusActivity>() {
-      @Override
-      PlusActivity setItemForNewAdd(PlusActivity newItem) throws Exception {
-        newItem.setPlusOnerIds(
-            stackPlusOnersForUpdate(apiService.getPlusOnersByActivity(newItem.getId())));
-        logger.activitiesAdded();
-        return newItem;
-      }
-
-      @Override
-      PlusActivity setItemForUpdate(PlusActivity newItem, PlusActivity sourceItem)
-          throws Exception {
-        if (sourceItem.getNumOfPlusOners().equals(newItem.getNumOfPlusOners())) {
-          return null; // 更新しない
-        }
-        logger.activitiesUpdated();
-        return setItemForNewAdd(newItem); // 新規アイテムで置き換え
-      }
-    }.update(newActivities, sourceActivities);
+    return new NewItemsApplyer<PlusActivity>(newActivities, sourceActivities) {}.apply(
+        newItem -> setItemForNewAdd(newItem),
+        (newItem, matchedItem) -> replaceWhen(newItem, matchedItem));
   }
 
   /**
-   * 更新対象のPlusOnerを更新リストにスタックする。
+   * 追加する新規アイテムを設定する
+   * 
+   * @param newItem
+   * @return
+   * @throws Exception
+   */
+  private PlusActivity setItemForNewAdd(PlusActivity newItem) throws Exception {
+    newItem = setPlusOnerIdsFromApi(newItem);
+    logger.activitiesAdded();
+    return newItem;
+  }
+
+  /**
+   * 同一IDをもつ既存アイテムを新規アイテムで置き換える場合の条件を設定する
+   * 
+   * @param newItem
+   * @param matchedItem
+   * @return
+   * @throws Exception
+   */
+  private boolean replaceWhen(PlusActivity newItem, PlusActivity matchedItem) {
+    return !(matchedItem.getNumOfPlusOners().equals(newItem.getNumOfPlusOners()));
+  }
+
+  /**
+   * アクテビティに+1したユーザーのリストをG+APIサービスを呼んでセットする
+   * 
+   * @param newItem
+   * @return
+   * @throws Exception
+   */
+  private PlusActivity setPlusOnerIdsFromApi(PlusActivity newItem) throws Exception {
+    newItem.setPlusOnerIds(
+        getPlusOnerIdsAndStacToUpdateList(apiService.getPlusOnersByActivity(newItem.getId())));
+    return newItem;
+  }
+
+  /**
+   * 新規アクテビティに+1したユーザーのリストを抽出し
+   * +1erの更新対象リストにスタックする
    * 
    * @param onersInActivity
    *          APIコールで得たactivity毎の＋１ユーザーリスト
    * @return Activityに+1したユーザーのIDリスト
    */
-  private List<String> stackPlusOnersForUpdate(List<PlusPeople> onersInActivity) {
+  private List<String> getPlusOnerIdsAndStacToUpdateList(List<PlusPeople> onersInActivity) {
     List<String> plusOnerIds = new ArrayList<String>();
-    for (PlusPeople onerInActivity : onersInActivity) {
-      String plusOnerId = onerInActivity.getId();
+    onersInActivity.forEach(plusOner -> {
+      String plusOnerId = plusOner.getId();
       plusOnerIds.add(plusOnerId);
       if (!idIsExistIn(this.plusOnersForUpdate, plusOnerId)) {
-        this.plusOnersForUpdate.add(onerInActivity);
+        this.plusOnersForUpdate.add(plusOner);
       }
-    }
+    });
     return plusOnerIds;
   }
 
@@ -101,7 +122,8 @@ public class ActivitiesProcesser {
    */
   public List<PlusActivity> setStatisticsInfo(PlusOneCounter plusOneCounter,
       List<PlusActivity> sourceItems) {
-    for (ListIterator<PlusActivity> iterator = sourceItems.listIterator(); iterator.hasNext();) {
+    ListIterator<PlusActivity> iterator = sourceItems.listIterator();
+    while (iterator.hasNext()) {
       PlusActivity activity = iterator.next();
       iterator.set(setActivityStastics(plusOneCounter, activity));
     }
@@ -149,13 +171,11 @@ public class ActivitiesProcesser {
    */
   public List<PlusActivity> removeDisusedActivities(List<PlusActivity> newActivities,
       List<PlusActivity> sourceActivities) {
-    for (Iterator<PlusActivity> iterator = sourceActivities.iterator(); iterator.hasNext();) {
-      PlusActivity activity = iterator.next();
-      if (!idIsExistIn(newActivities, activity.getId())) {
-        logger.activitiesDeleted();
-        iterator.remove();
-      }
-    }
+    List<PlusActivity> removeActivies = sourceActivities.stream()
+        .filter(sourceActivity -> !idIsExistIn(newActivities, sourceActivity.getId()))
+        .collect(Collectors.toList());
+    logger.activitiesDeleted(removeActivies.size());
+    sourceActivities.removeAll(removeActivies);
     return sourceActivities;
   }
 
@@ -167,9 +187,7 @@ public class ActivitiesProcesser {
    */
   public List<PlusActivity> getNewActivitiesFromAPI(DataStoreHandler storeHandler)
       throws Exception {
-    List<PlusActivity> newActivites = apiService.getPlusActivies(storeHandler.getActorId());
-    newActivites = removeNoImageActivity(newActivites);
-    return newActivites;
+    return removeNoImageActivity(apiService.getPlusActivies(storeHandler.getActorId()));
   }
 
   /**
@@ -180,12 +198,7 @@ public class ActivitiesProcesser {
    * @return
    */
   private <I extends PlusItem> boolean idIsExistIn(List<I> items, String id) {
-    for (I item : items) {
-      if (item.getId().equals(id)) {
-        return true;
-      }
-    }
-    return false;
+    return items.stream().anyMatch(item -> item.getId().equals(id));
   }
 
   /**
@@ -195,30 +208,7 @@ public class ActivitiesProcesser {
    * @return
    */
   private List<PlusActivity> removeNoImageActivity(List<PlusActivity> activities) {
-    for (Iterator<PlusActivity> iterator = activities.iterator(); iterator.hasNext();) {
-      PlusActivity activity = iterator.next();
-      if (noImage(activity)) {
-        iterator.remove();
-      }
-    }
+    activities.removeIf(activity -> !activity.getAttachmentImageUrls().isPresent());
     return activities;
   }
-
-  /**
-   * 単体アクテビティの写真投稿の有無をチェックする
-   * 
-   * @param activity
-   * @return アイテムに写真投稿がない場合にtrue
-   */
-  private boolean noImage(PlusActivity activity) {
-    if (activity.getAttachmentImageUrls() == null) {
-      return true;
-    } else if (activity.getAttachmentImageUrls().size() == 0) {
-      return true;
-    } else if (activity.getAttachmentImageUrls().get(0) == null) {
-      return true;
-    }
-    return false;
-  }
-
 }

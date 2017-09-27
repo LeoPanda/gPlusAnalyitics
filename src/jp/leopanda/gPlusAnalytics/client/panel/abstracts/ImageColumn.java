@@ -1,5 +1,8 @@
 package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -13,65 +16,93 @@ import com.google.gwt.user.cellview.client.Column;
  */
 public abstract class ImageColumn<I> extends Column<I, SafeHtml> {
   static final SafeHtmlCell cell = new SafeHtmlCell();
-  private String height = "";
-  private String width = "";
-  private String imgUrl = null;
+  private Optional<String> height;
+  private Optional<String> width;
 
   /**
    * コンストラクタ
-   */
-  public ImageColumn() {
-    super(cell);
-  }
-  /**
-   * イメージの高さを指定する
    * @param height
-   */
-  protected void setImageHeight(int height){
-    this.height = String.valueOf(height);
-  }
-  /**
-   * イメージの幅を指定する
    * @param width
    */
-  protected void setImageWidth(int width){
-    this.width = String.valueOf(width);
+  public ImageColumn(String height, String width) {
+    super(cell);
+    this.height = Optional.ofNullable(height);
+    this.width = Optional.ofNullable(width);
   }
+
   /**
-   * イメージのソースURLをセットする
-   * @param url
-   */
-  protected void setImageUrl(String url){
-    this.imgUrl = url;
-  }
-  /**
-   * イメージ表示用のHTMLを取得する
+   * イメージ表示用のHTMLをURLlistから取得する
+   * 
    * @return
    */
-  protected SafeHtml getImageTag() {
-    SafeHtml imageTag;
+  protected SafeHtml getImageTagFromUrlList(Optional<List<String>> imgUrls) {
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
-    if(imgUrl == null){
-      return null;
-    }
-    imageTag = builder
-        .appendHtmlConstant(
-            "<img " +
-                (height.length() > 0 ? "height=\"" + height + "\"" : "") +
-                (width.length() > 0 ? "width =\"" + width + "\"" : "") +
-                " src=\"")
-        .appendEscaped(imgUrl).appendHtmlConstant("\">").appendHtmlConstant("<br/>").toSafeHtml();
-    clearValiable();
-    return imageTag;
+    return (imgUrls.isPresent() ? getImageTag(imgUrls.get().get(0), builder)
+        : getBlankTag(builder));
   }
+
   /**
-   * 変数を初期化する
+   * イメージ表示用HTMLをURL String から得る
+   * 
+   * @param imgUrl
+   * @return
    */
-  private void clearValiable(){
-    height = "";
-    width = "";
-    imgUrl = "";
+  protected SafeHtml getImageTagFromUrl(Optional<String> imgUrl) {
+    SafeHtmlBuilder builder = new SafeHtmlBuilder();
+    return (imgUrl.isPresent() ? getImageTag(imgUrl.get(), builder)
+        : getBlankTag(builder));
   }
-  
+
+  /**
+   * ブランク行のHTMLタグを生成する
+   * 
+   * @param builder
+   * @return
+   */
+  private SafeHtml getBlankTag(SafeHtmlBuilder builder) {
+    return builder.appendHtmlConstant("<br/>").toSafeHtml();
+  }
+
+  /**
+   * イメージを表示するHTMLタグを生成する
+   * 
+   * @param imgUrl
+   * @param builder
+   * @return
+   */
+  private SafeHtml getImageTag(String imgUrl, SafeHtmlBuilder builder) {
+    return builder
+        .appendHtmlConstant(appendWidthAttribute(appendHeightAttribute(setTagPref())))
+        .appendHtmlConstant(" src=\"").appendEscaped(imgUrl).appendHtmlConstant("\"><br/>").toSafeHtml();
+  }
+
+  /**
+   * イメージタグの接頭値を設定する
+   * 
+   * @return
+   */
+  private String setTagPref() {
+    return "<img ";
+  }
+
+  /**
+   * イメージタグの高さ属性を設定する
+   * 
+   * @param htmlText
+   * @return
+   */
+  private String appendHeightAttribute(String htmlText) {
+    return height.isPresent() ? htmlText.concat(" height=\"" + height.get() + "\""):htmlText;
+  }
+
+  /**
+   * イメージタグの幅属性を設定する
+   * 
+   * @param htmlText
+   * @return
+   */
+  private String appendWidthAttribute(String htmlText) {
+    return width.isPresent() ? htmlText.concat(" width=\"" + width + "\""):htmlText;
+  }
 
 }

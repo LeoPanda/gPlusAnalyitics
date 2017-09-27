@@ -1,6 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client.util;
 
 import java.util.Date;
+import java.util.function.Function;
 
 import com.google.gwt.user.client.ui.Label;
 
@@ -22,17 +23,20 @@ public class DateDivider {
   public DateDivider() {
     this.currentDate = null;
   }
-  public DateDivider(Date currentDate){
+
+  public DateDivider(Date currentDate) {
     this.currentDate = currentDate;
   }
-  
+
   /**
    * カレントの基準日付を提供する
+   * 
    * @return
    */
-  public Date getCurrentDate(){
+  public Date getCurrentDate() {
     return this.currentDate;
   }
+
   /**
    * 日付のブレークレベルをチェックする
    * 
@@ -43,23 +47,44 @@ public class DateDivider {
     DateBreakLevel breakLevel = DateBreakLevel.NONE;
     if (currentDate == null) {
       breakLevel = setBreakLevel(newDate, DateBreakLevel.YEAR_BREAK);
-    } else if (new BreakChecker(newDate, currentDate) {
-      @Override
-      String dateFormatter(Date date) {
-        return Formatter.getYear(date);
-      }
-    }.isBreak()) {
+    } else if (isYearBreak(newDate)) {
       breakLevel = setBreakLevel(newDate, DateBreakLevel.YEAR_BREAK);
-    } else if (new BreakChecker(newDate, currentDate) {
-      @Override
-      String dateFormatter(Date date) {
-        return Formatter.getMonth(date);
-      }
-    }.isBreak()) {
+    } else if (isMonthBreak(newDate)) {
       breakLevel = setBreakLevel(newDate, DateBreakLevel.MONTH_BREAK);
     }
 
     return breakLevel;
+  }
+
+  /**
+   * 年レベルのブレークをチェックする
+   * 
+   * @param newDate
+   * @return
+   */
+  private boolean isYearBreak(Date newDate) {
+    return !equalToFormattedCurrentDate(newDate, date -> Formatter.getYear(date));
+  }
+
+  /**
+   * 月レベルのブレークをチェックする
+   * 
+   * @param newDate
+   * @return
+   */
+  private boolean isMonthBreak(Date newDate) {
+    return !equalToFormattedCurrentDate(newDate, date -> Formatter.getMonth(date));
+  }
+
+  /**
+   * 指定されたフォーマッタで取り出した文字列がカレント日付と同一かをチェックする
+   * 
+   * @param newDate
+   * @param formatter
+   * @return
+   */
+  private boolean equalToFormattedCurrentDate(Date newDate, Function<Date, String> formatter) {
+    return formatter.apply(newDate).equals(formatter.apply(currentDate));
   }
 
   /**
@@ -97,44 +122,6 @@ public class DateDivider {
    */
   public void clear() {
     this.currentDate = null;
-  }  
-  
-  /**
-   * 日付のブレークを検出する抽象クラス
-   * 
-   * @author LeoPanda
-   *
-   */
-  private abstract class BreakChecker {
-    Date compareDate;
-    Date targetDate;
-
-    /**
-     * コンストラクタ
-     * 
-     * @param compareDate
-     * @param targetDate
-     */
-    BreakChecker(Date compareDate, Date targetDate) {
-      this.compareDate = compareDate;
-      this.targetDate = targetDate;
-    }
-
-    /**
-     * 日付はブレークしているか
-     * 
-     * @return
-     */
-    public boolean isBreak() {
-      return !dateFormatter(compareDate).equals(dateFormatter(targetDate));
-    }
-
-    /**
-     * 日付の比較要素を取り出す
-     * 
-     * @param date
-     * @return
-     */
-    abstract String dateFormatter(Date date);
   }
+
 }

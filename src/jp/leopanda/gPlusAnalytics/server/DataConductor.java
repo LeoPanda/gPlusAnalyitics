@@ -49,8 +49,7 @@ public class DataConductor {
   /**
    * データストアを最新状態に更新する
    * 
-   * @param isCronBatch
-   *          処理をcronバッチから呼び出すならTrueを指定する
+   * @param isCronBatch　処理をcronバッチから呼び出すならTrueを指定する
    * @return
    * @throws Exception
    */
@@ -81,9 +80,9 @@ public class DataConductor {
     PlusOneCounter plusOneCounter = new PlusOneCounter();
     // 処理対象のアクテビティを設定する
     List<PlusActivity> interruptedActivities = storeHandler.getInterruptedActivities();
-    if (interruptedActivities.size() > 0) {
+    if (interruptedActivities.size() > 0) {//処理途中に中断されたアクテビティが残っている場合はこれを処理
       newActivities = interruptedActivities;
-    } else {
+    } else {//中断アクテビティがない場合はG+APIから全アクテビティを読み込む
       newActivities = activitiesProcesser.getNewActivitiesFromAPI(storeHandler);
       sourceItems.activities = activitiesProcesser.removeDisusedActivities(newActivities,
           sourceItems.activities);
@@ -101,10 +100,8 @@ public class DataConductor {
   /**
    * ソースアクテビティリストを更新する
    * 
-   * @param newActivities
-   *          最新アクテビティリスト
-   * @param sourceActivities
-   *          ソースアクテビティリスト
+   * @param newActivities　最新アクテビティリスト
+   * @param sourceActivities　ソースアクテビティリスト
    * @param activitiesProcesser
    * @param plusOneCounter
    * @return

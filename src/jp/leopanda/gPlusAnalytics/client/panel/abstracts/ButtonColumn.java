@@ -1,7 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
 import com.google.gwt.cell.client.ButtonCell;
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.user.cellview.client.Column;
 
 /**
@@ -18,13 +17,7 @@ public abstract class ButtonColumn<I> extends Column<I, String> {
    */
   public ButtonColumn() {
     super(cell);
-    this.setFieldUpdater(new FieldUpdater<I, String>() {
-      @Override
-      public void update(int index, I item, String value) {
-        addClickEvent(index, item);
-      }
-
-    });
+    this.setFieldUpdater((index,item,value) -> addClickEvent(index,item));
   }
 
   /**

@@ -1,6 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -12,11 +13,10 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import jp.leopanda.gPlusAnalytics.client.util.SquareDimensions;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
-import jp.leopanda.gPlusAnalytics.interFace.DetailPopRequestListener;
 
 /**
  * 写真一覧パネル
- *  PhotoPanel -- PhotoCellList -- PhotoCell
+ * PhotoPanel -- PhotoCellList -- PhotoCell
  * 
  * @author LeoPanda
  *
@@ -123,14 +123,8 @@ public class PhotoPanel extends VerticalPanel {
    */
   private PhotoCellList loadAllPhotoCells(List<PlusActivity> activities) {
     PhotoCellList photoCellList = new PhotoCellList();
-    for (PlusActivity activity : activities) {
-      photoCellList.addCell(activity, pageMaker.getLineHeight(), new DetailPopRequestListener() {
-        @Override
-        public void request(PlusActivity activity, SquareDimensions photoDimensions,int clickX,int clickY ) {
-          popActivityDetail(activity, photoDimensions, clickX,clickY);
-        }
-      });
-    }
+    activities.forEach(activity -> photoCellList.addCell(activity, pageMaker.getLineHeight(),
+        this::popActivityDetail));
     return photoCellList;
   }
 
@@ -139,13 +133,13 @@ public class PhotoPanel extends VerticalPanel {
    * 
    * @param activity
    */
-  private void popActivityDetail(PlusActivity activity, SquareDimensions photoDimensions,int clickX,int clickY) {
-    if (photoDetailPop == null) {
-      photoDetailPop = new PhotoDetailPop(
-          new SquareDimensions(pageMaker.getPageWidth(),
-              pageMaker.getLineHeight() * pageMaker.getPageRowSize()));
-    }
-    photoDetailPop.show(activity, photoDimensions, clickX,clickY);
+  private void popActivityDetail(PlusActivity activity, SquareDimensions photoDimensions,
+      int clickX, int clickY) {
+    photoDetailPop = Optional.ofNullable(photoDetailPop)
+        .orElse(new PhotoDetailPop(
+            new SquareDimensions(pageMaker.getPageWidth(),
+                pageMaker.getLineHeight() * pageMaker.getPageRowSize())));
+    photoDetailPop.show(activity, photoDimensions, clickX, clickY);
   }
 
 }

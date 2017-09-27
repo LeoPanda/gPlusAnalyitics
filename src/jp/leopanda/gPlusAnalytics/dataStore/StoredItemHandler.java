@@ -63,10 +63,7 @@ public abstract class StoredItemHandler<T> {
     List<Entity> entities = entityOperator.getEntityAsList();
     if (!entityOperator.isNew()) {
       for (Entity entity : entities) {
-        List<T> itemsInEntity = decodeItems(entity);
-        for (T item : itemsInEntity) {
-          items.add(item);
-        }
+        decodeItems(entity).forEach(item -> items.add(item));
       }
     }
     return items;
@@ -85,8 +82,8 @@ public abstract class StoredItemHandler<T> {
    */
   private List<T> decodeItems(Entity entity) throws HostGateException {
     entityOperator.setEntity(entity);
-    return new Serializer<T>(this.clazz) {
-    }.decodeAsList((Blob) entityOperator.getProperty(entityProperty.ITEMS));
+    return new Serializer<T>(this.clazz) {}
+        .decodeAsList((Blob) entityOperator.getProperty(entityProperty.ITEMS));
   }
 
   /**
@@ -129,8 +126,7 @@ public abstract class StoredItemHandler<T> {
     entityOperator.newEntity();
     entityOperator.setProperty(entityProperty.SEQUENCE, String.valueOf(sequence));
     entityOperator.setProperty(entityProperty.ITEMS,
-        new Serializer<List<T>>() {
-        }.encode(items));
+        new Serializer<List<T>>() {}.encode(items));
     entityOperator.putEntity();
     return sequence;
   }

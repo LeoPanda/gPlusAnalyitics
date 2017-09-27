@@ -5,10 +5,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Optional;
 
-import jp.leopanda.gPlusAnalytics.client.chart.abstracts.ChartRangeFilterdChart;
+import jp.leopanda.gPlusAnalytics.client.chart.abstracts.RangeFilterdChart;
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.client.util.SortComparator;
@@ -19,6 +18,7 @@ import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.ChartWrapper;
 import com.googlecode.gwt.charts.client.ColumnType;
 import com.googlecode.gwt.charts.client.DataTable;
+import com.googlecode.gwt.charts.client.controls.filter.ChartRangeFilterUi;
 import com.googlecode.gwt.charts.client.corechart.ColumnChartOptions;
 import com.googlecode.gwt.charts.client.corechart.ComboChartOptions;
 import com.googlecode.gwt.charts.client.event.SelectEvent;
@@ -38,27 +38,28 @@ import com.googlecode.gwt.charts.client.options.VAxis;
  *
  */
 public class ActivityColumnChart extends
-    ChartRangeFilterdChart<PlusActivity, ColumnChartOptions> {
+    RangeFilterdChart<PlusActivity, ColumnChartOptions> {
   private Map<Integer, String> activityUrls = new HashMap<Integer, String>();
-  private Bar columnBar; // カラムのバー設定
-  Logger logger = Logger.getLogger("ActivityColumnChart");
+  private Bar columnBar;
 
   /**
    * コンストラクタ
    */
   public ActivityColumnChart() {
     super(ChartType.COLUMN);
-    logger.log(Level.INFO, "ActivityColumnChart.constractor:");
-    columnBar = Bar.create();
-    columnBar.setGroupWidth("98%");
+    setChartFunction(chart -> getChart(chart));
+    setChartOptionsFunction(chartOptions -> getChartOptions(chartOptions));
+    setDataTableFunction(dataTable -> getDataTable(dataTable));
+    setRangeFilterUiFunction(rangeFilterUi -> setRangeFilterUi(rangeFilterUi));
   }
 
-  /*
-   * チャートの生成
+  /**
+   * チャートの設定
+   * 
+   * @param chart
+   * @return
    */
-  @Override
-  protected ChartWrapper<ColumnChartOptions> getChart(ChartType chartType) {
-    chart = super.getChart(chartType);
+  private ChartWrapper<ColumnChartOptions> getChart(ChartWrapper<ColumnChartOptions> chart) {
     chart.addSelectHandler(new SelectHandler() {
       @Override
       public void onSelect(SelectEvent event) {
@@ -70,12 +71,13 @@ public class ActivityColumnChart extends
     return chart;
   }
 
-  /*
-   * チャートのオプションを生成する
+  /**
+   * チャートオプションの設定
+   * 
+   * @param chartOptions
+   * @return
    */
-  @Override
-  protected ColumnChartOptions getChartOptions() {
-    chartOptions = super.getChartOptions();
+  private ColumnChartOptions getChartOptions(ColumnChartOptions chartOptions) {
     chartOptions.setTitle(getChartTitle());
     chartOptions.setLegend(Legend.create(LegendPosition.TOP));
     HAxis haxis = HAxis.create("アクテビティ");
@@ -83,31 +85,30 @@ public class ActivityColumnChart extends
     chartOptions.setHAxis(haxis);
     chartOptions.setVAxes(VAxis.create("+1数"));
     // バーの設定
-    chartOptions.setBar(columnBar);
+    chartOptions.setBar(getColumnBar());
     // 積み上げカラムに設定
     chartOptions.setIsStacked(true);
     return chartOptions;
 
   }
 
-  /*
-   * レンジフィルターの設定
+  /**
+   * レンジフィルターUIを設定する
+   * 
+   * @param rangeFilterUi
+   * @return
    */
-  @Override
-  protected void setRangeFilter() {
-    setMaxRangeValue(sourceData.size());
-    setMiniRangeWidth(5);
-    setDefaultRangeWidth(10);
-    super.setRangeFilter();
-    // 日付でフィルター
-    filterOptions.setFilterColumnIndex(0);
-    // フィルターチャートの外形設定
-    filterUi.setChartType(ChartType.COMBO);
-    filterUi.setChartOptions(presetFilterChartOptions());
+  private ChartRangeFilterUi setRangeFilterUi(ChartRangeFilterUi rangeFilterUi) {
+    setRangeValues(5, getSourceData().size(), 10);
+    rangeFilterUi.setChartType(ChartType.COMBO);
+    rangeFilterUi.setChartOptions(presetFilterChartOptions());
+    return rangeFilterUi;
   }
 
-  /*
-   * レンジフィルターのチャートオプションをカラムチャート用にセットする
+  /**
+   * レンジフィルターUIのチャートオプションを設定する
+   * 
+   * @return
    */
   private ComboChartOptions presetFilterChartOptions() {
     ComboChartOptions filterChartOptions = ComboChartOptions.create();
@@ -119,18 +120,30 @@ public class ActivityColumnChart extends
     filterChartOptions.setHAxis(haxis);
     filterChartOptions.setIsStacked(true);
     // フィルターチャートのカラムバーをチャートと同一に設定
-    filterChartOptions.setBar(columnBar);
+    filterChartOptions.setBar(getColumnBar());
     return filterChartOptions;
   }
 
-  /*
-   * グラフに表示するデータをセットする
+  /**
+   * 共通カラムバー
+   * 
+   * @return
    */
-  @Override
-  protected DataTable getDataTable() {
-    List<PlusActivity> activities = new ArrayList<PlusActivity>(sourceData);
+  private Bar getColumnBar() {
+    columnBar = Optional.ofNullable(columnBar).orElse(Bar.create());
+    columnBar.setGroupWidth("98%");
+    return columnBar;
+  }
+
+  /**
+   * チャートのデータテーブルを設定する
+   * 
+   * @param dataTable
+   * @return
+   */
+  private DataTable getDataTable(DataTable dataTable) {
+    List<PlusActivity> activities = new ArrayList<PlusActivity>(getSourceData());
     Collections.sort(activities, new SortComparator().getAscendingActivitesOrder());
-    dataTable = super.getDataTable();
     dataTable.addColumn(ColumnType.NUMBER, "No.");
     dataTable.addColumn(ColumnType.NUMBER, Distribution.FIRST_LOOKER.name);
     dataTable.addColumn(ColumnType.NUMBER, Distribution.LOW_MIDDLE_LOOKER.name);

@@ -89,7 +89,7 @@ public class PhotoDetailPop extends PopupPanel {
     this.clear();
     published.setText(Formatter.getYYMDString(activity.getPublished()));
     title.setText(activity.getTitle());
-    numOfPlusOne.setText("+1:"+ String.valueOf(activity.getNumOfPlusOners()));
+    numOfPlusOne.setText("+1:" + String.valueOf(activity.getNumOfPlusOners()));
     accessDescription.setText(activity.getAccessDescription());
     HorizontalPanel publishedLine = new HorizontalPanel();
     publishedLine.add(published);
@@ -120,9 +120,7 @@ public class PhotoDetailPop extends PopupPanel {
    */
   private Image getImage(PlusActivity activity) {
     image = new Image();
-    if (activity.getAttachmentImageUrls().size() > 0) {
-      image.setUrl(activity.getAttachmentImageUrls().get(0));
-    }
+    activity.getAttachmentImageUrls().ifPresent(urls -> image.setUrl(urls.get(0)));
     return image;
   }
 

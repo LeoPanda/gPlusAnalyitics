@@ -2,6 +2,8 @@ package jp.leopanda.gPlusAnalytics.dataStore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
@@ -15,7 +17,7 @@ import com.google.appengine.api.datastore.QueryResultList;
 import jp.leopanda.gPlusAnalytics.server.ServerUtil;
 
 /**
- * DataStore Entity操作クラス 
+ * DataStore Entity操作クラス
  * 
  * @author LeoPanda
  *
@@ -72,35 +74,44 @@ public class EntityOperator {
    */
   public List<Entity> getEntityAsList() {
     this.isNew = false;
-    List<Entity> entities = new EntitiesProceccer<List<Entity>>(new ArrayList<Entity>()) {
-      @Override
-      void whenNoEntity() {
-        entities.add(newEntity());
-      }
-      @Override
-      void doEachEntity(Entity entity) {
-        entities.add(entity);
-      }
-    }.exec().getEntities();
-
+    List<Entity> entities = new ArrayList<Entity>();
+    processEachEntities(entity -> entities.add(entity), () -> entities.add(newEntity()));
     return entities;
   }
-
 
   /**
    * データストアからEntityを削除する
    */
   public void removeAllEntites() {
     this.isNew = true;
-    new EntitiesProceccer<Void>() {
-      @Override
-      void doEachEntity(Entity entity) {
-        ds.delete(entity.getKey());        
-      }
-      @Override
-      void whenNoEntity() {
-      }
-    }.exec();
+    processEachEntities(entity -> ds.delete(entity.getKey()), () -> null);
+  }
+
+  /**
+   * データストアからエンティティを取り出して処理する
+   * 
+   * @param action エンティティ毎の処理
+   * @param isEmpty エンティティが見つからなかった場合の処理
+   */
+  private void processEachEntities(Consumer<Entity> action, Supplier<?> isEmpty) {
+    QueryResultList<Entity> resultList = getPreparedQuery()
+        .asQueryResultList(FetchOptions.Builder.withDefaults());
+    if (resultList.size() > 0) {
+      resultList.forEach(entity -> action.accept(entity));
+    } else {
+      isEmpty.get();
+    }
+  }
+
+  /**
+   * 共通エンティティ用のPreparedQueryを取得する
+   * 
+   * @return
+   */
+  private PreparedQuery getPreparedQuery() {
+    Query query = new Query(property.getKindName());
+    query.setFilter(new FilterPredicate(property.ACTOR_ID, FilterOperator.EQUAL, actorId));
+    return ds.prepare(query);
   }
 
   /**
@@ -137,77 +148,6 @@ public class EntityOperator {
     entity.setProperty(property.ACTOR_ID, actorId);
     this.isNew = true;
     return entity;
-  }
-
-  /**
-   * 共通エンティティ用のPreparedQueryを取得する
-   * 
-   * @return
-   */
-  private PreparedQuery getPreparedQuery() {
-    Query query = new Query(property.getKindName());
-    query.setFilter(new FilterPredicate(property.ACTOR_ID, FilterOperator.EQUAL, actorId));
-    return ds.prepare(query);
-  }
-
-  /**
-   * Queryを実行してデータストアからEntityのリストを取得し
-   * 各Entity毎に処理を行わせるための抽象クラス
-   * @author LeoPanda
-   *
-   * @param <I>
-   */
-  private abstract class EntitiesProceccer<I> {
-    PreparedQuery pq = getPreparedQuery();
-    QueryResultList<Entity> resultList = pq.asQueryResultList(FetchOptions.Builder.withDefaults());
-    I entities; //ループ内処理の結果を保持するためのスタックエリア
-
-    /**
-     * ループ内の処理結果を出力する場合のコンストラクタ
-     * @param entities
-     */
-    EntitiesProceccer(I entities) {
-      this.entities = entities;
-    }
-
-    /**
-     * コンストラクタ
-     */
-    EntitiesProceccer() {
-    }
-
-    /**
-     * 処理の実行
-     * @return
-     */
-    EntitiesProceccer<I> exec() {
-      if (resultList.size() > 0) {
-        for (Entity entity : resultList) {
-          doEachEntity(entity);
-        }
-      } else {
-        whenNoEntity();
-      }
-      return this;
-    }
-
-    /**
-     * 処理結果を取り出す
-     * @return
-     */
-    I getEntities() {
-      return this.entities;
-    }
-    /**
-     * 取得した各Entity毎の処理
-     * @param entity
-     */
-    abstract void doEachEntity(Entity entity);
-
-    /**
-     *Entityがない場合の処理 
-     */
-    abstract void whenNoEntity();
   }
 
 }

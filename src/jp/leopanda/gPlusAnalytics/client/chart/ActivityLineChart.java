@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jp.leopanda.gPlusAnalytics.client.chart.abstracts.ChartRangeFilterdChart;
+import jp.leopanda.gPlusAnalytics.client.chart.abstracts.RangeFilterdChart;
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.client.util.SortComparator;
@@ -18,6 +18,7 @@ import com.googlecode.gwt.charts.client.ChartType;
 import com.googlecode.gwt.charts.client.ChartWrapper;
 import com.googlecode.gwt.charts.client.ColumnType;
 import com.googlecode.gwt.charts.client.DataTable;
+import com.googlecode.gwt.charts.client.controls.filter.ChartRangeFilterUi;
 import com.googlecode.gwt.charts.client.corechart.LineChartOptions;
 import com.googlecode.gwt.charts.client.event.SelectEvent;
 import com.googlecode.gwt.charts.client.event.SelectHandler;
@@ -34,7 +35,7 @@ import com.googlecode.gwt.charts.client.options.VAxis;
  *
  */
 public class ActivityLineChart extends
-    ChartRangeFilterdChart<PlusActivity, LineChartOptions> {
+    RangeFilterdChart<PlusActivity, LineChartOptions> {
   private Map<Integer, String> activityUrls = new HashMap<Integer, String>();
   Logger logger = Logger.getLogger("ActivityLineChart");
 
@@ -43,14 +44,18 @@ public class ActivityLineChart extends
    */
   public ActivityLineChart() {
     super(ChartType.LINE);
+    setChartFunction(chart -> getChart(chart));
+    setDataTableFunction(dataTable -> getDataTable(dataTable));
+    setChartOptionsFunction(chartOptions -> getChartOptions(chartOptions));
+    setRangeFilterUiFunction(rangeFilterUi -> setRangeFilterUi(rangeFilterUi));
   }
 
-  /*
-   * チャートの生成
+  /**
+   * チャートの設定
+   * @param chart
+   * @return
    */
-  @Override
-  protected ChartWrapper<LineChartOptions> getChart(ChartType chartType) {
-    chart = super.getChart(chartType);
+  private ChartWrapper<LineChartOptions> getChart(ChartWrapper<LineChartOptions> chart) {
     chart.addSelectHandler(new SelectHandler() {
       @Override
       public void onSelect(SelectEvent event) {
@@ -62,12 +67,12 @@ public class ActivityLineChart extends
     return chart;
   }
 
-  /*
-   * チャートのオプションを生成する
+  /**
+   * チャートオプションの設定
+   * @param chartOptions
+   * @return
    */
-  @Override
-  protected LineChartOptions getChartOptions() {
-    chartOptions = super.getChartOptions();
+  private LineChartOptions getChartOptions(LineChartOptions chartOptions) {
     chartOptions.setTitle(getChartTitle());
     chartOptions.setLegend(Legend.create(LegendPosition.TOP));
     HAxis haxis = HAxis.create("アクテビティ");
@@ -77,27 +82,23 @@ public class ActivityLineChart extends
     return chartOptions;
 
   }
-
-  /*
-   * レンジフィルターの設定
+  /**
+   * レンジフィルターUIを設定する
+   * @param rangeFilterUi
+   * @return
    */
-  @Override
-  protected void setRangeFilter() {
-    setMaxRangeValue(sourceData.size());
-    setMiniRangeWidth(5);
-    setDefaultRangeWidth(50);
-    super.setRangeFilter();
-    // 日付でフィルター
-    filterOptions.setFilterColumnIndex(0);
-    // フィルターチャートの外形設定
-    filterUi.setChartType(ChartType.LINE);
-    filterUi.setChartOptions(getFilterChartOptions());
+  private ChartRangeFilterUi setRangeFilterUi(ChartRangeFilterUi rangeFilterUi){
+    setRangeValues(5, getSourceData().size(), 50);
+    rangeFilterUi.setChartType(ChartType.LINE);
+    rangeFilterUi.setChartOptions(getFilterUiOptions());
+    return rangeFilterUi;
   }
 
-  /*
-   * フィルターチャートのオプションを生成する
+  /**
+   * レンジフィルターUIのチャートオプションを設定する
+   * @return
    */
-  private LineChartOptions getFilterChartOptions() {
+  private LineChartOptions getFilterUiOptions() {
     LineChartOptions filterChartOptions = LineChartOptions.create();
     filterChartOptions.setHeight(100);
     HAxis haxis = HAxis.create();
@@ -107,14 +108,14 @@ public class ActivityLineChart extends
     return filterChartOptions;
   }
 
-  /*
-   * グラフに表示するデータをセットする
+  /**
+   * チャートのデータテーブルを設定する
+   * @param dataTable
+   * @return
    */
-  @Override
-  protected DataTable getDataTable() {
-    List<PlusActivity> activities = new ArrayList<PlusActivity>(sourceData);
+  private DataTable getDataTable(DataTable dataTable) {
+    List<PlusActivity> activities = new ArrayList<PlusActivity>(getSourceData());
     Collections.sort(activities, new SortComparator().getAscendingActivitesOrder());
-    dataTable = super.getDataTable();
     dataTable.addColumn(ColumnType.NUMBER, "No.");
     dataTable.addColumn(ColumnType.NUMBER, Distribution.FIRST_LOOKER.name);
     dataTable.addColumn(ColumnType.NUMBER, Distribution.LOW_MIDDLE_LOOKER.name);
@@ -126,13 +127,13 @@ public class ActivityLineChart extends
       activityUrls.put(row, activity.getUrl());
       dataTable.setValue(row, 0, row);
       dataTable.setValue(row, 1,
-          getPercentage(activity.getNumOfPlusOners(), activity.getFirstLookers()));
+          getRepeaterPercentage(activity.getNumOfPlusOners(), activity.getFirstLookers()));
       dataTable.setValue(row, 2,
-          getPercentage(activity.getNumOfPlusOners(), activity.getLowMiddleLookers()));
+          getRepeaterPercentage(activity.getNumOfPlusOners(), activity.getLowMiddleLookers()));
       dataTable.setValue(row, 3,
-          getPercentage(activity.getNumOfPlusOners(), activity.getHighMiddleLookers()));
+          getRepeaterPercentage(activity.getNumOfPlusOners(), activity.getHighMiddleLookers()));
       dataTable.setValue(row, 4,
-          getPercentage(activity.getNumOfPlusOners(), activity.getHighLookers()));
+          getRepeaterPercentage(activity.getNumOfPlusOners(), activity.getHighLookers()));
       row += 1;
     }
     return dataTable;
@@ -145,7 +146,7 @@ public class ActivityLineChart extends
    * @param numOfRepeaters
    * @return
    */
-  private double getPercentage(int numOfPlusOners, int numOfRepeaters) {
+  private double getRepeaterPercentage(int numOfPlusOners, int numOfRepeaters) {
     return 100 * (double) numOfRepeaters / (double) numOfPlusOners;
   }
 

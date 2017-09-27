@@ -2,6 +2,7 @@ package jp.leopanda.gPlusAnalytics.client.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * セルテーブルの表示データをフィルタリングするための抽象クラス
@@ -9,37 +10,49 @@ import java.util.List;
  * @author LeoPanda
  *
  */
-public abstract class ItemFilter<I, C> {
+public abstract class ItemFilter<I> {
+  List<I> sourceItems;
+
+  public ItemFilter(List<I> sourceItems) {
+    this.sourceItems = sourceItems;
+  }
+
   /**
-   * リストデータをフィルタリングする
+   * ソースアイテムリストをフィルタして新しいインスタンスを返す
    * 
-   * @param comparator C
-   *          フィルタ比較オブジェクト
-   * @param sourceItems List<I>
-   *          表示データを変更したいアイテムリスト
+   * @param predicate フィルター条件
    * @return List<I> フィルター後のアイテムリスト
    */
-  public List<I> doFilter(List<I> sourceItems,C comparator) {
-    if(comparator == null){
-      return sourceItems;
-    }
+  public List<I> doFilter(Predicate<I> predicate) {
     List<I> filterdItems = new ArrayList<I>();
-    for (I sourceItem : sourceItems) {
-      if (compare(sourceItem, comparator)) {
-        filterdItems.add(sourceItem);
-      }
-    }
+    sourceItems.stream().filter(predicate).forEach(item -> filterdItems.add(item));
     return filterdItems;
   }
 
   /**
-   * フィルタリング方法を記述する
+   * アイテムリストをソースアイテムリストにOR結合する
    * 
-   * @param sourceItem
-   *          フィルタ対象のアイテムオブジェクト
-   * @param comparator
-   *          比較フィールドオブジェクト
-   * @return 比較結果
+   * @param originalItems
+   * @return
    */
-  public abstract boolean compare(I sourceItem, C comparator);
+  public List<I> combineOr(List<I> targetItems) {
+    geFreshItems(targetItems).forEach(item -> sourceItems.add(item));
+    return sourceItems;
+  }
+
+  /**
+   * 対象リストからソースアイテムリストに存在しないアイテムを抽出する
+   * 
+   * @param comparsionItems 比較対象リスト
+   * @return
+   */
+  private List<I> geFreshItems(List<I> comparsionItems) {
+    List<I> fleshItems = new ArrayList<I>();
+    comparsionItems.forEach(item -> {
+      if (!sourceItems.contains(item)) {
+        fleshItems.add(item);
+      }
+    });
+    return fleshItems;
+  }
 }

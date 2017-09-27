@@ -2,7 +2,6 @@ package jp.leopanda.gPlusAnalytics.client.panel;
 
 import java.util.Date;
 
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -39,12 +38,12 @@ class PhotoCell extends FocusPanel {
    */
   PhotoCell(final PlusActivity activity, int gridHeight, DetailPopRequestListener listener) {
     this.activity = activity;
-    if (activity.getAttachmentImageUrls() != null) {
+    activity.getAttachmentImageUrls().ifPresent(urls -> {
       this.add(new PhotoImage(activity, gridHeight));
       this.detailPopRequestListener = listener;
       this.gridHeight = gridHeight;
       this.addStyleName(MyStyle.PHOTO_CELL.getStyle());
-    }
+  });
   }
 
   /**
@@ -78,26 +77,34 @@ class PhotoCell extends FocusPanel {
 
     PhotoImage(PlusActivity activity, int height) {
       super();
-      this.setUrl(activity.getAttachmentImageUrls().get(0));
+      activity.getAttachmentImageUrls().ifPresent(urls -> this.setUrl(urls.get(0)));
       this.setWidth(
           Statics.getLengthWithUnit((int) calcUtil.getTemporarryPhotoWidth(activity, height)));
       this.addStyleName(MyStyle.GRID_IMAGE.getStyle());
       this.addClickHandler(setClickHandler(activity));
     }
 
-    /*
-     * ブラウザにロード後、イメージの縦横サイズを検出する
+    /**
+     * ブラウザにロード後、イメージの縦横サイズを再設定する
      */
     @Override
     public void onLoad() {
       if (photoDimensions == null) {
-        if (this.getWidth() > 0 && this.getHeight() > 0) {
-          photoDimensions = new SquareDimensions(this.getWidth(), this.getHeight());
-          this.setWidth(Statics.getLengthWithUnit((int) getPhotoWidth()));
-          this.setHeight(Statics.getLengthWithUnit(gridHeight));
-        }
+        photoDimensions = getPhotoDimemsions();
       }
       super.onLoad();
+    }
+
+    /**
+     * イメージの縦横サイズを設定する
+     */
+    private SquareDimensions getPhotoDimemsions() {
+      if (this.getWidth() > 0 && this.getHeight() > 0) {
+        this.setWidth(Statics.getLengthWithUnit((int) getPhotoWidth()));
+        this.setHeight(Statics.getLengthWithUnit(gridHeight));
+        return new SquareDimensions(this.getWidth(), this.getHeight());
+      }
+      return null;
     }
 
     /**
@@ -106,16 +113,13 @@ class PhotoCell extends FocusPanel {
      * @param activity
      */
     private ClickHandler setClickHandler(final PlusActivity activity) {
-      return new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
+      return  event  -> {
           PhotoCell.this.detailPopRequestListener.request(activity,
               new SquareDimensions(PhotoImage.this.getWidth(),
                   PhotoImage.this.getHeight()),
               Window.getScrollLeft() + event.getClientX(),
                   Window.getScrollTop() + event.getClientY());
-        }
-      };
+        };
     }
 
   }

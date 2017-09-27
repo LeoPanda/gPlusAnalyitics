@@ -1,12 +1,19 @@
 package jp.leopanda.gPlusAnalytics.client.chart;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.SimpleChart;
-import jp.leopanda.gPlusAnalytics.client.panel.ActivitySelectorPop;
+import jp.leopanda.gPlusAnalytics.client.enums.DateFormat;
+import jp.leopanda.gPlusAnalytics.client.panel.ActivityMiniTablePanel;
+import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ItemListPopPanel;
 import jp.leopanda.gPlusAnalytics.client.util.Formatter;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
+import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.Window;
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartType;
@@ -24,121 +31,121 @@ import com.googlecode.gwt.charts.client.event.SelectHandler;
  *
  */
 public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOptions> {
-  private ActivitySelectorPop activitySelectorPop = null; // アクテビティ選択用ポップアップ画面
+  private ItemListPopPanel<PlusActivity, ActivityMiniTablePanel> activitySelectorPanel;
 
   /**
    * コンストラクタ
    */
   public ActivityCalendarChart() {
     super(ChartType.CALENDAR, ChartPackage.CALENDAR);
+    setChartFunction(chart -> getChart(chart));
+    setChartOptionsFunction(chartOptions -> getChartOptions(chartOptions));
+    setDataTableFunction(dataTable -> getDataTable(dataTable));
   }
 
-  /*
-   * グラフの作成
+  /**
+   * チャートの生成
+   * 
+   * @param chart
+   * @return
    */
-  protected ChartWrapper<CalendarOptions> getChart(ChartType chartType) {
-    chart = super.getChart(chartType);
-    chart.addSelectHandler(new SelectHandler() {
-      @Override
-      public void onSelect(SelectEvent event) {
-        if (chart.getSelection().length() > 0) {
-          if (chart.getSelection().get(0).getRow() != null) {
-            Date selectedDate =
-                chart.getDataTable().getValueDate(chart.getSelection().get(0).getRow(), 0);
-            showSelector(selectedDate);
-          } else {
-            Window.alert("この日は投稿がありません。");
-          }
-        }
-      }
-    });
+  private ChartWrapper<CalendarOptions> getChart(ChartWrapper<CalendarOptions> chart) {
+    chart.addSelectHandler(getSelectHandler(chart));
     return chart;
   }
 
-  /*
-   * グラフのオプションを作成する
+  /**
+   * カラム選択時ハンドラの生成
+   * 
+   * @param chart
+   * @return
    */
-  protected CalendarOptions getChartOptions() {
-    chartOptions = super.getChartOptions();
+  private SelectHandler getSelectHandler(ChartWrapper<CalendarOptions> chart) {
+    return new SelectHandler() {
+      @Override
+      public void onSelect(SelectEvent event) {
+        int selectedRowIndex = getSelectedRowIndex(chart);
+        if (selectedRowIndex > 0) {
+          popActivitySelectorPanel(chart.getDataTable().getValueDate(selectedRowIndex, 0));
+          // popTest();
+        } else {
+          Window.alert("この日は投稿がありません。");
+        }
+      }
+    };
+  }
+
+  /**
+   * 選択行インデックスの取得
+   * 
+   * @param chart
+   * @return
+   */
+  private int getSelectedRowIndex(ChartWrapper<CalendarOptions> chart) {
+    return chart.getSelection().length() > 0
+        ? Optional.ofNullable(chart.getSelection().get(0).getRow()).orElse(0) : 0;
+  }
+
+  /**
+   * アクテビティ選択パネルを表示する
+   * 
+   * @param selectedDate
+   */
+  private void popActivitySelectorPanel(Date selectedDate) {
+    Optional.ofNullable(activitySelectorPanel).ifPresent(panel -> activitySelectorPanel.closePop());
+    activitySelectorPanel = new ItemListPopPanel<PlusActivity, ActivityMiniTablePanel>(
+        Formatter.getYYMDString(selectedDate) + "のアクテビティ", 10,
+        new ActivityMiniTablePanel(getSourceData()));
+    activitySelectorPanel.show(item -> Formatter.getYYMDString(item.published)
+        .equals(Formatter.getYYMDString(selectedDate)));
+  }
+
+  /**
+   * グラフオプションの生成
+   * 
+   * @param chartOptions
+   * @return
+   */
+  private CalendarOptions getChartOptions(CalendarOptions chartOptions) {
     chartOptions.setTitle(getChartTitle());
     chartOptions.setNoDataPattern("#DDD", "rgba(76, 69, 10, 0.86)");
     return chartOptions;
   }
 
-  /*
-   * グラフに表示するデータをセットする
+  /**
+   * 表示データのセット
+   * 
+   * @param dataTable
+   * @return
    */
-  @Override
-  protected DataTable getDataTable() {
-    dataTable = super.getDataTable();
+  private DataTable getDataTable(DataTable dataTable) {
     dataTable.addColumn(ColumnType.DATE, "投稿日");
     dataTable.addColumn(ColumnType.NUMBER, "+1数");
-    PlusOnerCounter counter = new PlusOnerCounter();
-    for (PlusActivity activity : sourceData) {
-      if (counter.isSamePublished(activity)) {
-      } else {
-        dataTable = counter.addNumOfPlusOnersByPublished(dataTable);
-        counter.published = activity.getPublished();
-      }
-      counter.countNumOfPlusOners(activity);
-    }
-    dataTable = counter.addNumOfPlusOnersByPublished(dataTable);
+    getSummaryNumOfPlusOneByPublishedDay(getSourceData()).forEach((k, v) -> dataTable.addRow(k, v));
     return dataTable;
   }
 
-  /*
-   * アクテビティ選択画面を表示する
+  /**
+   * アクテビティリストから投稿日毎の+1数を集計する
+   * 
+   * @param activities
+   * @return
    */
-  private void showSelector(Date selectedDate) {
-    if (activitySelectorPop != null) {
-      activitySelectorPop.closePop();
-      activitySelectorPop = null;
-    }
-    activitySelectorPop = new ActivitySelectorPop(selectedDate,sourceData);
-    activitySelectorPop.show();
+  private Map<Date, Integer> getSummaryNumOfPlusOneByPublishedDay(List<PlusActivity> activities) {
+    return activities.stream().collect(
+        Collectors.groupingBy(item -> tranceteTime(item.getPublished()),
+            Collectors.reducing(0, PlusActivity::getNumOfPlusOners, Integer::sum)));
   }
 
   /**
-   * 同一年月日に投稿されたアクテビティの+1数を集計するためのカウンターオブジェクト
+   * 日付から時間を切り捨てる
+   * 
+   * @param date
+   * @return
    */
-  class PlusOnerCounter {
-    public Date published = null;
-    private int numOfPlusOners = 0;
-
-    /**
-     * カウンターに+1er数を加算する
-     * @param activity
-     */
-    public void countNumOfPlusOners(PlusActivity activity) {
-      numOfPlusOners += activity.getNumOfPlusOners();
-    }
-
-    /**
-     * 投稿日付別+1er数をデータテーブルへ書き出す
-     * @param dataTable　
-     * @return
-     */
-    public DataTable addNumOfPlusOnersByPublished(DataTable dataTable) {
-      dataTable.addRow(published, numOfPlusOners);
-      numOfPlusOners = 0;
-      return dataTable;
-    }
-
-    /**
-     * カウンターの累積判定
-     * 
-     * @param activity 対象のアクティビティレコード
-     * @return カウントアップが必要な場合にtrue
-     */
-    public boolean isSamePublished(PlusActivity activity) {
-      if (published == null) {
-        published = activity.getPublished();
-        return true;
-      } else {
-        return Formatter.getYYMDString(activity.published).equals(
-            Formatter.getYYMDString(published));
-      }
-    }
+  private Date tranceteTime(Date date) {
+    DateTimeFormat ymdFormat = DateTimeFormat.getFormat(DateFormat.YYMD.getValue());
+    return ymdFormat.parse(ymdFormat.format(date));
   }
 
 }

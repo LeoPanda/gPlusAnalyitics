@@ -20,10 +20,10 @@ import com.google.gwt.user.client.ui.Label;
  */
 public class TableLaunchPanel extends HorizontalPanel {
   FilterableSourceItems sourceItems;
-  ActivityTable activityTable;
-  PlusOnersTable plusOnersTable;
-  PagedItemListPanel<PlusActivity, ActivityTable> activityTablePanel;
-  PagedItemListPanel<PlusPeople, PlusOnersTable> plusOnersTablePanel;
+  ActivityTablePanel activityTable;
+  PlusOnersTablePanel plusOnersTable;
+  PagedItemListPanel<PlusActivity, ActivityTablePanel> activityTablePanel;
+  PagedItemListPanel<PlusPeople, PlusOnersTablePanel> plusOnersTablePanel;
   ItemClickListener<PlusItem> itemClickListener;
 
   /**
@@ -67,8 +67,8 @@ public class TableLaunchPanel extends HorizontalPanel {
    * 一覧表テーブルと表示パネルを新規作成する
    */
   private void setUpTables() {
-    activityTable = new ActivityTable(sourceItems.getActivities());
-    plusOnersTable = new PlusOnersTable(sourceItems.getPlusOners());
+    activityTable = new ActivityTablePanel(sourceItems.getActivities());
+    plusOnersTable = new PlusOnersTablePanel(sourceItems.getPlusOners());
     
     activityTable.addItemClickListener(new ItemClickListener<PlusActivity>() {
       @Override
@@ -83,10 +83,10 @@ public class TableLaunchPanel extends HorizontalPanel {
       }
     });
 
-    activityTablePanel = new PagedItemListPanel<PlusActivity, ActivityTable>("アクティビティ一覧", 7,
+    activityTablePanel = new PagedItemListPanel<PlusActivity, ActivityTablePanel>("アクティビティ一覧", 7,
         activityTable) {
     };
-    plusOnersTablePanel = new PagedItemListPanel<PlusPeople, PlusOnersTable>("+1ユーザー一覧", 10,
+    plusOnersTablePanel = new PagedItemListPanel<PlusPeople, PlusOnersTablePanel>("+1ユーザー一覧", 10,
         plusOnersTable) {
     };
   }

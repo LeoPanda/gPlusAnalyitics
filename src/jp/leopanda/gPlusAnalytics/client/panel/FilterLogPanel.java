@@ -1,15 +1,16 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import java.util.function.Consumer;
+
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 
 import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
-import jp.leopanda.gPlusAnalytics.client.util.ChildCardsProcesser;
+import jp.leopanda.gPlusAnalytics.client.util.NumOfPlusOneFilterKeyword;
+import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
+import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.interFace.CheckBoxListener;
 import jp.leopanda.gPlusAnalytics.interFace.FilterRequestListener;
 
@@ -20,22 +21,61 @@ import jp.leopanda.gPlusAnalytics.interFace.FilterRequestListener;
  *
  */
 public class FilterLogPanel extends HorizontalPanel {
-  private CheckBoxListener checkListener; // 各カードのチェックボックス状態変更リスナー
   private FilterRequestListener resetButtonListener; // リセットボタンリスナー
   private Button resetButton;
   private Label titleLabel = new Label("フィルター:");
-  private int logCardCounter = 0;
+  private boolean isLeadCard;
 
   /**
    * コンストラクタ
    */
   public FilterLogPanel() {
     resetButton = getResetButton();
-    this.add(resetButton);
-    this.add(titleLabel);
-    resetButton.setVisible(false);
-    titleLabel.setVisible(false);
     titleLabel.addStyleName(MyStyle.FILTER_LABEL.getStyle());
+    initialPanel();
+  }
+
+  /**
+   * ログカードをパネルに追加する
+   * 
+   * @param filterType
+   * @param keyword
+   * @param listener
+   * @return
+   */
+  public void addFilterLogCard(FilterType filterType, Object keyword,
+      CheckBoxListener listener) {
+    add(getCard(filterType, keyword, listener));
+    panelOperatorVisible(true);
+    cardBooleansVisibler();
+  }
+
+  /**
+   * ログカードを生成する
+   * 
+   * @param filterType
+   * @param keyword
+   * @param listener
+   * @return
+   */
+  private FilterLogCard getCard(FilterType filterType, Object keyword, CheckBoxListener listener) {
+    FilterLogCard card;
+    if (keyword instanceof PlusActivity) {
+      card = new FilterLogCard(FilterType.PLUSONER_TABLE_ACTIVITY, (PlusActivity) keyword);
+    } else if (keyword instanceof PlusPeople) {
+      card = new FilterLogCard(FilterType.ACTIVITY_TABLE_PLUSONER, (PlusPeople) keyword);
+    } else if (keyword instanceof String) {
+      card = new FilterLogCard(filterType, (String) keyword);
+    } else if (keyword instanceof NumOfPlusOneFilterKeyword) {
+      card = new FilterLogCard(filterType, (NumOfPlusOneFilterKeyword) keyword);
+    } else {
+      return null;
+    }
+    card.addCheckBoxListener(value -> {
+      cardBooleansVisibler();
+      listener.onValueChange(value);
+    });
+    return card;
   }
 
   /**
@@ -43,15 +83,10 @@ public class FilterLogPanel extends HorizontalPanel {
    * 
    * @return
    */
-  public Button getResetButton() {
+  private Button getResetButton() {
     Button resetButton = new Button("X");
     resetButton.addStyleName(MyStyle.FILTER_BUTTON.getStyle());
-    resetButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        resetButtonListener.request(FilterType.RESET_ITEMS, null);
-      }
-    });
+    resetButton.addClickHandler(event -> resetButtonListener.request(FilterType.RESET_ITEMS, null));
     return resetButton;
   }
 
@@ -65,85 +100,63 @@ public class FilterLogPanel extends HorizontalPanel {
   }
 
   /**
-   * 表示されたログカードにチェックボックスの動作リスナーを追加する
-   * 
-   * @param listener
+   * パネルの初期表示
    */
-  public void addCardCheckBoxListerer(CheckBoxListener listener) {
-    this.checkListener = listener;
-    new ChildCardsProcesser(this) {
-      @Override
-      public void cardProcess(FilterLogCard card) {
-        cardBooleansVisibler(card);
-        card.addCheckBoxListener(getCheckBoxListener());
-      }
-    }.processAll();
+  private void initialPanel() {
+    this.add(resetButton);
+    this.add(titleLabel);
+    panelOperatorVisible(false);
   }
 
   /**
-   * 先頭のログカードは論理和チェックの表示をしない
+   * パネル操作領域の表示設定
+   * 
+   * @param bool
+   */
+  private void panelOperatorVisible(boolean bool) {
+    resetButton.setVisible(bool);
+    titleLabel.setVisible(bool);
+  }
+
+  /**
+   * 各ログカード論理和チェックの表示設定
    * 
    * @param card
    * @param logCardCounter
    */
-  private void cardBooleansVisibler(FilterLogCard card) {
-    if (logCardCounter == 0) {
-      card.setBooleansVisible(false);
-    } else {
-      card.setBooleansVisible(true);
-    }
-    if (card.getEnableCheck()) {
-      logCardCounter++;
-    }else{
-      card.setBooleansVisible(false);
-    }
-  }
-
-  /**
-   * カードに追加するチェックボックスリスナーを生成する
-   * 
-   * @return
-   */
-  private CheckBoxListener getCheckBoxListener() {
-    return new CheckBoxListener() {
-      @Override
-      public void onValueChange(boolean value) {
-        checkListener.onValueChange(value);
-        logCardCounter = 0;
-        new ChildCardsProcesser(FilterLogPanel.this) {
-          @Override
-          public void cardProcess(FilterLogCard card) {
-            cardBooleansVisibler(card);
-          }
-        }.processAll();
+  private void cardBooleansVisibler() {
+    isLeadCard = true;
+    forEachCards(card -> {
+      if (isLeadCard) {
+        card.setBooleansVisible(false);
+        card.resetBooleans();
+        isLeadCard = false;
+      } else {
+        card.setBooleansVisible(true);
       }
-    };
+    });
   }
 
   /**
-   * パネルにログカードを追加する
-   * 
-   * @param widget
-   */
-  @Override
-  public void add(Widget widget) {
-    resetButton.setVisible(true);
-    titleLabel.setVisible(true);
-    logCardCounter = 0; 
-    super.add(widget);
-  }
-
-  /**
-   * パネルのログカードをすべて消去する
+   * パネルのログカードをすべて消去し再表示する
    */
   @Override
   public void clear() {
     super.clear();
-    this.logCardCounter = 0;
-    this.add(resetButton);
-    this.add(titleLabel);
-    resetButton.setVisible(false);
-    titleLabel.setVisible(false);
+    initialPanel();
   }
 
+  /**
+   * すべてのログカードを処理する
+   */
+  public void forEachCards(Consumer<FilterLogCard> action) {
+    this.forEach(widget -> {
+      if (widget.getClass() == FilterLogCard.class) {
+        FilterLogCard card = (FilterLogCard) widget;
+        if (card.getEnableCheck()) {
+          action.accept(card);
+        }
+      }
+    });
+  }
 }

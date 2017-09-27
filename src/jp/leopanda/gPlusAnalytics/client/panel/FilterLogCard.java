@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 
-import jp.leopanda.gPlusAnalytics.client.enums.BOOLEANS;
+import jp.leopanda.gPlusAnalytics.client.enums.FilterBooleans;
 import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.util.NumOfPlusOneFilterKeyword;
@@ -111,7 +111,7 @@ public class FilterLogCard extends HorizontalPanel {
    * @return
    */
   private ListBoxField getBooleansField() {
-    ListBoxField booleans = new ListBoxField("", null, BOOLEANS.values());
+    ListBoxField booleans = new ListBoxField("", null, FilterBooleans.values());
     booleans.getBasicField().addStyleName(MyStyle.FILTER_BOOLEAN.getStyle());
     booleans.getBasicField().addChangeHandler(new ChangeHandler() {
       @Override
@@ -185,8 +185,8 @@ public class FilterLogCard extends HorizontalPanel {
    * 
    * @return
    */
-  public BOOLEANS getBooleansValue() {
-    return BOOLEANS.values()[(booleans.getSelectedIndex())];
+  public FilterBooleans getBooleansValue() {
+    return FilterBooleans.values()[(booleans.getSelectedIndex())];
   }
 
   /**
@@ -196,6 +196,12 @@ public class FilterLogCard extends HorizontalPanel {
    */
   public void setBooleansVisible(boolean visible) {
     this.booleans.getBasicField().setVisible(visible);
+  }
+  /**
+   * 論理和セッターの値をリセットする
+   */
+  public void resetBooleans(){
+    this.booleans.reset();
   }
 
   /**

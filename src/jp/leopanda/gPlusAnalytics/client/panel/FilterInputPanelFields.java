@@ -1,5 +1,8 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
@@ -103,38 +106,43 @@ public class FilterInputPanelFields {
    * @return
    */
   private EventAction getOnValueChange(final FilterType filterType) {
-    return new EventAction() {
-      @Override
-      public void onValueChange() {
-        requestListener.request(filterType, getFilterKeyword(filterType));
-      }
-    };
+    return () -> requestListener.request(filterType, getFilterKeyword(filterType));
   }
 
   /**
-   * 入力フィールド内でエンターキーが押された場合の処理ハンドラを返す
+   * 入力フィールド内でエンターキーが押された場合にフィルターを実行する
    * 
    * @param filterType
    * @return
    */
   private KeyPressHandler getEnterKeyHandler(final FilterType filterType) {
-    return new KeyPressHandler() {
-
-      @Override
-      public void onKeyPress(KeyPressEvent event) {
-        int keyCode = event.getUnicodeCharCode();
-        if (keyCode == 0) {
-          // Probably Firefox
-          keyCode = event.getNativeEvent().getKeyCode();
-        }
-        if (keyCode == KeyCodes.KEY_ENTER) {
-          Object keyword = getFilterKeyword(filterType);
-          if (keyword != null) {
-            requestListener.request(filterType, keyword);
-          }
-        }
+    return event -> {
+      int keyCode = getKeycode(event);
+      if (keyCode == KeyCodes.KEY_ENTER) {
+        requestFilter(filterType);
       }
     };
+  }
+
+  /**
+   * キーワードを取得し選択されたフィルターをリクエストする
+   * @param filterType
+   */
+  private void requestFilter(final FilterType filterType) {
+    Optional<Object> keyword = Optional.ofNullable(getFilterKeyword(filterType));
+    keyword.ifPresent(value -> requestListener.request(filterType, value));
+  }
+
+  /**
+   * 押されたキーのコードを取得する
+   * @param event
+   * @return
+   */
+  private int getKeycode(KeyPressEvent event) {
+    final int fireFoxKeyCode = 0;
+    int keyCode = event.getUnicodeCharCode();
+    keyCode = (keyCode == fireFoxKeyCode) ? event.getNativeEvent().getKeyCode():keyCode;
+    return keyCode;
   }
 
   /**
@@ -147,10 +155,10 @@ public class FilterInputPanelFields {
     Object keyword = null;
     switch (filterType) {
     case PLUSONER_KEYWORD:
-      keyword = new FieldProcess(plusOnerFilter) {}.getKeyWord();
+      keyword = validateAndGetKeyWord(plusOnerFilter, field -> field.getText());
       break;
     case ACTIVITIES_KEYWORD:
-      keyword = new FieldProcess(activityFilter) {}.getKeyWord();
+      keyword = validateAndGetKeyWord(activityFilter, field -> field.getText());
       break;
     case ACTIVITIES_PUBLISHED_YEAR:
       keyword = (String) publishedYear.getValue();
@@ -162,13 +170,9 @@ public class FilterInputPanelFields {
       keyword = (String) postCategory.getValue();
       break;
     case PLUSONER_NUMOFPLUSONE:
-      keyword = new FieldProcess(numOfPlusOneFilter) {
-        @Override
-        Object keywordSetter() {
-          return new NumOfPlusOneFilterKeyword(Integer.valueOf(numOfPlusOneFilter.getText()),
-              CompOperator.values()[compOperator.getSelectedIndex()]);
-        }
-      }.getKeyWord();
+      keyword = validateAndGetKeyWord(numOfPlusOneFilter,
+          field -> new NumOfPlusOneFilterKeyword(Integer.valueOf(field.getText()),
+              CompOperator.values()[compOperator.getSelectedIndex()]));
     default:
       break;
     }
@@ -176,38 +180,20 @@ public class FilterInputPanelFields {
   }
 
   /**
-   * フィールドからkeywordを取り出す定形処理
+   * フィールドのバリデートとkeywordの取り出し
    * 
-   * @author LeoPanda
-   *
+   * @param field
+   * @param keywordSetter
+   * @return
    */
-  private abstract class FieldProcess {
-    FieldCommon field;
-
-    FieldProcess(FieldCommon field) {
-      this.field = field;
+  private Object validateAndGetKeyWord(FieldCommon field,
+      Function<FieldCommon, Object> keywordSetter) {
+    if (field.validate()) {
+      return keywordSetter.apply(field);
+    } else {
+      field.popError();
     }
-
-    /**
-     * フィールドのバリデートチェックとキーワードの取り出し
-     * @return
-     */
-    Object getKeyWord() {
-      if (field.validate()) {
-        return keywordSetter();
-      } else {
-        field.popError();
-      }
-      return null;
-    }
-
-    /**
-     * キーワードの取り出しロジック
-     * @return
-     */
-    Object keywordSetter(){
-      return (String) field.getText();
-    }
+    return null;
   }
 
 }

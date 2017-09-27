@@ -67,7 +67,7 @@ public class MenuTabPanel extends TabPanel {
    */
   public void reloadItems() {
     tablePanel.reloadItems();
-    chartPanel.reloadChartDataTables();
+    chartPanel.reDrawCharts();
     photoPanel.reload();
   }
 }

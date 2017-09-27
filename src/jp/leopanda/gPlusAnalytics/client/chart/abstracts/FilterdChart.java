@@ -1,7 +1,11 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
+import java.util.function.UnaryOperator;
+
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartType;
+import com.googlecode.gwt.charts.client.ChartWrapper;
+import com.googlecode.gwt.charts.client.DataTable;
 import com.googlecode.gwt.charts.client.controls.ControlOptions;
 import com.googlecode.gwt.charts.client.controls.ControlState;
 import com.googlecode.gwt.charts.client.controls.ControlType;
@@ -17,57 +21,68 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
  * @author LeoPanda
  *
  */
-public abstract class FilterdChart<I extends PlusItem, O extends Options, C extends ControlOptions<?>, S extends ControlState>
-    extends SimpleChart<I, O> {
+public abstract class FilterdChart<I extends PlusItem, O extends Options, CO extends ControlOptions<?>, CS extends ControlState>
+    extends ChartBasePanel<I, O> {
   private Dashboard dashboard;
-  private ControlWrapper<C, S> rangeFilter;
-  protected C filterOptions;
-  protected S filterState;
+  private ControlWrapper<CO, CS> controlFilter;
   private ControlType controlType;
+  private CO controlFilterOptions;
+  private CS controlFilterState;
+  private UnaryOperator<CO> controlFilterOptionSetter;
+  private UnaryOperator<CS> controlFilterStateSetter;
 
   /**
    * コンストラクタ <br/>
-   * ChartPackage.CONTROLS使用時にはChartype.CALENDARは使用できません。
    * 
-   * @param chartType
-   *          チャートタイプ
-   * @param controlTyle
-   *          チャートコントロールタイプ
+   * @param chartType チャートタイプ
+   * @param controlTyle チャートコントロールタイプ
    */
   public FilterdChart(ChartType chartType, ControlType controlTyle) {
     super(chartType, ChartPackage.CONTROLS);
     this.controlType = controlTyle;
   }
 
-  @Override
-  protected void addChartToPanel(ChartType chartType) {
-    add(getDashboardWidget());
-    super.addChartToPanel(chartType);
-    add(getRangeFilter(controlType));
+  /**
+   * レンジフィルターオプション設定関数をセットする
+   * 
+   * @param rangeFilterOptionSetter
+   * @param rangeFilterStateSetter
+   */
+  protected void setRangeFilterOptionFunction(
+      UnaryOperator<CO> controlFilterOptionSetter) {
+    this.controlFilterOptionSetter = controlFilterOptionSetter;
+  }
+
+  /**
+   * レンジフィルターオプションステート設定関数をセットする
+   * 
+   * @param controlFilterStateSetter
+   */
+  protected void setRangeFilterStateFunction(UnaryOperator<CS> controlFilterStateSetter) {
+    this.controlFilterStateSetter = controlFilterStateSetter;
   }
 
   /*
-   * チャートを描画する
+   * チャートの描画処理
    */
   @Override
-  protected void drawCore() {
-    // レンジフィルターの設定
-    setRangeFilter();
-    if (filterState != null) {
-      rangeFilter.setState(filterState);
-    }
-    if (filterOptions != null) {
-      rangeFilter.setOptions(filterOptions);
-    }
-    // グラフの設定
-    chart.setOptions(getChartOptions());
+  void runDraw(ChartWrapper<O> chart, DataTable dataTable) {
+    dashboard = getDashboardWidget();
+    controlFilter = getRangeFilter(controlType);
+    // 要素を画面へ追加
+    add(dashboard);
+    add(chart);
+    add(controlFilter);
+    // コントロールフィルターの設定
+    controlFilter = getRangeFilter(controlType);
+    controlFilter.setOptions(controlFilterOptionSetter.apply(controlFilterOptions));
+    controlFilter.setState(controlFilterStateSetter.apply(controlFilterState));
     // グラフ描画
-    dashboard.bind(rangeFilter, chart);
-    dashboard.draw(getDataTable());
-
+    dashboard.bind(controlFilter, chart);
+    dashboard.draw(dataTable);
   }
 
-  /*
+  /**
    * ダッシュボードの作成
    */
   private Dashboard getDashboardWidget() {
@@ -77,36 +92,19 @@ public abstract class FilterdChart<I extends PlusItem, O extends Options, C exte
     return dashboard;
   }
 
-  /*
+  /**
    * レンジフィルターの作成
+   * 
+   * @param controlType
+   * @return
    */
-  private ControlWrapper<C, S> getRangeFilter(ControlType controlType) {
-    if (rangeFilter == null) {
-      rangeFilter = new ControlWrapper<C, S>();
-      rangeFilter.setControlType(controlType);
+  private ControlWrapper<CO, CS> getRangeFilter(
+      ControlType controlType) {
+    if (controlFilter == null) {
+      controlFilter = new ControlWrapper<CO, CS>();
+      controlFilter.setControlType(controlType);
     }
-    return rangeFilter;
+    return controlFilter;
   }
-
-  /**
-   * レンジフィルターオプションの作成
-   * 
-   * @return レンジフィルターオプション
-   */
-  protected abstract C getfilterOptions();
-
-  /**
-   * レンジフィルターステートの作成
-   * 
-   * @return レンジフィルターオプションステート
-   */
-  protected abstract S getFilterState();
-
-  /**
-   * レンジフィルターの設定 <br/>
-   * getFilterOptions あるいは getFilterlStateを呼び出し<br/>
-   * レンジフィルターに必要なオプションとステートを設定する。
-   */
-  protected abstract void setRangeFilter();
 
 }

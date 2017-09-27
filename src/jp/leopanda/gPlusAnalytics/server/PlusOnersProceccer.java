@@ -7,19 +7,23 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
 /**
  * ソース+1erリストの処理クラス
+ * 
  * @author LeoPanda
  *
  */
 public class PlusOnersProceccer {
   LoggerWidhConter logger;
+
   /**
    * 
    */
   public PlusOnersProceccer(LoggerWidhConter logger) {
     this.logger = logger;
   }
+
   /**
-   * ソース+1erアイテムリストの+1数を更新する ソースアクテビティに存在しなくなった+1erはアイテムリストから削除する
+   * ソース+1erアイテムリストの+1数を更新する
+   * ソースアクテビティに存在しなくなった+1erはアイテムリストから削除する
    * 
    * @param counter
    * @param sourceItems
@@ -27,14 +31,15 @@ public class PlusOnersProceccer {
    */
   public List<PlusPeople> updatePlusOners(PlusOneCounter counter,
       List<PlusPeople> sourceItems) {
-    for (ListIterator<PlusPeople> iterator = sourceItems.listIterator(); iterator.hasNext();) {
+    ListIterator<PlusPeople> iterator = sourceItems.listIterator();
+    while (iterator.hasNext()) {
       PlusPeople plusOner = iterator.next();
-      if (!counter.containsKey(plusOner.getId())) {
+      if (!counter.containsKey(plusOner.getId())) {// アクテビティに存在しなくなった+1erは削除
         logger.plusOnerDeleted();
         iterator.remove();
       } else {
         int numOfPlusOne = counter.get(plusOner.getId());
-        if (numOfPlusOne == 0) {
+        if (numOfPlusOne == 0) {// +1数が0になった+1erは削除
           logger.plusOnerDeleted();
           iterator.remove();
         } else {
@@ -47,26 +52,25 @@ public class PlusOnersProceccer {
   }
 
   /**
-   * 新規のPlusOnerをソースアイテムリストへ適用する
+   * 新規のPlusOnerをソースアイテムリストへ追加する
    * 
    * @throws Exception
    */
   public List<PlusPeople> addNewPlusOners(List<PlusPeople> newItems, List<PlusPeople> sourceItems)
       throws Exception {
+    return new NewItemsApplyer<PlusPeople>(newItems, sourceItems) {}
+        .apply(newItem -> setNewItem(newItem), (newItem, matchedItem) -> false);
+  }
 
-    return new CompareItemsForUpdate<PlusPeople>() {
-
-      @Override
-      PlusPeople setItemForNewAdd(PlusPeople newItem) throws Exception {
-        logger.plusOnerAdded();
-        return newItem;
-      }
-
-      @Override
-      PlusPeople setItemForUpdate(PlusPeople newItem, PlusPeople sourceItem) throws Exception {
-        return null;
-      }
-    }.update(newItems, sourceItems);
+  /**
+   * 新規アイテムを設定する
+   * 
+   * @param newItem
+   * @return
+   */
+  private PlusPeople setNewItem(PlusPeople newItem) {
+    logger.plusOnerAdded();
+    return newItem;
   }
 
 }

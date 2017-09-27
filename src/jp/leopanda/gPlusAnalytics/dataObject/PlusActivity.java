@@ -3,6 +3,7 @@ package jp.leopanda.gPlusAnalytics.dataObject;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -72,8 +73,8 @@ public class PlusActivity extends PlusItem implements Serializable{
     return this.object.getContent();
   }
 
-  public List<String> getAttachmentImageUrls() {
-    return this.object.getAttachmentImageUrls();
+  public Optional<List<String>> getAttachmentImageUrls() {
+    return Optional.ofNullable(this.object.getAttachmentImageUrls());
   }
 
   public Integer getNumOfPlusOners() {

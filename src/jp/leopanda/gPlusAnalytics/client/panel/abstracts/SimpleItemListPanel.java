@@ -13,10 +13,10 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  * @author LeoPanda
  *
  */
-public abstract class SimpleItemListPanel<I, T extends SimpleCellTable<I>> extends
+public abstract class SimpleItemListPanel<I, T extends SimpleCellTablePanel<I>> extends
     VerticalPanel {
 
-  protected SimpleCellTable<I> itemTable;// 表示するアイテムデータ用の表
+  protected SimpleCellTablePanel<I> itemTable;// 表示するアイテムデータ用の表
   private Label titleLabel = new Label();// パネルのタイトル名を表示するラベル
   private String originalTitle;// 元のタイトル名
   private Label lineCountLabel = new Label();// アイテムの総数を表示するラベル

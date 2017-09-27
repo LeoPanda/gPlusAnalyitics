@@ -4,46 +4,43 @@ import com.googlecode.gwt.charts.client.corechart.PieChartOptions;
 import com.googlecode.gwt.charts.client.options.Legend;
 import com.googlecode.gwt.charts.client.options.LegendPosition;
 
-import jp.leopanda.gPlusAnalytics.client.chart.abstracts.AggregatePieChart;
+import jp.leopanda.gPlusAnalytics.client.chart.abstracts.SummarySingleFieldPieChart;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
+ * 投稿先集計パイチャート
+ * 
  * @author LeoPanda
- *
  */
-public class PostCirclePieChart extends AggregatePieChart<PlusActivity> {
+public class PostCirclePieChart extends SummarySingleFieldPieChart<PlusActivity> {
 
   /**
-   * 投稿先集計パイチャート
+   * コンストラクタ
    */
   public PostCirclePieChart() {
-    super();
+    super(item -> item.getAccessDescription());//集計項目の設定
+    setChartOptionsFunction(chartOptions -> setChartOptions(chartOptions));
   }
 
-  /*
-   * チャートラベルの位置を設定
+  /**
+   * チャートオプションの生成
+   * 
+   * @param chartOptions
+   * @return
    */
-  @Override
-  protected PieChartOptions getChartOptions() {
-    PieChartOptions options = super.getChartOptions();
-    options.setLegend(Legend.create(LegendPosition.NONE));
-    return options;
+  private PieChartOptions setChartOptions(PieChartOptions chartOptions) {
+    chartOptions.setTitle(getChartTitle());
+    chartOptions.setLegend(getLegend());
+    return chartOptions;
   }
 
-  /*
-   * @see jp.leopanda.gPlusAnalytics.client.chart.AggregatePieChart#getTargetField
-   * (jp.leopanda.gPlusAnalytics.dataObject.PlusItem)
+  /**
+   * チャートラベルの設定
+   * @return
    */
-  @Override
-  protected String getTargetField(PlusActivity item) {
-    return item.getAccessDescription();
+  private Legend getLegend() {
+    Legend legend = Legend.create(LegendPosition.TOP);
+    legend.setMaxLines(1);
+    return legend;
   }
-
-  /*
-   * @see jp.leopanda.gPlusAnalytics.client.chart.AggregatePieChart#setFieldNameMap ()
-   */
-  @Override
-  protected void setFieldAliasMap() {}
-
-  
 }
