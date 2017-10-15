@@ -3,33 +3,22 @@ package jp.leopanda.gPlusAnalytics.client.panel;
 import java.util.Date;
 
 /**
- * 写真パネル用
+ * 写真パネル用ページタグ
  * ページをまたがり継続するべき変数をスタックする
  * @author LeoPanda
  *
  */
-public class PhotoPanelPageKeeper {
+public class PageTag {
 
   int currentIndex;
   Date currentPublishDate;
-  PhotoPanelDisplayCell currentCell;
+  PhotoCell currentCell;
   
   /**
    * コンストラクタ（初期用）
    */
-  public PhotoPanelPageKeeper(){
+  public PageTag(){
     clear();
-  }
-  /**
-   * コンストラクタ(引き継ぎ作成用)
-   * @param currentIndex
-   * @param currentPublishDate
-   * @param currentCell
-   */
-  public PhotoPanelPageKeeper(int currentIndex,Date currentPublishDate,PhotoPanelDisplayCell currentCell){
-    this.currentIndex = currentIndex;
-    this.currentPublishDate = currentPublishDate;
-    this.currentCell = currentCell;
   }
 
   /**
@@ -39,6 +28,17 @@ public class PhotoPanelPageKeeper {
     currentIndex = 0;
     currentPublishDate = null;
     currentCell = null;
+  }
+  /**
+   * setter
+   * @param currentIndex
+   * @param currentPublishDate
+   * @param currentCell
+   */
+  public void set(int currentIndex,Date currentPublishDate,PhotoCell currentCell){
+    this.currentIndex = currentIndex;
+    this.currentPublishDate = currentPublishDate;
+    this.currentCell = currentCell;
   }
 
   
@@ -51,7 +51,7 @@ public class PhotoPanelPageKeeper {
     return currentPublishDate;
   }
 
-  public PhotoPanelDisplayCell getCurrentCell() {
+  public PhotoCell getCurrentCell() {
     return currentCell;
   }
   

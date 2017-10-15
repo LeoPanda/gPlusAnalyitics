@@ -4,8 +4,6 @@ import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.gPlusAnalytics.interFace.ItemClickListener;
 
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.TabPanel;
 
 /**
@@ -37,12 +35,9 @@ public class MenuTabPanel extends TabPanel {
         itemClickListener.onClick(item);
       }
     });
-    this.addSelectionHandler(new SelectionHandler<Integer>() {
-      @Override
-      public void onSelection(SelectionEvent<Integer> event) {
-        if (event.getSelectedItem() == 1) {
-          photoPanel.reload();
-        }
+    this.addSelectionHandler(event -> {
+      if (event.getSelectedItem() == 1) {
+        photoPanel.reload();
       }
     });
 

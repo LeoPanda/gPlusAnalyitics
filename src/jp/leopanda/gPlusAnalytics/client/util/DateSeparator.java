@@ -13,18 +13,18 @@ import jp.leopanda.gPlusAnalytics.client.enums.DateBreakLevel;
  * @author LeoPanda
  *
  */
-public class DateDivider {
+public class DateSeparator {
 
   private Date currentDate;
 
   /**
    * コンストラクタ
    */
-  public DateDivider() {
+  public DateSeparator() {
     this.currentDate = null;
   }
 
-  public DateDivider(Date currentDate) {
+  public DateSeparator(Date currentDate) {
     this.currentDate = currentDate;
   }
 

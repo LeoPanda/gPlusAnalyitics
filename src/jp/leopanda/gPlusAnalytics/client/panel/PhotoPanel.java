@@ -1,14 +1,14 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import jp.leopanda.gPlusAnalytics.client.util.SquareDimensions;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
@@ -22,36 +22,47 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
  *
  */
 public class PhotoPanel extends VerticalPanel {
-  FilterableSourceItems items;
-  PhotoCellList allPhotoCells;
-  PhotoDetailPop photoDetailPop;
+  FilterableSourceItems sourceItems;
+  PhotoImageList sourcePhotoImages;
+  PhotoDetailPopPanel photoDetailPopPanel;
   Button nextPageButton = new Button("more..");
   Label pageIndexLabel = new Label();
-  VerticalPanel listPanel = new VerticalPanel();
+  VerticalPanel photoListPanel = new VerticalPanel();
 
-  PhotoPanelPageMaker pageMaker = new PhotoPanelPageMaker();
-  PhotoPanelPageKeeper pageKeeper = new PhotoPanelPageKeeper();
+  PhotoPanelPageGenerator pageGenerator = new PhotoPanelPageGenerator();
+  PageTag pageTag = new PageTag();
 
   /**
    * コンストラクタ
    * 
-   * @param items
+   * @param sourceItems
    */
-  public PhotoPanel(FilterableSourceItems items) {
-    this.items = items;
-    this.setHorizontalAlignment(ALIGN_RIGHT);
-    this.add(getIndexLine());
-    this.setHorizontalAlignment(ALIGN_LEFT);
-    this.add(listPanel);
-    this.setHorizontalAlignment(ALIGN_RIGHT);
-    this.add(nextPageButton);
-    nextPageButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        addOnePage();
-      }
-    });
-    addFirstPage(items);
+  public PhotoPanel(FilterableSourceItems sourceItems) {
+    this.sourceItems = sourceItems;
+    sourcePhotoImages = getPhotoImageList(sourceItems.getActivities());
+    setPanel();
+    addFirstPage();
+  }
+
+  /**
+   * パネルの初期設定
+   */
+  private void setPanel() {
+    nextPageButton.addClickHandler(event -> addOnePage());
+    addWidthAlign(getIndexLine(), ALIGN_RIGHT);
+    addWidthAlign(photoListPanel, ALIGN_LEFT);
+    addWidthAlign(nextPageButton, ALIGN_RIGHT);
+  }
+
+  /**
+   * 割付を指定してパネルにウィジェットを追加する
+   * 
+   * @param widget
+   * @param align
+   */
+  private void addWidthAlign(Widget widget, HorizontalAlignmentConstant align) {
+    this.setHorizontalAlignment(align);
+    this.add(widget);
   }
 
   /**
@@ -70,9 +81,8 @@ public class PhotoPanel extends VerticalPanel {
    * 
    * @param items
    */
-  private void addFirstPage(FilterableSourceItems items) {
-    allPhotoCells = loadAllPhotoCells(items.getActivities());
-    pageMaker.setSourceData(allPhotoCells);
+  private void addFirstPage() {
+    pageGenerator.setSourceData(sourcePhotoImages);
     addOnePage();
   }
 
@@ -81,13 +91,13 @@ public class PhotoPanel extends VerticalPanel {
    */
   private void addOnePage() {
     // 写真サイズ確定のための仮読み込み
-    listPanel.add(pageMaker.getPagePanel(pageKeeper));
-    listPanel.remove(listPanel.getWidgetCount() - 1);
+    photoListPanel.add(pageGenerator.getPagePanel(pageTag));
+    photoListPanel.remove(photoListPanel.getWidgetCount() - 1);
     // 本読み込み
-    listPanel.add(pageMaker.getPagePanel(pageKeeper));
+    photoListPanel.add(pageGenerator.getPagePanel(pageTag));
     // 読込結果をフィードバック
-    this.pageKeeper = pageMaker.getStocker();
-    if (pageKeeper.getCurrentIndex() < allPhotoCells.size()) {
+    pageTag = pageGenerator.getPageTag();
+    if (pageTag.getCurrentIndex() < sourcePhotoImages.size()) {
       nextPageButton.setVisible(true);
     } else {
       nextPageButton.setVisible(false);
@@ -100,32 +110,34 @@ public class PhotoPanel extends VerticalPanel {
    */
   private void setIndexLabel() {
     pageIndexLabel
-        .setText(String.valueOf(pageKeeper.getCurrentIndex()) + "/"
-            + String.valueOf(allPhotoCells.size()) + "件");
+        .setText(String.valueOf(pageTag.getCurrentIndex()) + "/"
+            + String.valueOf(sourcePhotoImages.size()) + "件");
   }
 
   /**
    * 画面の再表示
    */
   public void reload() {
-    pageKeeper.clear();
-    pageMaker.clear();
-    allPhotoCells.clear();
-    listPanel.clear();
-    addFirstPage(items);
+    pageTag.clear();
+    pageGenerator.clear();
+    photoListPanel.clear();
+    sourcePhotoImages.clear();
+    sourcePhotoImages = getPhotoImageList(sourceItems.getActivities());
+    addFirstPage();
   }
 
   /**
-   * 全写真リストの読み込み
+   * 写真リストの作成
    * 
    * @param activities
    * @return
    */
-  private PhotoCellList loadAllPhotoCells(List<PlusActivity> activities) {
-    PhotoCellList photoCellList = new PhotoCellList();
-    activities.forEach(activity -> photoCellList.addCell(activity, pageMaker.getLineHeight(),
-        this::popActivityDetail));
-    return photoCellList;
+  private PhotoImageList getPhotoImageList(List<PlusActivity> activities) {
+    PhotoImageList photoImageList = new PhotoImageList();
+    activities.stream().sorted(Comparator.comparing(PlusActivity::getPublished))
+        .forEach(activity -> photoImageList.addImage(activity, pageGenerator.getLabelHeight(),
+            this::popActivityDetail));
+    return photoImageList;
   }
 
   /**
@@ -135,11 +147,11 @@ public class PhotoPanel extends VerticalPanel {
    */
   private void popActivityDetail(PlusActivity activity, SquareDimensions photoDimensions,
       int clickX, int clickY) {
-    photoDetailPop = Optional.ofNullable(photoDetailPop)
-        .orElse(new PhotoDetailPop(
-            new SquareDimensions(pageMaker.getPageWidth(),
-                pageMaker.getLineHeight() * pageMaker.getPageRowSize())));
-    photoDetailPop.show(activity, photoDimensions, clickX, clickY);
+    photoDetailPopPanel = Optional.ofNullable(photoDetailPopPanel)
+        .orElse(new PhotoDetailPopPanel(
+            new SquareDimensions(pageGenerator.getPageWidth(),
+                pageGenerator.getLabelHeight() * pageGenerator.getPageRowSize())));
+    photoDetailPopPanel.show(activity, photoDimensions, clickX, clickY);
   }
 
 }

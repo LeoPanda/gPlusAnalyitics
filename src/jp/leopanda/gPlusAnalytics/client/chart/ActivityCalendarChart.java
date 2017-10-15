@@ -67,7 +67,6 @@ public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOpt
         int selectedRowIndex = getSelectedRowIndex(chart);
         if (selectedRowIndex > 0) {
           popActivitySelectorPanel(chart.getDataTable().getValueDate(selectedRowIndex, 0));
-          // popTest();
         } else {
           Window.alert("この日は投稿がありません。");
         }
@@ -87,7 +86,7 @@ public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOpt
   }
 
   /**
-   * アクテビティ選択パネルを表示する
+   * 該当日に投稿されたアクテビティの選択パネルを表示する
    * 
    * @param selectedDate
    */
@@ -138,7 +137,7 @@ public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOpt
   }
 
   /**
-   * 日付から時間を切り捨てる
+   * 日付フィールドから時間を切り捨てる
    * 
    * @param date
    * @return

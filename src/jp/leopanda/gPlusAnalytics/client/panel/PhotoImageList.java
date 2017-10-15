@@ -13,25 +13,25 @@ import jp.leopanda.gPlusAnalytics.interFace.DetailPopRequestListener;
  * @author LeoPanda
  *
  */
-public class PhotoCellList extends ArrayList<PhotoCell> {
+public class PhotoImageList extends ArrayList<PhotoImage> {
 
   private static final long serialVersionUID = 1L;
 
   /**
    * コンストラクタ
    */
-  public PhotoCellList() {
+  public PhotoImageList() {
   }
 
 
   /**
-   * アクテビティをリストに追加する
+   * イメージをリストに追加する
    * 
    * @param activity
    * @param gridHeight
    * @param detailPopRequestListener
    */
-  public void addCell(PlusActivity activity,int gridHeight,DetailPopRequestListener detailPopRequestListener) {
-      this.add(new PhotoCell(activity, gridHeight, detailPopRequestListener));
+  public void addImage(PlusActivity activity,int gridHeight,DetailPopRequestListener detailPopRequestListener) {
+      this.add(new PhotoImage(activity, gridHeight, detailPopRequestListener));
   }
 }

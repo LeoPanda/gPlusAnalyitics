@@ -19,7 +19,7 @@ public class PhotoCalcUtil {
    * @param gridHeight
    * @return
    */
-  public double getTemporarryPhotoWidth(PlusActivity activity, long gridHeight) {
+  public double getTemporarryImageWidth(PlusActivity activity, long gridHeight) {
     return (double) (getActivityPhotoRatio(activity) * gridHeight);
   }
 

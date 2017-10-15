@@ -19,7 +19,6 @@
 	<inherits name="jp.leopanda.googleAuthorization.GoogleAuthorization" />
 	<inherits name='jp.leopanda.panelFrame.panelFrame' />
 	<inherits name="com.googlecode.gwt.charts.Charts" />
-	<!-- <inherits name="com.google.gwt.logging.Logging"/> -->
 
 	<!-- Specify the app entry point class. -->
 	<entry-point class='jp.leopanda.gPlusAnalytics.client.GPlusAnalytics' />

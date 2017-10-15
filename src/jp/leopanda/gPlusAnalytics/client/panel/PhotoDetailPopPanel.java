@@ -25,7 +25,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
  * @author LeoPanda
  *
  */
-public class PhotoDetailPop extends PopupPanel {
+public class PhotoDetailPopPanel extends PopupPanel {
   Label published = new Label();
   Label numOfPlusOne = new Label();
   Label title = new Label();
@@ -42,7 +42,7 @@ public class PhotoDetailPop extends PopupPanel {
    * @param posX
    * @param posY
    */
-  public PhotoDetailPop(SquareDimensions parentPanelDimensions) {
+  public PhotoDetailPopPanel(SquareDimensions parentPanelDimensions) {
     super();
     this.parentPanelDimensions = parentPanelDimensions;
     setStyle();
