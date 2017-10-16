@@ -25,12 +25,14 @@
 }
 
 .monthLabel {
-	background-color: #fffbf8;
-	font-size: 18px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	background-color: #2f4ca0;
+	font-size: 28px;
+	font-stretch: extra-condensed;
 	font-family: inherit;
-	font-style: italic;
 	text-align: center;
-	color: #9b7b39;
+	color: #ffffff;
 }
 
 .photoCell {

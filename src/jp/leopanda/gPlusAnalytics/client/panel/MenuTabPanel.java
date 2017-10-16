@@ -28,18 +28,7 @@ public class MenuTabPanel extends TabPanel {
     photoPanel = new PhotoPanel(sourceItems);
     chartPanel = new ChartMenuPanel(sourceItems);
     mentePanel = new MaintenancePanel();
-
-    tablePanel.addItemEventListener(new ItemClickListener<PlusItem>() {
-      @Override
-      public void onClick(PlusItem item) {
-        itemClickListener.onClick(item);
-      }
-    });
-    this.addSelectionHandler(event -> {
-      if (event.getSelectedItem() == 1) {
-        photoPanel.reload();
-      }
-    });
+    tablePanel.addItemEventListener(item -> itemClickListener.onClick(item));
 
     this.add(tablePanel, "tables");
     this.add(photoPanel, "photos");

@@ -1,7 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
 import java.util.Date;
-import java.util.logging.Level;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -21,6 +21,7 @@ import jp.leopanda.gPlusAnalytics.client.util.DateSeparator;
 public class PhotoPanelPageGenerator {
 
   PhotoImageList sourcePhotoImageList;
+  Consumer<Boolean> actionAfterLoadPage;
 
   private VerticalPanel pagePanel;
   private HorizontalPanel photoRowPanel;
@@ -47,6 +48,15 @@ public class PhotoPanelPageGenerator {
    */
   public void setSourceData(PhotoImageList sourcePhotoImageList) {
     this.sourcePhotoImageList = sourcePhotoImageList;
+  }
+
+  /**
+   * オンロードリスナーの設定
+   * 
+   * @param action
+   */
+  public void setActionAfterLoadPage(Consumer<Boolean> action) {
+    this.actionAfterLoadPage = action;
   }
 
   /**
@@ -106,21 +116,37 @@ public class PhotoPanelPageGenerator {
     for (int i = currentIndex; i < sourcePhotoImageList.size(); i++) {
       try {
         setPhotoRowPanel(sourcePhotoImageList.get(i));
-      } catch (RowIsReachedMaxLimit e) {
+      } catch (RowsReachedMaxLimit e) {
+        setPhotoImageOnLoadAction(i - 1);
         break;
       }
     }
+    if (currentIndex == sourcePhotoImageList.size())
+      setPhotoImageOnLoadAction(currentIndex - 1);
     pagePanel.add(photoRowPanel);
     return pagePanel;
+  }
+
+  /**
+   * 最後尾写真イメージロード後に実行するアクションを設定する
+   * 
+   * @param i
+   */
+  private void setPhotoImageOnLoadAction(int i) {
+    if (i < 0) return;
+    PhotoImage photoImage = sourcePhotoImageList.get(i);
+    if (!photoImage.actionOnLoadImage(e -> this.actionAfterLoadPage.accept(e))) {
+      setPhotoImageOnLoadAction(i - 1);
+    }
   }
 
   /**
    * 行パネルをセットする
    * 
    * @param photoImage
-   * @throws RowIsReachedMaxLimit
+   * @throws RowsReachedMaxLimit
    */
-  private void setPhotoRowPanel(PhotoImage photoImage) throws RowIsReachedMaxLimit {
+  private void setPhotoRowPanel(PhotoImage photoImage) throws RowsReachedMaxLimit {
     currentCell = getCurrentCell(photoImage);
     currentRowWidth += currentCell.getWidth() + speceWidth;
     if (currentRowWidth >= pageWidth) {
@@ -159,24 +185,24 @@ public class PhotoPanelPageGenerator {
    * 改行する
    * ページの最大行に達した場合には例外を発生させる
    * 
-   * @throws RowIsReachedMaxLimit
+   * @throws RowsReachedMaxLimit
    */
-  private void doNewRow() throws RowIsReachedMaxLimit {
+  private void doNewRow() throws RowsReachedMaxLimit {
     if (photoRowPanel.getWidgetCount() > 0) {
       pagePanel.add(photoRowPanel);
       setNewPhotoRowPanel();
       currentRow++;
     }
-    if (currentRow >= rowLimitSize) throw new RowIsReachedMaxLimit();
+    if (currentRow >= rowLimitSize) throw new RowsReachedMaxLimit();
   }
 
   /**
    * 写真表示セルを生成する
    * 
    * @param photoImage
-   * @throws RowIsReachedMaxLimit
+   * @throws RowsReachedMaxLimit
    */
-  private PhotoCell getCurrentCell(PhotoImage photoImage) throws RowIsReachedMaxLimit {
+  private PhotoCell getCurrentCell(PhotoImage photoImage) throws RowsReachedMaxLimit {
     PhotoCell photoCell = null;
     switch (dateSeparator.getBreakLevel(photoImage.getPublished())) {
       case YEAR_BREAK:
@@ -200,10 +226,10 @@ public class PhotoPanelPageGenerator {
    * @param photoLinePanel
    * @param photoImage
    * @return
-   * @throws RowIsReachedMaxLimit
+   * @throws RowsReachedMaxLimit
    */
   private PhotoCell getYearBreakedCell(HorizontalPanel photoLinePanel,
-      PhotoImage photoImage) throws RowIsReachedMaxLimit {
+      PhotoImage photoImage) throws RowsReachedMaxLimit {
     currentRow++;
     doNewRow();
     pagePanel.add(getYearDivideLabel());
@@ -250,12 +276,12 @@ public class PhotoPanelPageGenerator {
   }
 
   /**
-   * 行数がページの制限値に達した場合のフラグ例外
+   * 行数がページの制限値に達した場合の通知用例外
    * 
    * @author LeoPanda
    *
    */
-  private class RowIsReachedMaxLimit extends Exception {
+  private class RowsReachedMaxLimit extends Exception {
     private static final long serialVersionUID = 1L;
   }
 

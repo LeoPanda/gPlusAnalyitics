@@ -3,6 +3,7 @@ package jp.leopanda.gPlusAnalytics.client.panel;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -31,6 +32,7 @@ public class PhotoPanel extends VerticalPanel {
 
   PhotoPanelPageGenerator pageGenerator = new PhotoPanelPageGenerator();
   PageTag pageTag = new PageTag();
+  Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * コンストラクタ
@@ -40,8 +42,23 @@ public class PhotoPanel extends VerticalPanel {
   public PhotoPanel(FilterableSourceItems sourceItems) {
     this.sourceItems = sourceItems;
     sourcePhotoImages = getPhotoImageList(sourceItems.getActivities());
+    setPageGenerator();
     setPanel();
-    addFirstPage();
+    addOnePage();
+  }
+
+  /**
+   * 画面の再表示
+   */
+  public void reload() {
+    pageTag.clear();
+    photoListPanel.clear();
+    sourcePhotoImages.clear();
+    pageGenerator.clear();
+    sourcePhotoImages = getPhotoImageList(sourceItems.getActivities());
+    pageGenerator.setSourceData(sourcePhotoImages);
+    writeIndexLabel();
+    addOnePage();
   }
 
   /**
@@ -73,57 +90,44 @@ public class PhotoPanel extends VerticalPanel {
   private HorizontalPanel getIndexLine() {
     HorizontalPanel indexLine = new HorizontalPanel();
     indexLine.add(pageIndexLabel);
+    writeIndexLabel();
     return indexLine;
   }
 
   /**
-   * 最初の１ページを表示する
-   * 
-   * @param items
+   * ページジェネレータをセットアップする
    */
-  private void addFirstPage() {
+  private void setPageGenerator() {
     pageGenerator.setSourceData(sourcePhotoImages);
-    addOnePage();
+    pageGenerator.setActionAfterLoadPage(e -> reWritePage());
   }
 
   /**
-   * １ページ分の写真リストをページに追加する
+   * １ページ分の写真リストをパネルに追加する
    */
   private void addOnePage() {
-    // 写真サイズ確定のための仮読み込み
     photoListPanel.add(pageGenerator.getPagePanel(pageTag));
-    photoListPanel.remove(photoListPanel.getWidgetCount() - 1);
-    // 本読み込み
-    photoListPanel.add(pageGenerator.getPagePanel(pageTag));
-    // 読込結果をフィードバック
-    pageTag = pageGenerator.getPageTag();
-    if (pageTag.getCurrentIndex() < sourcePhotoImages.size()) {
-      nextPageButton.setVisible(true);
-    } else {
-      nextPageButton.setVisible(false);
-    }
-    setIndexLabel();
+    nextPageButton.setVisible(false);
   }
 
   /**
-   * インデックスラベルをセットする
+   * 写真イメージをリサイズするためにページを書き直す
    */
-  private void setIndexLabel() {
+  private void reWritePage() {
+    photoListPanel.remove(photoListPanel.getWidgetCount() - 1);
+    photoListPanel.add(pageGenerator.getPagePanel(pageTag));
+    pageTag = pageGenerator.getPageTag();
+    nextPageButton.setVisible(pageTag.getCurrentIndex() < sourcePhotoImages.size());
+    writeIndexLabel();
+  }
+
+  /**
+   * インデックスラベルを表示する
+   */
+  private void writeIndexLabel() {
     pageIndexLabel
         .setText(String.valueOf(pageTag.getCurrentIndex()) + "/"
             + String.valueOf(sourcePhotoImages.size()) + "件");
-  }
-
-  /**
-   * 画面の再表示
-   */
-  public void reload() {
-    pageTag.clear();
-    pageGenerator.clear();
-    photoListPanel.clear();
-    sourcePhotoImages.clear();
-    sourcePhotoImages = getPhotoImageList(sourceItems.getActivities());
-    addFirstPage();
   }
 
   /**

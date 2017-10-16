@@ -53,6 +53,7 @@ public class TableLaunchPanel extends HorizontalPanel {
 
   /**
    * アイテムリストをロードし直す。
+   * 
    * @param activityItems
    * @param plusOners
    */
@@ -69,25 +70,13 @@ public class TableLaunchPanel extends HorizontalPanel {
   private void setUpTables() {
     activityTable = new ActivityTablePanel(sourceItems.getActivities());
     plusOnersTable = new PlusOnersTablePanel(sourceItems.getPlusOners());
-    
-    activityTable.addItemClickListener(new ItemClickListener<PlusActivity>() {
-      @Override
-      public void onClick(PlusActivity item) {
-        itemClickListener.onClick(item);
-      }
-    });
-    plusOnersTable.addItemClickListener(new ItemClickListener<PlusPeople>() {
-      @Override
-      public void onClick(PlusPeople item) {
-        itemClickListener.onClick(item);
-      }
-    });
+
+    activityTable.addItemClickListener(item -> itemClickListener.onClick(item));
+    plusOnersTable.addItemClickListener(item -> itemClickListener.onClick(item));
 
     activityTablePanel = new PagedItemListPanel<PlusActivity, ActivityTablePanel>("アクティビティ一覧", 7,
-        activityTable) {
-    };
+        activityTable) {};
     plusOnersTablePanel = new PagedItemListPanel<PlusPeople, PlusOnersTablePanel>("+1ユーザー一覧", 10,
-        plusOnersTable) {
-    };
+        plusOnersTable) {};
   }
 }
