@@ -6,6 +6,6 @@ package jp.leopanda.gPlusAnalytics.interFace;
  *
  */
 @FunctionalInterface
-public interface ItemForNewAdd<I> {
+public interface NewItemSetter<I> {
   I setItem(I newItem) throws Exception;
 }

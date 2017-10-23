@@ -1,5 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
+import java.util.Comparator;
 import java.util.List;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -59,7 +60,7 @@ public class ActivityTablePanel extends ClickablePlusItemTable<PlusActivity> {
     imageColumn = new ImageColumn<PlusActivity>("80", null) {
       @Override
       public SafeHtml getValue(PlusActivity item) {
-        return getImageTagFromUrlList(item.getAttachmentImageUrls());
+        return getImageTagFromUrl(item.getFirstAttachmentImageUrl());
       }
     };
     imageColumn.setCellStyleNames(MyStyle.TABLE_PHOTO.getStyle());
@@ -102,16 +103,16 @@ public class ActivityTablePanel extends ClickablePlusItemTable<PlusActivity> {
   protected void setSortHandler() {
     // 投稿日でソート
     publishedColumn.setSortable(true);
-    sortHandler.setComparator(publishedColumn,
-        (x, y) -> x.getPublished().compareTo(y.getPublished()));
+    sortHandler.setComparator(publishedColumn,Comparator.comparing(PlusActivity::getPublished));
+//        (x, y) -> x.getPublished().compareTo(y.getPublished()));
     // 投稿先でソート
     accessColumn.setSortable(true);
-    sortHandler.setComparator(accessColumn,
-        (x, y) -> x.getAccessDescription().compareTo(y.getAccessDescription()));
+    sortHandler.setComparator(accessColumn,Comparator.comparing(PlusActivity::getAccessDescription));
+//        (x, y) -> x.getAccessDescription().compareTo(y.getAccessDescription()));
     // +1でソート
     filterButton.setSortable(true);
-    sortHandler.setComparator(filterButton,
-        (x, y) -> x.getNumOfPlusOners() - y.getNumOfPlusOners());
+    sortHandler.setComparator(filterButton,Comparator.comparing(PlusActivity::getNumOfPlusOners));
+//        (x, y) -> x.getNumOfPlusOners() - y.getNumOfPlusOners());
 
   }
 }

@@ -1,7 +1,7 @@
 package jp.leopanda.gPlusAnalytics.dataObject;
 
 import java.io.Serializable;
-
+import java.util.Optional;
 
 public class PlusPeople extends PlusItem implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -26,18 +26,24 @@ public class PlusPeople extends PlusItem implements Serializable {
   }
 
   public int getNumOfPlusOne() {
-    return this.numOfPlusOne;
+    return numOfPlusOne;
   }
 
   public String getDisplayName() {
     return displayName;
   }
 
-  public String getImageUrl() {
-    return this.image.getUrl();
+  public Optional<String> getImageUrl() {
+    if (getImage().isPresent()) {
+      return image.getUrl();
+    }
+    return Optional.ofNullable(null);
   }
 
- 
+  private Optional<AttachmentImage> getImage() {
+    return Optional.ofNullable(image);
+  }
+
   /*
    * setter
    */
@@ -58,10 +64,7 @@ public class PlusPeople extends PlusItem implements Serializable {
   }
 
   public void setImageUlr(String url) {
-    this.image = new AttachmentImage();
-    this.image.url = url;
+    getImage().orElse(new AttachmentImage()).url = url;
   }
-
- 
 
 }

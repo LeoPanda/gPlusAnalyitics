@@ -2,6 +2,11 @@ package jp.leopanda.gPlusAnalytics.server;
 
 import java.util.logging.Logger;
 
+import jp.leopanda.gPlusAnalytics.client.enums.DateFormat;
+import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
+import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
+import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
+
 /**
  * 実行結果カウンター付きロガー
  * 
@@ -24,13 +29,15 @@ public class LoggerWidhConter {
     counter.numOfNewActivities = numOfNewActivities;
   }
 
-  public void activitiesAdded() {
-    counter.addedActivities++;
+  public void itemAdded(PlusItem item) {
+    if (item.getClass() == PlusActivity.class) counter.addedActivities++;
+    if (item.getClass() == PlusPeople.class) counter.addedPlusOners++;
+    ;
   }
 
-  public void activitiesUpdated() {
-    counter.updatedActivities++;
-    counter.addedActivities--;
+  public void itemUpdated(PlusItem item) {
+    if (item.getClass() == PlusActivity.class) counter.updatedActivities++;
+    if (item.getClass() == PlusPeople.class) counter.updatedPlusOners++;
   }
 
   public void activitiesDeleted(int count) {
@@ -41,16 +48,16 @@ public class LoggerWidhConter {
     counter.addedPlusOners++;
   }
 
+  public void setnumOfPlusOnerUpdated(int numOfUpdated) {
+    counter.updatedPlusOners = numOfUpdated;
+  }
+
   public void countUpPlusOne(int numOfPlusOne) {
     counter.totalPlusOne += numOfPlusOne;
   }
 
   public void countUpPlusOners(int numOfPlusOners) {
     counter.totalPlusOners += numOfPlusOners;
-  }
-
-  public void setnumOfPlusOnerUpdated(int updatedPlusOners) {
-    counter.updatedPlusOners = updatedPlusOners;
   }
 
   public void plusOnerDeleted() {
@@ -71,12 +78,13 @@ public class LoggerWidhConter {
 
   /**
    * 保存用統計情報を取得する
+   * 
    * @return
    */
-  public DailyStats getDailyStatsItem(){
-    return new DailyStats(ServerUtil.getCurrentDate(),this.counter);
+  public DailyStats getDailyStatsItem() {
+    return new DailyStats(ServerUtil.getCurrentDate(DateFormat.SERVER_RECORD), this.counter);
   }
-  
+
   /**
    * 結果ログの書き込み
    */

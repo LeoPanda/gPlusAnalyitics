@@ -46,7 +46,7 @@ class PhotoImage extends FocusPanel {
     this.gridHeight = gridHeight;
     defaultGridWidth = getDefaultWidth(activity, gridHeight);
     image = new ImageObject(activity, gridHeight);
-    activity.getAttachmentImageUrls().ifPresent(urls -> {
+    activity.getFirstAttachmentImageUrl().ifPresent(url -> {
       image = new ImageObject(activity, gridHeight);
       add(image);
       detailPopRequestListener = listener;
@@ -63,8 +63,8 @@ class PhotoImage extends FocusPanel {
    */
   public boolean actionOnLoadImage(Consumer<Boolean> action) {
     Optional<ImageObject> imageValue = Optional.ofNullable(image);
-    imageValue.ifPresent(image -> image.onLoadAction = action);
-    return imageValue.isPresent();
+    if (imageValue.isPresent()) return imageValue.get().setOnloadAction(action);
+    return false;
   }
 
   /**
@@ -116,12 +116,13 @@ class PhotoImage extends FocusPanel {
 
     /**
      * コンストラクタ
+     * 
      * @param activity
      * @param height
      */
     ImageObject(PlusActivity activity, int height) {
       super();
-      activity.getAttachmentImageUrls().ifPresent(urls -> this.setUrl(urls.get(0)));
+      activity.getFirstAttachmentImageUrl().ifPresent(url -> this.setUrl(url));
       this.setWidth(
           Statics.getLengthWithUnit((int) calcUtil.getTemporarryImageWidth(activity, height)));
       this.addStyleName(MyStyle.GRID_IMAGE.getStyle());
@@ -130,18 +131,7 @@ class PhotoImage extends FocusPanel {
     }
 
     /**
-     * 表示前にイメージの表示幅を再設定する
-     */
-    @Override
-    public void onLoad() {
-      if (photoDimensions != null) {
-        this.setWidth(Statics.getLengthWithUnit((int) getRealImageWidth()));
-      }
-      super.onLoad();
-    }
-
-    /**
-     * イメージを表示後、外寸を取得する
+     * イメージを表示後、実測外寸を取得しオンロードアクションを実行する
      * 
      * @return
      */
@@ -149,9 +139,24 @@ class PhotoImage extends FocusPanel {
       return (event) -> {
         if (photoDimensions == null) {
           photoDimensions = new SquareDimensions(getWidth(), getHeight());
-          Optional.ofNullable(onLoadAction).ifPresent(action -> action.accept(true)); // ページロード完了通知用のアクションリスナー
+        this.setWidth(Statics.getLengthWithUnit((int) getRealImageWidth()));
+          Optional.ofNullable(onLoadAction).ifPresent(action -> action.accept(true));
         }
       };
+    }
+
+    /**
+     * イメージのオンロードアクションを設定する
+     * 
+     * @param onloadAction
+     * @return
+     */
+    private boolean setOnloadAction(Consumer<Boolean> onloadAction) {
+      if (this.getUrl().trim().length() > 0) {
+        this.onLoadAction = onloadAction;
+        return true;
+      }
+      return false;
     }
 
     /**

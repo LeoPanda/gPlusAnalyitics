@@ -3,6 +3,7 @@ package jp.leopanda.gPlusAnalytics.server;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import com.google.api.services.plus.model.Activity;
@@ -36,13 +37,14 @@ public class PlusActivityMaker {
     plusActivity.title = activity.getTitle();
     plusActivity.id = activity.getId();
     plusActivity.url = activity.getUrl();
-    plusActivity.actor = activity.getActor() == null ? null : getPlusActor(activity.getActor());
+    plusActivity.actor =
+        Optional.ofNullable(activity.getActor()).isPresent() ? getPlusActor(activity.getActor()) : null;
     plusActivity.published = new Date(activity.getUpdated().getValue());
     plusActivity.updated = new Date(activity.getUpdated().getValue());
     plusActivity.object = getItemObject(activity.getObject());
     plusActivity.access = new ItemAccess();
-    plusActivity.access.description = activity.getAccess() == null ? null
-        : activity.getAccess().getDescription();
+    plusActivity.access.description = Optional.ofNullable(activity.getAccess()).isPresent()
+        ? activity.getAccess().getDescription() : null;
     return plusActivity;
 
   }

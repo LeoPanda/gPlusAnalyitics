@@ -65,11 +65,6 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
-		<buildCommand>
-			<name>com.github.sdbg.integration.jdt.gwtsdmbuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
@@ -79,7 +74,6 @@
 		<nature>com.google.gwt.eclipse.core.gwtNature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 		<nature>com.gwtplugins.gwt.eclipse.core.gwtNature</nature>
-		<nature>com.github.sdbg.integration.jdt.gwtsdmnature</nature>
 	</natures>
 	<linkedResources>
 		<link>

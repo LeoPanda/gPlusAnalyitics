@@ -24,7 +24,8 @@ import jp.leopanda.googleAuthorization.server.CredentialUtils;
 public class GoogleGateServiceImpl extends RemoteServiceServlet implements GoogleGateService {
   private static final long serialVersionUID = 1L;
 
-  private Map<String, DataStoreHandler> storeHandlerStocker = new HashMap<String, DataStoreHandler>();
+  private Map<String, DataStoreHandler> storeHandlerStocker =
+      new HashMap<String, DataStoreHandler>();
   Logger logger = Logger.getLogger(GoogleGateServiceImpl.class.getName());
 
   /**
@@ -35,15 +36,8 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    */
   public String updateDataStore() throws Exception {
     storeHandlerStocker.clear();
-    return new CatchException<String>() {
-
-      @Override
-      public String tryApiCall() throws Exception {
-        return getDataConductor().updateDataStore(false);
-      }
-    }.execute();
+    return new CatchException<String>() {}.execute(() -> getDataConductor().updateDataStore(false));
   }
-
 
   /**
    * データストアからソースアイテムを読み込む
@@ -52,14 +46,17 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * @throws Exception
    */
   public SourceItems getItems() throws Exception {
-    return new CatchException<SourceItems>() {
+    return new CatchException<SourceItems>() {}.execute(() -> getStoreHandler().getItems());
+  }
 
-      @Override
-      public SourceItems tryApiCall() throws Exception {
-        return getStoreHandler().getItems();
-      }
+  /**
+   * サーバーメモリー内のItemsをクリアする
+   * @return
+   * @throws Exception
+   */
+  public String clearItemsOnMemory() throws Exception {
+    return new CatchException<String>() {}.execute(() -> getStoreHandler().setItemsExpired());
 
-    }.execute();
   }
 
   /**
@@ -114,5 +111,4 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
     return getApiService().getGplusUserId();
   }
 
-  
 }

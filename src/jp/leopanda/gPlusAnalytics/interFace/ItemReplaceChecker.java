@@ -7,6 +7,6 @@ package jp.leopanda.gPlusAnalytics.interFace;
  *
  */
 @FunctionalInterface
-public interface ItemChecker<I> {
+public interface ItemReplaceChecker<I> {
   boolean replaceWhen(I newItem, I sourceItem);
 }

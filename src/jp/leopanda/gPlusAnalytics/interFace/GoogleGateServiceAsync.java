@@ -8,9 +8,8 @@ import jp.leopanda.gPlusAnalytics.dataObject.SourceItems;
 
 public interface GoogleGateServiceAsync {
   void getItems(AsyncCallback<SourceItems> callback);
-
-
   void updateDataStore(AsyncCallback<String> callback);
+  void clearItemsOnMemory(AsyncCallback<String> callback);
 
   
 }

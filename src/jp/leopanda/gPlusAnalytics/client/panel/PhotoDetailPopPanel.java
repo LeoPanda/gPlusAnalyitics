@@ -120,7 +120,7 @@ public class PhotoDetailPopPanel extends PopupPanel {
    */
   private Image getImage(PlusActivity activity) {
     image = new Image();
-    activity.getAttachmentImageUrls().ifPresent(urls -> image.setUrl(urls.get(0)));
+    activity.getFirstAttachmentImageUrl().ifPresent(url -> image.setUrl(url));
     return image;
   }
 

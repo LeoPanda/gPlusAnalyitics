@@ -23,7 +23,6 @@ public class MenuTabPanel extends TabPanel {
    * コンストラクタ
    */
   public MenuTabPanel(FilterableSourceItems sourceItems) {
-
     tablePanel = new TableLaunchPanel(sourceItems);
     photoPanel = new PhotoPanel(sourceItems);
     chartPanel = new ChartMenuPanel(sourceItems);

@@ -11,6 +11,7 @@ import jp.leopanda.googleAuthorization.client.ForbiddenException;
 
 /**
  * Async RPCの戻り値定義クラス
+ * 
  * @author LeoPanda
  *
  */
@@ -38,25 +39,24 @@ public class GenAsync<R> {
     };
   }
 
-
-/**
- * エラー時の処理ハンドラ
- * 
- * @param caught
- *          スローオブジェクト
- */
-private void asyncErrorHandler(Throwable caught) {
-  if (caught instanceof HostGateException) {
-    Window.alert("RPCエラー:" + ((HostGateException) caught).getStatus());
-  } else if (caught instanceof IOException) {
-    Window.alert("RPC IOエラー:" + (caught.getMessage()));
-  } else if (caught instanceof ForbiddenException) {
-    if (Window.confirm("アクセス権が不足しています。リロードして認証を取得し直しますか？")) {
-      Window.Location.reload();
+  /**
+   * エラー時の処理ハンドラ
+   * 
+   * @param caught
+   *          スローオブジェクト
+   */
+  private void asyncErrorHandler(Throwable caught) {
+    if (caught instanceof HostGateException) {
+      Window.alert("RPCエラー:" + ((HostGateException) caught).getStatus());
+    } else if (caught instanceof IOException) {
+      Window.alert("RPC IOエラー:" + (caught.getMessage()));
+    } else if (caught instanceof ForbiddenException) {
+      if (Window.confirm("アクセス権が不足しています。リロードして認証を取得し直しますか？")) {
+        Window.Location.reload();
+      }
+    } else {
+      Window.alert("RPCエラー:" + caught.toString());
     }
-  } else {
-    Window.alert("RPCエラー:" + caught.toString());
   }
-}
 
 }

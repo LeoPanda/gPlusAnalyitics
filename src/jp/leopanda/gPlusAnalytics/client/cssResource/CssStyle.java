@@ -42,6 +42,8 @@ public interface CssStyle extends ClientBundle {
 
     String monthLabel();
 
+    String nextPageButton();
+
     String detailPopWindow();
 
     String detailPopLine();

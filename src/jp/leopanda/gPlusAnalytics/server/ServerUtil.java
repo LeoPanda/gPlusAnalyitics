@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import jp.leopanda.gPlusAnalytics.client.enums.DateFormat;
+
 /**
  * サーバーサイド共通ユーティリティ
  * @author LeoPanda
@@ -15,13 +17,13 @@ public class ServerUtil {
    * 
    * @return
    */
-  public static String getCurrentDate() {
-    final String dateFormat = "yyyy-MM-dd-HH-mm-ss";
+  public static String getCurrentDate(DateFormat format) {
     final String timeZone = "Asia/Tokyo";
     TimeZone timezone = TimeZone.getTimeZone(timeZone);
-    SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+    SimpleDateFormat formatter = new SimpleDateFormat(format.getValue());
     formatter.setTimeZone(timezone);
     return formatter.format(new Date());
   }
-
+  
+ 
 }

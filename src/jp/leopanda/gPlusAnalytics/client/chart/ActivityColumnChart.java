@@ -2,6 +2,7 @@ package jp.leopanda.gPlusAnalytics.client.chart;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,6 @@ import java.util.Optional;
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.RangeFilterdChart;
 import jp.leopanda.gPlusAnalytics.client.enums.Distribution;
 import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
-import jp.leopanda.gPlusAnalytics.client.util.SortComparator;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 import com.google.gwt.user.client.Window;
@@ -143,7 +143,7 @@ public class ActivityColumnChart extends
    */
   private DataTable getDataTable(DataTable dataTable) {
     List<PlusActivity> activities = new ArrayList<PlusActivity>(getSourceData());
-    Collections.sort(activities, new SortComparator().getAscendingActivitesOrder());
+    Collections.sort(activities, Comparator.comparing(PlusActivity::getPublished));
     dataTable.addColumn(ColumnType.NUMBER, "No.");
     dataTable.addColumn(ColumnType.NUMBER, Distribution.FIRST_LOOKER.name);
     dataTable.addColumn(ColumnType.NUMBER, Distribution.LOW_MIDDLE_LOOKER.name);

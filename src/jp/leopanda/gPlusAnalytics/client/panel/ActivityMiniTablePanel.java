@@ -45,7 +45,7 @@ public class ActivityMiniTablePanel extends ClickablePlusItemTable<PlusActivity>
     imageColumn = new ImageColumn<PlusActivity>("80",null) {
       @Override
       public SafeHtml getValue(PlusActivity item) {
-        return getImageTagFromUrlList(item.getAttachmentImageUrls());
+        return getImageTagFromUrl(item.getFirstAttachmentImageUrl());
       }
     };
     // +1er数

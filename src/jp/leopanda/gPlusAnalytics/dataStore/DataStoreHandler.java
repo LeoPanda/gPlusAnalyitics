@@ -1,18 +1,21 @@
 package jp.leopanda.gPlusAnalytics.dataStore;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 
-import jp.leopanda.gPlusAnalytics.client.util.SortComparator;
+import jp.leopanda.gPlusAnalytics.client.enums.DateFormat;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.dataObject.SourceItems;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 import jp.leopanda.gPlusAnalytics.server.DailyStats;
+import jp.leopanda.gPlusAnalytics.server.ServerUtil;
 
 /**
  * Actor毎のDataStore Handler
@@ -30,6 +33,7 @@ public class DataStoreHandler {
 
   String actorId;
   SourceItems items = null;
+  String itemLoadedDate;
 
   Logger logger = Logger.getLogger(DataStoreHandler.class.getName());
 
@@ -41,14 +45,10 @@ public class DataStoreHandler {
     this.ds = DatastoreServiceFactory.getDatastoreService();
 
     interruptedActivitiesHandler = new StoredItemHandler<PlusActivity>("interruptedActivities", ds,
-        actorId) {
-    };
-    activitiesHandler = new StoredItemHandler<PlusActivity>("Activities", ds, actorId) {
-    };
-    plusOnersHandler = new StoredItemHandler<PlusPeople>("PlusOners", ds, actorId) {
-    };
-    dailyStatsHandler = new StoredItemHandler<DailyStats>("dailyStats", ds, actorId) {
-    };
+        actorId) {};
+    activitiesHandler = new StoredItemHandler<PlusActivity>("Activities", ds, actorId) {};
+    plusOnersHandler = new StoredItemHandler<PlusPeople>("PlusOners", ds, actorId) {};
+    dailyStatsHandler = new StoredItemHandler<DailyStats>("dailyStats", ds, actorId) {};
   }
 
   /**
@@ -112,20 +112,42 @@ public class DataStoreHandler {
    * @throws HostGateException
    */
   public SourceItems getItems() throws HostGateException {
-    if (items != null) {
-      logger.info("Items are returned from server memory.");
+    if ((items != null) && (!isItemsExpired())) {
+      logger.info("Items are returned from server memory loaded " + itemLoadedDate + ".");
       return items;
     }
     items = new SourceItems();
-    // Jsonからデコード
+    // DataStoreからデコード
     activitiesHandler.setClass(PlusActivity.class);
     plusOnersHandler.setClass(PlusPeople.class);
     items.activities = activitiesHandler.getItems();
     items.plusOners = plusOnersHandler.getItems();
     // ソート
-    Collections.sort(items.activities, new SortComparator().getLatestActivitesOrder());
-    Collections.sort(items.plusOners, new SortComparator().getPlusOnerDecendingOrder());
+    Collections.sort(items.activities, Comparator.comparing(PlusActivity::getPublished).reversed());
+    Collections.sort(items.plusOners, Comparator.comparing(PlusPeople::getNumOfPlusOne).reversed());
     return items;
+  }
+
+  /**
+   * メモリー内itemsの有効期限をチェックする
+   * 
+   * @return
+   */
+  private boolean isItemsExpired() {
+    String currentYMD = ServerUtil.getCurrentDate(DateFormat.YYMD);
+    if (Optional.ofNullable(itemLoadedDate).isPresent()) {
+      if (currentYMD.equals(itemLoadedDate)) return false;
+    }
+    itemLoadedDate = currentYMD;
+    return true;
+  }
+
+  /**
+   * メモリー内itemsを有効期限切れにする
+   */
+  public String setItemsExpired() {
+    itemLoadedDate = null;
+    return "";
   }
 
   /**

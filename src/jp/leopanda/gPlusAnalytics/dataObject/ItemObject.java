@@ -3,6 +3,7 @@ package jp.leopanda.gPlusAnalytics.dataObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ItemObject implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -11,42 +12,71 @@ public class ItemObject implements Serializable {
   public List<Attachment> attachments;
 
   /**
-   * getter
+   * get Content
    * 
-   * @return Content
+   * @return
    */
   public String getContent() {
     return content;
   }
 
   /**
-   * getter
+   * get Users
    * 
-   * @return plusOners
+   * @return
    */
   public Users getPlusoners() {
     return plusoners;
   }
 
   /**
-   * getter
+   * 最初のAttachmentを取得する
    * 
-   * @return attachmentImageUrls
+   * @return
    */
-  public List<String> getAttachmentImageUrls() {
-    if (attachments == null) {
-      return null;
+  public Optional<Attachment> getFirstAttachment() {
+    if (Optional.ofNullable(attachments).isPresent()) {
+      return attachments.stream().filter(attachment -> attachment != null).findFirst();
     }
-    List<String> results = new ArrayList<String>();
-    for (Attachment attachment : attachments) {
-      if (attachment != null) {
-        results.add(attachment.getImageUrl());
-      }
-    }
-    return results;
+    return Optional.ofNullable(null);
   }
 
-  
+  /**
+   * 最初のAttachmentのImageUrlを取得する
+   * 
+   * @return
+   */
+  public Optional<String> getFirstAttachmentImagetUrl() {
+    if (getFirstAttachment().isPresent()) {
+      return getFirstAttachment().get().getImageUrl();
+    }
+    return Optional.ofNullable(null);
+  }
+
+  /**
+   * 最初のAttachmentのImageの高さを取得する
+   * 
+   * @return
+   */
+  public Optional<Long> getFirstAttachmentImageHeight() {
+    if (getFirstAttachment().isPresent()) {
+      return getFirstAttachment().get().getImageHeight();
+    }
+    return Optional.ofNullable(null);
+  }
+
+  /**
+   * 最初のAttachmentのImageの幅を取得する
+   * 
+   * @return
+   */
+  public Optional<Long> getFirstAttachmentImageWidth() {
+    if (getFirstAttachment().isPresent()) {
+      return getFirstAttachment().get().getImageWidth();
+    }
+    return Optional.ofNullable(null);
+  }
+
   /**
    * setter
    * 
@@ -55,11 +85,11 @@ public class ItemObject implements Serializable {
    */
   public void setAttachmentImageUrls(List<String> urls) {
     List<Attachment> attachments = new ArrayList<Attachment>();
-    for (String url : urls) {
+    urls.forEach(url -> {
       Attachment attachment = new Attachment();
       attachment.setImageUrl(url);
       attachments.add(attachment);
-    }
+    });
     this.attachments = attachments;
   }
 }

@@ -2,6 +2,7 @@ package jp.leopanda.gPlusAnalytics.dataObject;
 
 
 import java.io.Serializable;
+import java.util.Optional;
 
 public class AttachmentImage implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -9,14 +10,14 @@ public class AttachmentImage implements Serializable {
   public Long height;
   public Long width;
 
-  public String getUrl() {
-    return url;
+  public Optional<String> getUrl() {
+    return Optional.ofNullable(url);
   }
-  public Long getHeight(){
-    return this.height;
+  public Optional<Long> getHeight(){
+    return Optional.ofNullable(height);
   }
-  public Long getWidth(){
-    return this.width;
+  public Optional<Long> getWidth(){
+    return Optional.ofNullable(width);
   }
 
 }

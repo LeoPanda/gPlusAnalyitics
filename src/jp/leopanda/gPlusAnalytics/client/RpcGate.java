@@ -6,7 +6,6 @@ import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateService;
 import jp.leopanda.gPlusAnalytics.interFace.GoogleGateServiceAsync;
 
-
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -48,18 +47,23 @@ public class RpcGate<R> {
     GenAsync<R> genAsync = new GenAsync<R>();
     genAsync.addListener((RpcGateListener<R>) this.listener);
     switch (function) {
-    case GET_STOREDITEMS: {
-      googleAsync.getItems((AsyncCallback<SourceItems>) genAsync.callbackR);
-    }
-      break;
-    case UPDATE＿ITEMSTORE: {
-      googleAsync.updateDataStore((AsyncCallback<String>) genAsync.callbackR);
+      case GET_STOREDITEMS: {
+        googleAsync.getItems((AsyncCallback<SourceItems>) genAsync.callbackR);
+      }
+        break;
+        
+      case UPDATE＿ITEMSTORE: {
+        googleAsync.updateDataStore((AsyncCallback<String>) genAsync.callbackR);
+      }
+        break;
+        
+      case CLEAR_SERVERMEMORY: {
+        googleAsync.clearItemsOnMemory((AsyncCallback<String>) genAsync.callbackR);
+      }
+        break;
 
-    }
-      break;
-
-    default:
-      break;
+      default:
+        break;
     }
   }
 

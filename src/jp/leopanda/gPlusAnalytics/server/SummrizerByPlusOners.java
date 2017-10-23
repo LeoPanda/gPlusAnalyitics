@@ -6,12 +6,12 @@ import java.util.List;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
- * +1毎に+1数をカウントするカウンター Map<+1erId,+1数>
+ * +1er毎に+1数を集計するカウンター Map<+1erId,+1数>
  * 
  * @author LeoPanda
  *
  */
-public class PlusOneCounter extends HashMap<String, Integer> {
+public class SummrizerByPlusOners extends HashMap<String, Integer> {
 
   /**
    * 
@@ -23,7 +23,7 @@ public class PlusOneCounter extends HashMap<String, Integer> {
    * 
    * @param sourceActivities
    */
-  public PlusOneCounter aggregatePlusOneCount(List<PlusActivity> sourceActivities) {
+  public SummrizerByPlusOners aggregatePlusOneCount(List<PlusActivity> sourceActivities) {
     for (PlusActivity activity : sourceActivities) {
       for (String plusOnerId : activity.getPlusOnerIds()) {
         countPlusOne(plusOnerId);

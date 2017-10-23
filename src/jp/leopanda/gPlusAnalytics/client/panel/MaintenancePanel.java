@@ -3,11 +3,7 @@ package jp.leopanda.gPlusAnalytics.client.panel;
 import jp.leopanda.gPlusAnalytics.client.RpcGate;
 import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
 import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
-import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
 
-
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
@@ -23,6 +19,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class MaintenancePanel extends VerticalPanel {
 
   Button updateButton = new Button("データストア更新");
+  Button clearMemoryButton = new Button("サーバーメモリーのクリア");
   VerticalPanel buttonPanel;
 
   /**
@@ -40,6 +37,8 @@ public class MaintenancePanel extends VerticalPanel {
       buttonPanel = new VerticalPanel();
       buttonPanel.add(updateButton);
       buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
+      buttonPanel.add(clearMemoryButton);
+      buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
       addClickHandlers();
     }
     return buttonPanel;
@@ -49,12 +48,8 @@ public class MaintenancePanel extends VerticalPanel {
    * ボタンクリックハンドラのセット
    */
   private void addClickHandlers() {
-    updateButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        confirmClicked(CallFunction.UPDATE＿ITEMSTORE);
-      }
-    });
+    updateButton.addClickHandler(event -> confirmClicked(CallFunction.UPDATE＿ITEMSTORE));
+    clearMemoryButton.addClickHandler(event -> confirmClicked(CallFunction.CLEAR_SERVERMEMORY));
   }
 
   /*
@@ -63,26 +58,18 @@ public class MaintenancePanel extends VerticalPanel {
   private void confirmClicked(CallFunction clicked) {
     if (Window.confirm(clicked.msg + "よろしいですか？")) {
       setPanelToOnGoing();
-      new RpcGate<String>(clicked, new Callback()) {}.request();
+      new RpcGate<String>(clicked, result -> {
+        Window.alert("更新指示が完了しました。画面をリロードします。");
+        Window.Location.reload();
+      }) {}.request();
     }
   }
 
   /*
-   * 　パネルをデータ更新中に変更
+   * パネルをデータ更新中に変更
    */
   private void setPanelToOnGoing() {
     this.clear();
     this.add(new Label("データストア更新中・・・"));
-  }
-
-  /*
-   * RPC実行後のコールバックを受信するクラス
-   */
-  private class Callback implements RpcGateListener<String> {
-    @Override
-    public void onCallback(String result) {
-      Window.alert("更新指示が完了しました。画面をリロードします。");
-      Window.Location.reload();
-    }
   }
 }

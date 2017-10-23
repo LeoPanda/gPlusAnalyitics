@@ -77,24 +77,35 @@ public class DataConductor {
    */
   private SourceItems updateSouceItems(SourceItems sourceItems) throws Exception {
     ActivitiesProcesser activitiesProcesser = new ActivitiesProcesser(apiService, logger);
-    PlusOneCounter plusOneCounter = new PlusOneCounter();
-    // 処理対象のアクテビティを設定する
+    SummrizerByPlusOners plusOneSummrizer = new SummrizerByPlusOners();
+    newActivities = setNewActivities(sourceItems, activitiesProcesser);
+    sourceItems.activities = updateActivities(newActivities, sourceItems.activities,
+        activitiesProcesser, plusOneSummrizer);
+    sourceItems.plusOners = updatePlusOners(activitiesProcesser.getPlusOnersForUpdate(),
+        sourceItems.plusOners, plusOneSummrizer);
+    // 未処理アクテビティリストのクリア
+    putUnprocessedActivities(newActivities);
+    return sourceItems;
+  }
+
+  /**
+   * 処理対象の入力アクテビティを設定する
+   * @param sourceItems
+   * @param activitiesProcesser
+   * @throws HostGateException
+   * @throws Exception
+   */
+  private List<PlusActivity> setNewActivities(SourceItems sourceItems, ActivitiesProcesser activitiesProcesser)
+      throws HostGateException, Exception {
     List<PlusActivity> interruptedActivities = storeHandler.getInterruptedActivities();
     if (interruptedActivities.size() > 0) {//処理途中に中断されたアクテビティが残っている場合はこれを処理
       newActivities = interruptedActivities;
     } else {//中断アクテビティがない場合はG+APIから全アクテビティを読み込む
       newActivities = activitiesProcesser.getNewActivitiesFromAPI(storeHandler);
-      sourceItems.activities = activitiesProcesser.removeDisusedActivities(newActivities,
+      sourceItems.activities = activitiesProcesser.removeDisusedActivitiesFromSource(newActivities,
           sourceItems.activities);
     }
-    // ソースアイテムを更新する
-    sourceItems.activities = updateActivities(newActivities, sourceItems.activities,
-        activitiesProcesser, plusOneCounter);
-    sourceItems.plusOners = updatePlusOners(activitiesProcesser.getPlusOnersForUpdate(),
-        sourceItems.plusOners, plusOneCounter);
-    // 未処理アクテビティリストのクリア
-    putUnprocessedActivities(newActivities);
-    return sourceItems;
+    return newActivities;
   }
 
   /**
@@ -109,11 +120,11 @@ public class DataConductor {
    */
   private List<PlusActivity> updateActivities(List<PlusActivity> newActivities,
       List<PlusActivity> sourceActivities, ActivitiesProcesser activitiesProcesser,
-      PlusOneCounter plusOneCounter) throws Exception {
+      SummrizerByPlusOners plusOneSummrizer) throws Exception {
     sourceActivities = activitiesProcesser.updatePlusActivitiesAndStackPlusOners(
         newActivities, sourceActivities);
     sourceActivities = activitiesProcesser.setStatisticsInfo(
-        plusOneCounter.aggregatePlusOneCount(sourceActivities), sourceActivities);
+        plusOneSummrizer.aggregatePlusOneCount(sourceActivities), sourceActivities);
     return sourceActivities;
   }
 
@@ -122,15 +133,15 @@ public class DataConductor {
    * 
    * @param plusOnersForUpdate
    * @param sourcePlusOners
-   * @param plusOneCounter
+   * @param plusOneSummrizer
    * @return
    * @throws Exception
    */
   private List<PlusPeople> updatePlusOners(List<PlusPeople> plusOnersForUpdate,
-      List<PlusPeople> sourcePlusOners, PlusOneCounter plusOneCounter) throws Exception {
+      List<PlusPeople> sourcePlusOners, SummrizerByPlusOners plusOneSummrizer) throws Exception {
     PlusOnersProceccer plusOnerProcesser = new PlusOnersProceccer(logger);
     sourcePlusOners = plusOnerProcesser.addNewPlusOners(plusOnersForUpdate, sourcePlusOners);
-    sourcePlusOners = plusOnerProcesser.updatePlusOners(plusOneCounter, sourcePlusOners);
+    sourcePlusOners = plusOnerProcesser.updatePlusOners(plusOneSummrizer, sourcePlusOners);
     return sourcePlusOners;
   }
 

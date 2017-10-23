@@ -25,20 +25,20 @@ public class PlusOnersProceccer {
    * ソース+1erアイテムリストの+1数を更新する
    * ソースアクテビティに存在しなくなった+1erはアイテムリストから削除する
    * 
-   * @param counter
+   * @param summrizer
    * @param sourceItems
    * @return
    */
-  public List<PlusPeople> updatePlusOners(PlusOneCounter counter,
+  public List<PlusPeople> updatePlusOners(SummrizerByPlusOners summrizer,
       List<PlusPeople> sourceItems) {
     ListIterator<PlusPeople> iterator = sourceItems.listIterator();
     while (iterator.hasNext()) {
       PlusPeople plusOner = iterator.next();
-      if (!counter.containsKey(plusOner.getId())) {// アクテビティに存在しなくなった+1erは削除
+      if (!summrizer.containsKey(plusOner.getId())) {// アクテビティに存在しなくなった+1erは削除
         logger.plusOnerDeleted();
         iterator.remove();
       } else {
-        int numOfPlusOne = counter.get(plusOner.getId());
+        int numOfPlusOne = summrizer.get(plusOner.getId());
         if (numOfPlusOne == 0) {// +1数が0になった+1erは削除
           logger.plusOnerDeleted();
           iterator.remove();
@@ -58,19 +58,8 @@ public class PlusOnersProceccer {
    */
   public List<PlusPeople> addNewPlusOners(List<PlusPeople> newItems, List<PlusPeople> sourceItems)
       throws Exception {
-    return new NewItemsApplyer<PlusPeople>(newItems, sourceItems) {}
-        .apply(newItem -> setNewItem(newItem), (newItem, matchedItem) -> false);
-  }
-
-  /**
-   * 新規アイテムを設定する
-   * 
-   * @param newItem
-   * @return
-   */
-  private PlusPeople setNewItem(PlusPeople newItem) {
-    logger.plusOnerAdded();
-    return newItem;
+    return new NewItemsApplyer<PlusPeople>(newItems, sourceItems,logger) {}
+        .apply(newItem -> newItem, null);
   }
 
 }

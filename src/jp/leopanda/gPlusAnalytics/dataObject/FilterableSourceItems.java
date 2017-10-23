@@ -2,6 +2,7 @@ package jp.leopanda.gPlusAnalytics.dataObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 
@@ -12,7 +13,6 @@ import jp.leopanda.gPlusAnalytics.client.panel.FilterLogPanel;
 import jp.leopanda.gPlusAnalytics.client.util.FilteredActivities;
 import jp.leopanda.gPlusAnalytics.client.util.FilteredPlusOners;
 import jp.leopanda.gPlusAnalytics.client.util.ItemFilter;
-import jp.leopanda.gPlusAnalytics.client.util.SortComparator;
 import jp.leopanda.gPlusAnalytics.client.util.TransItemList;
 
 /**
@@ -60,40 +60,40 @@ public class FilterableSourceItems {
    */
   private void doFilter(FilterLogCard card) {
     switch (card.getFilterType()) {
-    case ACTIVITY_TABLE_PLUSONER:
-      currentPlusActivities = filterAndCombineAcitivies(card.getBooleansValue(),
-          items -> new FilteredActivities(items) {}.byPlusOner(card.getPlusOner()));
-      break;
-    case ACTIVITIES_KEYWORD:
-      currentPlusActivities = filterAndCombineAcitivies(card.getBooleansValue(),
-          items -> new FilteredActivities(items) {}.byKeyword(card.getKeyword()));
-      break;
-    case ACTIVITIES_ACCESSDESCRIPTION:
-      currentPlusActivities = filterAndCombineAcitivies(card.getBooleansValue(),
-          items -> new FilteredActivities(items) {}.byAccessDescription(card.getKeyword()));
-      break;
-    case ACTIVITIES_PUBLISHED_YEAR:
-      currentPlusActivities = filterAndCombineAcitivies(card.getBooleansValue(),
-          items -> new FilteredActivities(items) {}.byPublishedYear(card.getKeyword()));
-      break;
-    case ACTIVITIES_PUBLISHED_MONTH:
-      currentPlusActivities = filterAndCombineAcitivies(card.getBooleansValue(),
-          items -> new FilteredActivities(items) {}.byPublishedMonth(card.getKeyword()));
-      break;
-    case PLUSONER_TABLE_ACTIVITY:
-      currentPlusOners = filterAndCombinePlusOners(card.getBooleansValue(),
-          items -> new FilteredPlusOners(items) {}.byActivity(card.getActivity()));
-      break;
-    case PLUSONER_KEYWORD:
-      currentPlusOners = filterAndCombinePlusOners(card.getBooleansValue(),
-          items -> new FilteredPlusOners(items) {}.byKeyword(card.getKeyword()));
-      break;
-    case PLUSONER_NUMOFPLUSONE:
-      currentPlusOners = filterAndCombinePlusOners(card.getBooleansValue(),
-          items -> new FilteredPlusOners(items) {}.byNumOfPlusOne(card.getNumOfPlusOneKeyword()));
-      break;
-    default:
-      break;
+      case ACTIVITY_TABLE_PLUSONER:
+        currentPlusActivities = filterAndCombineAcitivies(card.getBooleansValue(),
+            items -> new FilteredActivities(items) {}.byPlusOner(card.getPlusOner()));
+        break;
+      case ACTIVITIES_KEYWORD:
+        currentPlusActivities = filterAndCombineAcitivies(card.getBooleansValue(),
+            items -> new FilteredActivities(items) {}.byKeyword(card.getKeyword()));
+        break;
+      case ACTIVITIES_ACCESSDESCRIPTION:
+        currentPlusActivities = filterAndCombineAcitivies(card.getBooleansValue(),
+            items -> new FilteredActivities(items) {}.byAccessDescription(card.getKeyword()));
+        break;
+      case ACTIVITIES_PUBLISHED_YEAR:
+        currentPlusActivities = filterAndCombineAcitivies(card.getBooleansValue(),
+            items -> new FilteredActivities(items) {}.byPublishedYear(card.getKeyword()));
+        break;
+      case ACTIVITIES_PUBLISHED_MONTH:
+        currentPlusActivities = filterAndCombineAcitivies(card.getBooleansValue(),
+            items -> new FilteredActivities(items) {}.byPublishedMonth(card.getKeyword()));
+        break;
+      case PLUSONER_TABLE_ACTIVITY:
+        currentPlusOners = filterAndCombinePlusOners(card.getBooleansValue(),
+            items -> new FilteredPlusOners(items) {}.byActivity(card.getActivity()));
+        break;
+      case PLUSONER_KEYWORD:
+        currentPlusOners = filterAndCombinePlusOners(card.getBooleansValue(),
+            items -> new FilteredPlusOners(items) {}.byKeyword(card.getKeyword()));
+        break;
+      case PLUSONER_NUMOFPLUSONE:
+        currentPlusOners = filterAndCombinePlusOners(card.getBooleansValue(),
+            items -> new FilteredPlusOners(items) {}.byNumOfPlusOne(card.getNumOfPlusOneKeyword()));
+        break;
+      default:
+        break;
     }
   }
 
@@ -141,13 +141,13 @@ public class FilterableSourceItems {
       FilterBooleans booleans, Function<List<I>, List<I>> function) {
     List<I> combinedItems = new ArrayList<I>();
     switch (booleans) {
-    case AND:
-      combinedItems = function.apply(currentItems);
-      break;
-    case OR:
-      combinedItems = new ItemFilter<I>(currentItems) {}.combineOr(function.apply(originalItems));
-    default:
-      break;
+      case AND:
+        combinedItems = function.apply(currentItems);
+        break;
+      case OR:
+        combinedItems = new ItemFilter<I>(currentItems) {}.combineOr(function.apply(originalItems));
+      default:
+        break;
     }
     return combinedItems;
   }
@@ -214,8 +214,10 @@ public class FilterableSourceItems {
    * アイテムリストをソートする
    */
   private void sortItems() {
-    Collections.sort(currentPlusActivities, new SortComparator().getLatestActivitesOrder());
-    Collections.sort(currentPlusOners, new SortComparator().getPlusOnerDecendingOrder());
+    Collections.sort(currentPlusActivities,
+        Comparator.comparing(PlusActivity::getPublished).reversed());
+    Collections.sort(currentPlusOners,
+        Comparator.comparing(PlusPeople::getNumOfPlusOne).reversed());
   }
 
 }

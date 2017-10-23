@@ -32,18 +32,18 @@ public class PhotoCalcUtil {
   private double getActivityPhotoRatio(PlusActivity activity) {
     double photoRatio = 0;
     switch (attachmentsExsists(activity)) {
-    case EXSISTS:
-      long imgWidth = activity.object.attachments.get(0).getImageWidth();
-      long imgHeight = activity.object.attachments.get(0).getImageHeight();
-      photoRatio = (double) imgWidth / imgHeight;
-      break;
-    case HAS_NO_SIZE:
-      photoRatio = defaultPhotoRatio;
-    case NOT_EXSISTS:
-      photoRatio = 0;
-      break;
-    default:
-      break;
+      case EXSISTS:
+        long imgWidth = activity.getFirstAttachmentImageWidth().get();
+        long imgHeight = activity.getFirstAttachmentImageHeigt().get();
+        photoRatio = (double) imgWidth / imgHeight;
+        break;
+      case HAS_NO_SIZE:
+        photoRatio = defaultPhotoRatio;
+      case NOT_EXSISTS:
+        photoRatio = 0;
+        break;
+      default:
+        break;
     }
     return photoRatio;
   }
@@ -55,18 +55,14 @@ public class PhotoCalcUtil {
    * @return
    */
   private AttachmentsStatus attachmentsExsists(PlusActivity activity) {
-    AttachmentsStatus status;
-    if (activity.object.attachments.size() > 0) {
-      if (activity.object.attachments.get(0).getImageHeight() == null
-          || activity.object.attachments.get(0).getImageWidth() == null) {
-        status = AttachmentsStatus.HAS_NO_SIZE;
-      } else {
-        status = AttachmentsStatus.EXSISTS;
-      }
-    } else {
-      status = AttachmentsStatus.NOT_EXSISTS;
+    if (activity.getFirstAttachmentImageWidth().isPresent()
+        && activity.getFirstAttachmentImageHeigt().isPresent()) {
+      return AttachmentsStatus.EXSISTS;
     }
-    return status;
+    if (activity.getFirstAttachmentImageUrl().isPresent()) {
+      return AttachmentsStatus.HAS_NO_SIZE;
+    }
+    return AttachmentsStatus.NOT_EXSISTS;
   }
 
   /**
@@ -82,15 +78,15 @@ public class PhotoCalcUtil {
     double height = 0;
     double photoRatio = (double) (photoDimensions.getWidth() / photoDimensions.getHeight());
     switch (getPhotoOrientation(photoRatio)) {
-    case HORIZONTAL:
-      width = (double) parentPanelDimensions.getWidth() * lengthOcupancy;
-      height = (double) width / photoRatio;
-      break;
-    case VERTICAL:
-      height = (double) parentPanelDimensions.getHeight() * lengthOcupancy;
-      width = (double) height * photoRatio;
-    default:
-      break;
+      case HORIZONTAL:
+        width = (double) parentPanelDimensions.getWidth() * lengthOcupancy;
+        height = (double) width / photoRatio;
+        break;
+      case VERTICAL:
+        height = (double) parentPanelDimensions.getHeight() * lengthOcupancy;
+        width = (double) height * photoRatio;
+      default:
+        break;
     }
     return new SquareDimensions(width, height);
   }

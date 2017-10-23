@@ -14,6 +14,7 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.QueryResultList;
 
+import jp.leopanda.gPlusAnalytics.client.enums.DateFormat;
 import jp.leopanda.gPlusAnalytics.server.ServerUtil;
 
 /**
@@ -136,7 +137,7 @@ public class EntityOperator {
    * Entityを書き込む
    */
   public void putEntity() {
-    setProperty(property.PUBLISED, ServerUtil.getCurrentDate());
+    setProperty(property.PUBLISED, ServerUtil.getCurrentDate(DateFormat.SERVER_RECORD));
     ds.put(this.entity);
   }
 

@@ -2,7 +2,6 @@ package jp.leopanda.gPlusAnalytics.client.panel;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -40,7 +39,7 @@ public class PlusOnersTablePanel extends ClickablePlusItemTable<PlusPeople> {
     imageColumn = new ImageColumn<PlusPeople>("50", "50") {
       @Override
       public SafeHtml getValue(PlusPeople item) {
-        return getImageTagFromUrl(Optional.ofNullable(item.getImageUrl()));
+        return getImageTagFromUrl(item.getImageUrl());
       }
     };
     // ユーザー名
@@ -77,11 +76,6 @@ public class PlusOnersTablePanel extends ClickablePlusItemTable<PlusPeople> {
   @Override
   protected void setSortHandler() {
     filterButton.setSortable(true);
-    sortHandler.setComparator(filterButton, new Comparator<PlusPeople>() {
-      @Override
-      public int compare(PlusPeople o1, PlusPeople o2) {
-        return o1.getNumOfPlusOne() - o2.getNumOfPlusOne();
-      }
-    });
+    sortHandler.setComparator(filterButton, Comparator.comparing(PlusPeople::getNumOfPlusOne).reversed());
   }
 }

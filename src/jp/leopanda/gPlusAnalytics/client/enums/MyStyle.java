@@ -14,6 +14,7 @@ public enum MyStyle {
   PHOTO_CELL(CssStyle.INSTANCE.style().photoCell()),
   CHECKBOX_LABEL(CssStyle.INSTANCE.style().cehckBoxLabel()),
   RESET_BUTTON(CssStyle.INSTANCE.style().resetButton()),
+  NEXTPAGE_BUTTON(CssStyle.INSTANCE.style().nextPageButton()),
   YEAR_LABEL(CssStyle.INSTANCE.style().yearLabel()),
   MONTH_LABEL(CssStyle.INSTANCE.style().monthLabel()),
   COUNT_LABLEL(CssStyle.INSTANCE.style().countLabel()),

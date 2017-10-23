@@ -7,7 +7,8 @@ package jp.leopanda.gPlusAnalytics.client.enums;
  *
  */
 public enum CallFunction {
-  GET_STOREDITEMS("データをロードします。"), UPDATE＿ITEMSTORE("データストアを更新します。");
+  GET_STOREDITEMS("データをロードします。"), UPDATE＿ITEMSTORE("データストアを更新します。"),
+  CLEAR_SERVERMEMORY("サーバーのキャッシュメモリーをクリアします。");
   public String msg;
 
   private CallFunction(String msg) {

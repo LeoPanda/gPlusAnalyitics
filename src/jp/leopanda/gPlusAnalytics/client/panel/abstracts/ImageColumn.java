@@ -1,6 +1,5 @@
 package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -28,17 +27,6 @@ public abstract class ImageColumn<I> extends Column<I, SafeHtml> {
     super(cell);
     this.height = Optional.ofNullable(height);
     this.width = Optional.ofNullable(width);
-  }
-
-  /**
-   * イメージ表示用のHTMLをURLlistから取得する
-   * 
-   * @return
-   */
-  protected SafeHtml getImageTagFromUrlList(Optional<List<String>> imgUrls) {
-    SafeHtmlBuilder builder = new SafeHtmlBuilder();
-    return (imgUrls.isPresent() ? getImageTag(imgUrls.get().get(0), builder)
-        : getBlankTag(builder));
   }
 
   /**

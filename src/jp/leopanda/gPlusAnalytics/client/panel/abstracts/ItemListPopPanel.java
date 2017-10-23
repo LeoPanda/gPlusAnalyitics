@@ -1,7 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.google.gwt.user.client.ui.Button;

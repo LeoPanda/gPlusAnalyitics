@@ -50,34 +50,21 @@ public class ActivitiesProcesser {
   public List<PlusActivity> updatePlusActivitiesAndStackPlusOners(List<PlusActivity> newActivities,
       List<PlusActivity> sourceActivities) throws Exception {
     logger.setnumOfNewActivities(newActivities.size());
-    return new NewItemsApplyer<PlusActivity>(newActivities, sourceActivities) {}.apply(
-        newItem -> setItemForNewAdd(newItem),
-        (newItem, matchedItem) -> replaceWhen(newItem, matchedItem));
-  }
-
-  /**
-   * 追加する新規アイテムを設定する
-   * 
-   * @param newItem
-   * @return
-   * @throws Exception
-   */
-  private PlusActivity setItemForNewAdd(PlusActivity newItem) throws Exception {
-    newItem = setPlusOnerIdsFromApi(newItem);
-    logger.activitiesAdded();
-    return newItem;
+    return new NewItemsApplyer<PlusActivity>(newActivities, sourceActivities,logger) {}.apply(
+        newItem -> setPlusOnerIdsFromApi(newItem),
+        (newItem, sourceItem) -> replaceWhen(newItem, sourceItem));
   }
 
   /**
    * 同一IDをもつ既存アイテムを新規アイテムで置き換える場合の条件を設定する
    * 
    * @param newItem
-   * @param matchedItem
+   * @param sourceItem
    * @return
    * @throws Exception
    */
-  private boolean replaceWhen(PlusActivity newItem, PlusActivity matchedItem) {
-    return !(matchedItem.getNumOfPlusOners().equals(newItem.getNumOfPlusOners()));
+  private boolean replaceWhen(PlusActivity newItem, PlusActivity sourceItem) {
+    return !(sourceItem.getNumOfPlusOners().equals(newItem.getNumOfPlusOners()));
   }
 
   /**
@@ -89,7 +76,7 @@ public class ActivitiesProcesser {
    */
   private PlusActivity setPlusOnerIdsFromApi(PlusActivity newItem) throws Exception {
     newItem.setPlusOnerIds(
-        getPlusOnerIdsAndStacToUpdateList(apiService.getPlusOnersByActivity(newItem.getId())));
+        getPlusOnerIdsAndStackToUpdateList(apiService.getPlusOnersByActivity(newItem.getId())));
     return newItem;
   }
 
@@ -101,7 +88,7 @@ public class ActivitiesProcesser {
    *          APIコールで得たactivity毎の＋１ユーザーリスト
    * @return Activityに+1したユーザーのIDリスト
    */
-  private List<String> getPlusOnerIdsAndStacToUpdateList(List<PlusPeople> onersInActivity) {
+  private List<String> getPlusOnerIdsAndStackToUpdateList(List<PlusPeople> onersInActivity) {
     List<String> plusOnerIds = new ArrayList<String>();
     onersInActivity.forEach(plusOner -> {
       String plusOnerId = plusOner.getId();
@@ -116,16 +103,16 @@ public class ActivitiesProcesser {
   /**
    * ソースアクテビティリストの統計情報をセットする
    * 
-   * @param plusOneCounter
+   * @param plusOneSummrizer
    * @param sourceItems
    * @return
    */
-  public List<PlusActivity> setStatisticsInfo(PlusOneCounter plusOneCounter,
+  public List<PlusActivity> setStatisticsInfo(SummrizerByPlusOners plusOneSummrizer,
       List<PlusActivity> sourceItems) {
     ListIterator<PlusActivity> iterator = sourceItems.listIterator();
     while (iterator.hasNext()) {
       PlusActivity activity = iterator.next();
-      iterator.set(setActivityStastics(plusOneCounter, activity));
+      iterator.set(setActivityStastics(plusOneSummrizer, activity));
     }
     return sourceItems;
   }
@@ -133,11 +120,11 @@ public class ActivitiesProcesser {
   /**
    * アクテビティ単体の統計情報をセットする
    * 
-   * @param plusOneCounter
+   * @param plusOneSummrizer
    * @param activity
    * @return
    */
-  private PlusActivity setActivityStastics(PlusOneCounter plusOneCounter, PlusActivity activity) {
+  private PlusActivity setActivityStastics(SummrizerByPlusOners plusOneSummrizer, PlusActivity activity) {
 
     activity.highLookers = 0;
     activity.highMiddleLookers = 0;
@@ -145,7 +132,7 @@ public class ActivitiesProcesser {
     activity.firstLookers = 0;
 
     for (String plusOnerId : activity.plusOnerIds) {
-      int numOfPlusOne = plusOneCounter.get(plusOnerId);
+      int numOfPlusOne = plusOneSummrizer.get(plusOnerId);
       if (numOfPlusOne > Distribution.HIGH_LOOKER.threshold) {
         activity.highLookers++;
       } else if (numOfPlusOne > Distribution.HIGH_MIDDLE_LOOKER.threshold) {
@@ -169,7 +156,7 @@ public class ActivitiesProcesser {
    * @param sourceActivities
    * @return 更新後のソースアイテムリスト
    */
-  public List<PlusActivity> removeDisusedActivities(List<PlusActivity> newActivities,
+  public List<PlusActivity> removeDisusedActivitiesFromSource(List<PlusActivity> newActivities,
       List<PlusActivity> sourceActivities) {
     List<PlusActivity> removeActivies = sourceActivities.stream()
         .filter(sourceActivity -> !idIsExistIn(newActivities, sourceActivity.getId()))
@@ -208,7 +195,7 @@ public class ActivitiesProcesser {
    * @return
    */
   private List<PlusActivity> removeNoImageActivity(List<PlusActivity> activities) {
-    activities.removeIf(activity -> !activity.getAttachmentImageUrls().isPresent());
+    activities.removeIf(activity -> !activity.getFirstAttachmentImageUrl().isPresent());
     return activities;
   }
 }

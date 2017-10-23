@@ -5,14 +5,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-
 /**
  * Google+ API activity Item object
  * 
  * @author LeoPanda
  *
  */
-public class PlusActivity extends PlusItem implements Serializable{
+public class PlusActivity extends PlusItem implements Serializable {
   private static final long serialVersionUID = 1L;
   public String kind;
   public String title;
@@ -31,7 +30,6 @@ public class PlusActivity extends PlusItem implements Serializable{
   public int highMiddleLookers = 0;
   public int highLookers = 0;
 
-
   /**
    * コンストラクタ
    */
@@ -40,8 +38,16 @@ public class PlusActivity extends PlusItem implements Serializable{
     this.access = new ItemAccess();
   }
 
+  private Optional<Actor> getActor() {
+    return Optional.ofNullable(actor);
+  }
+
+  private Optional<ItemAccess> getAccess() {
+    return Optional.ofNullable(access);
+  }
+
   public String getActorId() {
-    return actor.id;
+    return getActor().orElse(new Actor()).id;
   }
 
   public String getKind() {
@@ -69,16 +75,43 @@ public class PlusActivity extends PlusItem implements Serializable{
     return updated;
   }
 
-  public String getItemOjbectContent() {
-    return this.object.getContent();
+  private Optional<ItemObject> getObject() {
+    return Optional.ofNullable(object);
   }
 
-  public Optional<List<String>> getAttachmentImageUrls() {
-    return Optional.ofNullable(this.object.getAttachmentImageUrls());
+  public Optional<String> getItemOjbectContent() {
+    if (getObject().isPresent()) {
+      return Optional.ofNullable(object.getContent());
+    }
+    return Optional.ofNullable(null);
   }
 
   public Integer getNumOfPlusOners() {
-    return this.object.getPlusoners().getTotalItems();
+    if (getObject().isPresent()) {
+      return this.object.getPlusoners().getTotalItems();
+    }
+    return null;
+  }
+
+  public Optional<String> getFirstAttachmentImageUrl() {
+    if (getObject().isPresent()) {
+      return this.object.getFirstAttachmentImagetUrl();
+    }
+    return Optional.ofNullable(null);
+  }
+
+  public Optional<Long> getFirstAttachmentImageHeigt() {
+    if (getObject().isPresent()) {
+      return this.object.getFirstAttachmentImageHeight();
+    }
+    return Optional.ofNullable(null);
+  }
+
+  public Optional<Long> getFirstAttachmentImageWidth() {
+    if (getObject().isPresent()) {
+      return this.object.getFirstAttachmentImageWidth();
+    }
+    return Optional.ofNullable(null);
   }
 
   /**
@@ -86,7 +119,7 @@ public class PlusActivity extends PlusItem implements Serializable{
    */
   public String getAccessDescription() {
     String result = this.access.getDescription();
-    if (result.equals("Public")||result.equals("Collection")) {
+    if (result.equals("Public") || result.equals("Collection")) {
       result = "日本の絶景";
     }
     return result;
@@ -129,10 +162,7 @@ public class PlusActivity extends PlusItem implements Serializable{
    * @param actorId actor ID
    */
   public void setActorId(String actorId) {
-    if (this.actor == null) {
-      this.actor = new Actor();
-    }
-    this.actor.id = actorId;
+    getActor().orElse(new Actor()).id = actorId;
   }
 
   public void setUrl(String url) {
@@ -153,10 +183,8 @@ public class PlusActivity extends PlusItem implements Serializable{
    * @param content content
    */
   public void setItemObjectContent(String content) {
-    if (this.object == null) {
-      this.object = new ItemObject();
-    }
-    this.object.content = content;
+    object = getObject().orElse(new ItemObject());
+    object.content = content;
   }
 
   /**
@@ -165,10 +193,8 @@ public class PlusActivity extends PlusItem implements Serializable{
    * @param urls attachment image Urls
    */
   public void setAttacimentImageUrls(List<String> urls) {
-    if (this.object == null) {
-      this.object = new ItemObject();
-    }
-    this.object.setAttachmentImageUrls(urls);
+    object = getObject().orElse(new ItemObject());
+    object.setAttachmentImageUrls(urls);
   }
 
   /**
@@ -177,11 +203,9 @@ public class PlusActivity extends PlusItem implements Serializable{
    * @param num number of plusoners
    */
   public void setNumOfPlusOners(int num) {
-    if (this.object == null) {
-      this.object = new ItemObject();
-    }
-    this.object.plusoners = new Users();
-    this.object.plusoners.totalItems = num;
+    object = getObject().orElse(new ItemObject());
+    object.plusoners = new Users();
+    object.plusoners.totalItems = num;
   }
 
   /**
@@ -190,9 +214,7 @@ public class PlusActivity extends PlusItem implements Serializable{
    * @param description access description
    */
   public void setAccessDescription(String description) {
-    if (this.access == null) {
-      this.access = new ItemAccess();
-    }
+    access = getAccess().orElse(new ItemAccess());
     access.description = description;
   }
 

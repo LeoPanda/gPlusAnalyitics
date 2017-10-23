@@ -48,17 +48,24 @@ public class FilterInputPanelFields {
    * @param requestListener
    */
   FilterInputPanelFields(FilterableSourceItems sourceItems) {
+    setEnterKeyPressHandler();
+    postCategory = new PostCategoryListBox("投稿先:", sourceItems.getActivities());
+    publishedYear = new PublishedYearListBox("投稿日付:", sourceItems.getActivities());
+    postCategory.addEventListener(getOnValueChange(FilterType.ACTIVITIES_ACCESSDESCRIPTION));
+    publishedYear.addEventListener(getOnValueChange(FilterType.ACTIVITIES_PUBLISHED_YEAR));
+    publishedMonth.addEventListener(getOnValueChange(FilterType.ACTIVITIES_PUBLISHED_MONTH));
+  }
+
+  /**
+   * 入力フィールド内でEnterキーが押された時の動作を設定する
+   */
+  private void setEnterKeyPressHandler() {
     plusOnerFilter.getBasicField()
         .addKeyPressHandler(getEnterKeyHandler(FilterType.PLUSONER_KEYWORD));
     activityFilter.getBasicField()
         .addKeyPressHandler(getEnterKeyHandler(FilterType.ACTIVITIES_KEYWORD));
     numOfPlusOneFilter.getBasicField()
         .addKeyPressHandler(getEnterKeyHandler(FilterType.PLUSONER_NUMOFPLUSONE));
-    postCategory = new PostCategoryListBox("投稿先:", sourceItems.getActivities());
-    publishedYear = new PublishedYearListBox("投稿日付:", sourceItems.getActivities());
-    postCategory.addEventListener(getOnValueChange(FilterType.ACTIVITIES_ACCESSDESCRIPTION));
-    publishedYear.addEventListener(getOnValueChange(FilterType.ACTIVITIES_PUBLISHED_YEAR));
-    publishedMonth.addEventListener(getOnValueChange(FilterType.ACTIVITIES_PUBLISHED_MONTH));
   }
 
   /**

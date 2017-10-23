@@ -30,12 +30,12 @@ public class PhotoPanelPageGenerator {
   private final int pageWidth = 1100;
   private final int labelHeight = 120;
   private final int labelCellWidth = 40;
-  private final int speceWidth = 2;
+  private final int marginWidth = 2;
 
-  private int currentIndex;
-  private int currentRow;
-  private int currentRowWidth;
-  private Date currnetPublishedDate;
+  private int currentIndex;// 処理中の写真インデックス
+  private int currentRow;// 処理中のページ内行
+  private int accumlateRowWidth;// 改行を検知するための行幅累積値
+  private Date currentPublishedDate;// 処理中写真の投稿日
   private PhotoCell currentCell = null;
 
   private DateSeparator dateSeparator;
@@ -73,7 +73,7 @@ public class PhotoPanelPageGenerator {
    */
   public PageTag getPageTag() {
     PageTag pageTag = new PageTag();
-    pageTag.set(this.currentIndex, this.currnetPublishedDate, this.currentCell);
+    pageTag.set(this.currentIndex, this.currentPublishedDate, this.currentCell);
     return pageTag;
   }
 
@@ -116,13 +116,14 @@ public class PhotoPanelPageGenerator {
     for (int i = currentIndex; i < sourcePhotoImageList.size(); i++) {
       try {
         setPhotoRowPanel(sourcePhotoImageList.get(i));
-      } catch (RowsReachedMaxLimit e) {
-        setPhotoImageOnLoadAction(i - 1);
+      } catch (PageBreaked e) {
+        setPhotoImageOnLoadAction(i);
         break;
       }
     }
-    if (currentIndex == sourcePhotoImageList.size())
-      setPhotoImageOnLoadAction(currentIndex - 1);
+    if (currentIndex == sourcePhotoImageList.size()) {
+      setPhotoImageOnLoadAction(currentIndex);
+    }
     pagePanel.add(photoRowPanel);
     return pagePanel;
   }
@@ -133,9 +134,10 @@ public class PhotoPanelPageGenerator {
    * @param i
    */
   private void setPhotoImageOnLoadAction(int i) {
+    i--;// ページブレーク時より１つ前がページ最後尾
     if (i < 0) return;
     PhotoImage photoImage = sourcePhotoImageList.get(i);
-    if (!photoImage.actionOnLoadImage(e -> this.actionAfterLoadPage.accept(e))) {
+    if (!photoImage.actionOnLoadImage(e -> actionAfterLoadPage.accept(e))) {
       setPhotoImageOnLoadAction(i - 1);
     }
   }
@@ -144,18 +146,18 @@ public class PhotoPanelPageGenerator {
    * 行パネルをセットする
    * 
    * @param photoImage
-   * @throws RowsReachedMaxLimit
+   * @throws PageBreaked
    */
-  private void setPhotoRowPanel(PhotoImage photoImage) throws RowsReachedMaxLimit {
+  private void setPhotoRowPanel(PhotoImage photoImage) throws PageBreaked {
     currentCell = getCurrentCell(photoImage);
-    currentRowWidth += currentCell.getWidth() + speceWidth;
-    if (currentRowWidth >= pageWidth) {
+    int cellWidth = currentCell.getWidth() + marginWidth;
+    if ((accumlateRowWidth += cellWidth) >= pageWidth) {
       doNewRow();
-      currentRowWidth = currentCell.getWidth() + speceWidth;
+      accumlateRowWidth = cellWidth;
     }
     photoRowPanel.add(currentCell.getCell());
     currentIndex++;
-    currnetPublishedDate = photoImage.getPublished();
+    currentPublishedDate = photoImage.getPublished();
   }
 
   /**
@@ -177,32 +179,32 @@ public class PhotoPanelPageGenerator {
   private void setNewPhotoRowPanel() {
     photoRowPanel = new HorizontalPanel();
     photoRowPanel.setWidth(Statics.getLengthWithUnit(pageWidth));
-    photoRowPanel.setSpacing(speceWidth);
-    currentRowWidth = 0;
+    photoRowPanel.setSpacing(marginWidth);
+    accumlateRowWidth = 0;
   }
 
   /**
    * 改行する
    * ページの最大行に達した場合には例外を発生させる
    * 
-   * @throws RowsReachedMaxLimit
+   * @throws PageBreaked
    */
-  private void doNewRow() throws RowsReachedMaxLimit {
+  private void doNewRow() throws PageBreaked {
     if (photoRowPanel.getWidgetCount() > 0) {
       pagePanel.add(photoRowPanel);
       setNewPhotoRowPanel();
       currentRow++;
     }
-    if (currentRow >= rowLimitSize) throw new RowsReachedMaxLimit();
+    if (currentRow >= rowLimitSize) throw new PageBreaked();
   }
 
   /**
    * 写真表示セルを生成する
    * 
    * @param photoImage
-   * @throws RowsReachedMaxLimit
+   * @throws PageBreaked
    */
-  private PhotoCell getCurrentCell(PhotoImage photoImage) throws RowsReachedMaxLimit {
+  private PhotoCell getCurrentCell(PhotoImage photoImage) throws PageBreaked {
     PhotoCell photoCell = null;
     switch (dateSeparator.getBreakLevel(photoImage.getPublished())) {
       case YEAR_BREAK:
@@ -226,10 +228,10 @@ public class PhotoPanelPageGenerator {
    * @param photoLinePanel
    * @param photoImage
    * @return
-   * @throws RowsReachedMaxLimit
+   * @throws PageBreaked
    */
   private PhotoCell getYearBreakedCell(HorizontalPanel photoLinePanel,
-      PhotoImage photoImage) throws RowsReachedMaxLimit {
+      PhotoImage photoImage) throws PageBreaked {
     currentRow++;
     doNewRow();
     pagePanel.add(getYearDivideLabel());
@@ -281,7 +283,7 @@ public class PhotoPanelPageGenerator {
    * @author LeoPanda
    *
    */
-  private class RowsReachedMaxLimit extends Exception {
+  private class PageBreaked extends Exception {
     private static final long serialVersionUID = 1L;
   }
 

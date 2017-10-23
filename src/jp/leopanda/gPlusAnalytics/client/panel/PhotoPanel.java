@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.util.SquareDimensions;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
@@ -32,6 +34,7 @@ public class PhotoPanel extends VerticalPanel {
 
   PhotoPanelPageGenerator pageGenerator = new PhotoPanelPageGenerator();
   PageTag pageTag = new PageTag();
+
   Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
@@ -57,7 +60,7 @@ public class PhotoPanel extends VerticalPanel {
     pageGenerator.clear();
     sourcePhotoImages = getPhotoImageList(sourceItems.getActivities());
     pageGenerator.setSourceData(sourcePhotoImages);
-    writeIndexLabel();
+    writeIndexLabel(pageTag);
     addOnePage();
   }
 
@@ -66,6 +69,8 @@ public class PhotoPanel extends VerticalPanel {
    */
   private void setPanel() {
     nextPageButton.addClickHandler(event -> addOnePage());
+    nextPageButton.setStyleName(MyStyle.NEXTPAGE_BUTTON.getStyle());
+    Window.addWindowScrollHandler(event -> onWindowScroll());
     addWidthAlign(getIndexLine(), ALIGN_RIGHT);
     addWidthAlign(photoListPanel, ALIGN_LEFT);
     addWidthAlign(nextPageButton, ALIGN_RIGHT);
@@ -90,7 +95,7 @@ public class PhotoPanel extends VerticalPanel {
   private HorizontalPanel getIndexLine() {
     HorizontalPanel indexLine = new HorizontalPanel();
     indexLine.add(pageIndexLabel);
-    writeIndexLabel();
+    writeIndexLabel(pageTag);
     return indexLine;
   }
 
@@ -103,10 +108,20 @@ public class PhotoPanel extends VerticalPanel {
   }
 
   /**
+   * ウィンドウスクロール時に次ページを表示する
+   */
+  private void onWindowScroll(){
+    if(nextPageButton.isVisible()){
+      addOnePage();
+    }
+  }
+  
+  /**
    * １ページ分の写真リストをパネルに追加する
    */
   private void addOnePage() {
     photoListPanel.add(pageGenerator.getPagePanel(pageTag));
+    writeIndexLabel(pageGenerator.getPageTag());
     nextPageButton.setVisible(false);
   }
 
@@ -117,16 +132,17 @@ public class PhotoPanel extends VerticalPanel {
     photoListPanel.remove(photoListPanel.getWidgetCount() - 1);
     photoListPanel.add(pageGenerator.getPagePanel(pageTag));
     pageTag = pageGenerator.getPageTag();
+    writeIndexLabel(pageTag);
     nextPageButton.setVisible(pageTag.getCurrentIndex() < sourcePhotoImages.size());
-    writeIndexLabel();
+
   }
 
   /**
    * インデックスラベルを表示する
    */
-  private void writeIndexLabel() {
+  private void writeIndexLabel(PageTag currnetPageTag) {
     pageIndexLabel
-        .setText(String.valueOf(pageTag.getCurrentIndex()) + "/"
+        .setText(String.valueOf(currnetPageTag.getCurrentIndex()) + "/"
             + String.valueOf(sourcePhotoImages.size()) + "件");
   }
 
@@ -138,7 +154,7 @@ public class PhotoPanel extends VerticalPanel {
    */
   private PhotoImageList getPhotoImageList(List<PlusActivity> activities) {
     PhotoImageList photoImageList = new PhotoImageList();
-    activities.stream().sorted(Comparator.comparing(PlusActivity::getPublished))
+    activities.stream().sorted(Comparator.comparing(PlusActivity::getPublished).reversed())
         .forEach(activity -> photoImageList.addImage(activity, pageGenerator.getLabelHeight(),
             this::popActivityDetail));
     return photoImageList;
