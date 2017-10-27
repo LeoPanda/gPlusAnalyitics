@@ -13,6 +13,9 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.PageTag;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.PhotoImageList;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.PhotoPanelPageGenerator;
 import jp.leopanda.gPlusAnalytics.client.util.SquareDimensions;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;

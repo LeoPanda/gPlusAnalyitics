@@ -1,7 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
 import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.PagedItemListPanel;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
@@ -20,10 +19,10 @@ import com.google.gwt.user.client.ui.Label;
  */
 public class TableLaunchPanel extends HorizontalPanel {
   FilterableSourceItems sourceItems;
-  ActivityTablePanel activityTable;
+  ActivityTable activityTable;
   PlusOnersTablePanel plusOnersTable;
-  PagedItemListPanel<PlusActivity, ActivityTablePanel> activityTablePanel;
-  PagedItemListPanel<PlusPeople, PlusOnersTablePanel> plusOnersTablePanel;
+  ItemListPanel<PlusActivity, ActivityTable> activityTablePanel;
+  ItemListPanel<PlusPeople, PlusOnersTablePanel> plusOnersTablePanel;
   ItemClickListener<PlusItem> itemClickListener;
 
   /**
@@ -68,15 +67,15 @@ public class TableLaunchPanel extends HorizontalPanel {
    * 一覧表テーブルと表示パネルを新規作成する
    */
   private void setUpTables() {
-    activityTable = new ActivityTablePanel(sourceItems.getActivities());
+    activityTable = new ActivityTable(sourceItems.getActivities());
     plusOnersTable = new PlusOnersTablePanel(sourceItems.getPlusOners());
 
     activityTable.addItemClickListener(item -> itemClickListener.onClick(item));
     plusOnersTable.addItemClickListener(item -> itemClickListener.onClick(item));
 
-    activityTablePanel = new PagedItemListPanel<PlusActivity, ActivityTablePanel>("アクティビティ一覧", 7,
-        activityTable) {};
-    plusOnersTablePanel = new PagedItemListPanel<PlusPeople, PlusOnersTablePanel>("+1ユーザー一覧", 10,
-        plusOnersTable) {};
+    activityTablePanel =
+        new ItemListPanel<PlusActivity, ActivityTable>("アクティビティ一覧", 7, activityTable);
+    plusOnersTablePanel =
+        new ItemListPanel<PlusPeople, PlusOnersTablePanel>("+1ユーザー一覧", 10, plusOnersTable);
   }
 }

@@ -3,21 +3,21 @@ package jp.leopanda.gPlusAnalytics.client.panel;
 import java.util.Comparator;
 import java.util.List;
 
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ButtonColumn;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ClickablePlusItemTable;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ImageColumn;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.ButtonColumn;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.ImageColumn;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.PlusItemTable;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.StringColumn;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 
 /**
  * @author LeoPanda
  *
  */
-public class PlusOnersTablePanel extends ClickablePlusItemTable<PlusPeople> {
+public class PlusOnersTablePanel extends PlusItemTable<PlusPeople> {
 
   /**
    * コンストラクタ
@@ -26,56 +26,35 @@ public class PlusOnersTablePanel extends ClickablePlusItemTable<PlusPeople> {
    */
   public PlusOnersTablePanel(List<PlusPeople> items) {
     super(items);
-
+    setSrotHandler(handler -> setSortRequirement(handler));
   }
 
-  ImageColumn<PlusPeople> imageColumn;
-  TextColumn<PlusPeople> nameColumn;
-  ButtonColumn<PlusPeople> filterButton;
+  ImageColumn<PlusPeople> imageColumn; //写真
+  StringColumn<PlusPeople> nameColumn; //ユーザー名
+  ButtonColumn<PlusPeople> filterButton; //+1erフィルターボタン
 
   @Override
   protected void setColumns() {
-    // 写真
-    imageColumn = new ImageColumn<PlusPeople>("50", "50") {
-      @Override
-      public SafeHtml getValue(PlusPeople item) {
-        return getImageTagFromUrl(item.getImageUrl());
-      }
-    };
-    // ユーザー名
-    nameColumn = new TextColumn<PlusPeople>() {
-      @Override
-      public String getValue(PlusPeople item) {
-        return item.getDisplayName();
-      }
-    };
-    // +1数 フィルターボタン
-    filterButton = new ButtonColumn<PlusPeople>() {
-      @Override
-      public void addClickEvent(int index, PlusPeople item) {
-        disableOnSelectEventTemporally();
-        itemClickListener.onClick(item);
-      }
+    imageColumn = new ImageColumn<PlusPeople>("50", "50", item -> item.getImageUrl());
 
-      @Override
-      public String getValue(PlusPeople item) {
-        return String.valueOf(item.getNumOfPlusOne());
-      }
-    };
+    nameColumn = new StringColumn<PlusPeople>(item -> item.getDisplayName());
+    
+    filterButton = new ButtonColumn<PlusPeople>(item -> String.valueOf(item.getNumOfPlusOne()));
+    filterButton.addClickEvent((index, item) -> setButtonClickEvent(item));
     filterButton.setCellStyleNames(MyStyle.FILTER_LABEL.getStyle());
 
     // カラム表示リストに登録
-    this.columSets.add(newColumnSet("", imageColumn, 50, null));
-    this.columSets.add(newColumnSet("名前", nameColumn, 200, null));
-    this.columSets.add(newColumnSet("+1", filterButton, 50, HasHorizontalAlignment.ALIGN_RIGHT));
+    addColumnSet("", imageColumn, 50, null);
+    addColumnSet("名前", nameColumn, 200, null);
+    addColumnSet("+1", filterButton, 50, HasHorizontalAlignment.ALIGN_RIGHT);
   }
 
   /**
    * カラムのソート条件をセットする
    */
-  @Override
-  protected void setSortHandler() {
+  private void setSortRequirement(ListHandler<PlusPeople> sortHandler) {
     filterButton.setSortable(true);
-    sortHandler.setComparator(filterButton, Comparator.comparing(PlusPeople::getNumOfPlusOne).reversed());
+    sortHandler.setComparator(filterButton,
+        Comparator.comparing(PlusPeople::getNumOfPlusOne).reversed());
   }
 }

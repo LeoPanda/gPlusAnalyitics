@@ -8,8 +8,8 @@ import java.util.function.Function;
 
 import jp.leopanda.gPlusAnalytics.client.enums.FilterBooleans;
 import jp.leopanda.gPlusAnalytics.client.enums.ItemType;
-import jp.leopanda.gPlusAnalytics.client.panel.FilterLogCard;
 import jp.leopanda.gPlusAnalytics.client.panel.FilterLogPanel;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.FilterLogCard;
 import jp.leopanda.gPlusAnalytics.client.util.FilteredActivities;
 import jp.leopanda.gPlusAnalytics.client.util.FilteredPlusOners;
 import jp.leopanda.gPlusAnalytics.client.util.ItemFilter;

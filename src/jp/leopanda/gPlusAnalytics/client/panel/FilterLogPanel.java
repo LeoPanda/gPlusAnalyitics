@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.Label;
 
 import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.FilterLogCard;
 import jp.leopanda.gPlusAnalytics.client.util.NumOfPlusOneFilterKeyword;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;

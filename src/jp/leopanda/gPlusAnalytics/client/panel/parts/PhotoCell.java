@@ -1,4 +1,4 @@
-package jp.leopanda.gPlusAnalytics.client.panel;
+package jp.leopanda.gPlusAnalytics.client.panel.parts;
 
 import com.google.gwt.user.client.ui.Widget;
 

@@ -1,4 +1,4 @@
-package jp.leopanda.gPlusAnalytics.client.cssResource;
+package jp.leopanda.gPlusAnalytics.client.resource;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
@@ -12,6 +12,9 @@ public interface CssStyle extends ClientBundle {
   CssStyle INSTANCE = GWT.create(CssStyle.class);
 
   interface Style extends CssResource {
+
+    String messageLabel();
+
     String pageButton();
 
     String titleLabel();

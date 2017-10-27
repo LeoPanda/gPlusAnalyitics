@@ -6,6 +6,8 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.FilterInputPanelFields;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.PostCategoryListBox;
 import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.interFace.FilterRequestListener;

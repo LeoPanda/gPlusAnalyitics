@@ -1,5 +1,4 @@
-package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
-
+package jp.leopanda.gPlusAnalytics.client.panel.parts;
 
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 
@@ -8,15 +7,15 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
- * Google+ API　アイテムデータの一覧表示パネル
+ * Google+ API アイテムデータの一覧表示パネル
  * 
  * @author LeoPanda
  *
  */
-public abstract class SimpleItemListPanel<I, T extends SimpleCellTablePanel<I>> extends
+public abstract class SimpleItemListPanel<I, T extends SimpleCellTable<I>> extends
     VerticalPanel {
 
-  protected SimpleCellTablePanel<I> itemTable;// 表示するアイテムデータ用の表
+  private SimpleCellTable<I> itemTable;// 表示するアイテムデータ用の表
   private Label titleLabel = new Label();// パネルのタイトル名を表示するラベル
   private String originalTitle;// 元のタイトル名
   private Label lineCountLabel = new Label();// アイテムの総数を表示するラベル
@@ -40,6 +39,7 @@ public abstract class SimpleItemListPanel<I, T extends SimpleCellTablePanel<I>> 
     // アイテム表示テーブルの追加
     addItemTable(itemTable);
   }
+
   /**
    * コンストラクタ(初期表示なし)
    * 
@@ -50,7 +50,7 @@ public abstract class SimpleItemListPanel<I, T extends SimpleCellTablePanel<I>> 
   public SimpleItemListPanel(int pageSize, T itemTable) {
     this.itemTable = itemTable;
     this.pageSize = pageSize;
-//    this.itemList = items;
+    // this.itemList = items;
   }
 
   /*
@@ -61,6 +61,15 @@ public abstract class SimpleItemListPanel<I, T extends SimpleCellTablePanel<I>> 
     HorizontalPanel headerLine = makeTitleLine();
     this.add(headerLine);
     this.add(spaceOfafterTitle);
+  }
+
+  /**
+   * itemTableを提供する
+   * 
+   * @return
+   */
+  public SimpleCellTable<I> getItemTable() {
+    return itemTable;
   }
 
   /*
@@ -76,7 +85,6 @@ public abstract class SimpleItemListPanel<I, T extends SimpleCellTablePanel<I>> 
     headerLine.add(lineCountLabel);
     return headerLine;
   }
-
 
   /**
    * オリジナルのタイトルを表示する

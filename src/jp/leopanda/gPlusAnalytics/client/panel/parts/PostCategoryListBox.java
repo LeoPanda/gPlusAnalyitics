@@ -1,8 +1,7 @@
-package jp.leopanda.gPlusAnalytics.client.panel;
+package jp.leopanda.gPlusAnalytics.client.panel.parts;
 
 import java.util.List;
 
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.AgregatedFieldListBox;
 import jp.leopanda.gPlusAnalytics.client.util.AgregatedValueList;
 import jp.leopanda.gPlusAnalytics.client.util.Formatter;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
@@ -27,10 +26,10 @@ public class PostCategoryListBox extends AgregatedFieldListBox<PlusActivity>{
    * @param sourceItems
    * @return
    */
-  protected AgregatedElement<String>[] getList(
+  protected AgregatedElements<String>[] getList(
       List<PlusActivity> sourceItems) {
 
-    AgregatedElement<String>[] valueList = new AgregatedValueList<PlusActivity, String>(
+    AgregatedElements<String>[] valueList = new AgregatedValueList<PlusActivity, String>(
         sourceItems) {
       @Override
       public String setAgregateValue(PlusActivity item) {

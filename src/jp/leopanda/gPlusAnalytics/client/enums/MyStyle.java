@@ -1,6 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.enums;
 
-import jp.leopanda.gPlusAnalytics.client.cssResource.CssStyle;
+import jp.leopanda.gPlusAnalytics.client.resource.CssStyle;
 
 /**
  * パネルに使用する CSSのスタイル
@@ -9,6 +9,7 @@ import jp.leopanda.gPlusAnalytics.client.cssResource.CssStyle;
  *
  */
 public enum MyStyle {
+  MESSAGE_LABEL(CssStyle.INSTANCE.style().messageLabel()),
   PAGE_BUTTON(CssStyle.INSTANCE.style().pageButton()),
   TITLE_LABEL(CssStyle.INSTANCE.style().titleLabel()),
   PHOTO_CELL(CssStyle.INSTANCE.style().photoCell()),

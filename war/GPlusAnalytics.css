@@ -6,9 +6,22 @@ h1 {
 	text-align: center;
 }
 
+.gwt-Image:focus {
+	outline: none;
+}
+
+td:focus {
+	outline: none;
+}
+
+div:focus {
+	outline: none;
+}
+
 table {
 	border-spacing: 0px;
 }
+
 .gwt-TextBox {
 	height: 12px;
 	width: 120px;
@@ -20,42 +33,20 @@ table {
 		"Hiragino Kaku Gothic Pro", "ＭＳ Ｐゴシック", sans-serif;
 }
 
-/** button */
-button {
-	-moz-border-radius: 42px;
-	-webkit-border-radius: 42px;
-	border-radius: 42px;
-	border: 0px solid #dcdcdc;
-	padding: 6px 9px;
-	text-decoration: none;
-	background: -moz-linear-gradient(center top, #ededed 17%, #dfdfdf 88%);
-	background: -ms-linear-gradient(top, #ededed 17%, #dfdfdf 88%);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed',
-		endColorstr='#dfdfdf');
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(17%, #ededed),
-		color-stop(88%, #dfdfdf));
-	background-color: #ededed;
-	color: #777777;
-	display: inline-block;
-}
-
-}
-button:hover {
-	background: -moz-linear-gradient(center top, #dfdfdf 17%, #ededed 88%);
-	background: -ms-linear-gradient(top, #dfdfdf 17%, #ededed 88%);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf',
-		endColorstr='#ededed');
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(17%, #dfdfdf),
-		color-stop(88%, #ededed));
-	background-color: #dfdfdf;
-}
-
-button:active {
-	position: relative;
-	top: 1px;
-}
 /** 写真グリッドライン*/
 .gridImage:hover {
-	border: #e87da0;
-	border-bottom-style: solid;
+	box-shadow: 6px 4px 12px #999999;
+}
+
+/** button */
+button:hover {
+	color: #000000;
+	font-weight: bold;
+	font-style: italic;
+}
+
+button {
+	background-color: rgba(0, 0, 0, 0);
+	color: #777777;
+	border: none;
 }

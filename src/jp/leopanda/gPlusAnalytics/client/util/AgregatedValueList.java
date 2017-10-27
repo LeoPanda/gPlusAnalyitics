@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import jp.leopanda.gPlusAnalytics.client.panel.AgregatedElement;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.AgregatedElements;
 
 /**
  * アイテムリストの特定フィールドの値を集約した選択リストを作成する
@@ -15,7 +15,7 @@ import jp.leopanda.gPlusAnalytics.client.panel.AgregatedElement;
  */
 public abstract class AgregatedValueList<I, F> {
 
-  AgregatedElement<F>[] elements;
+  AgregatedElements<F>[] elements;
 
   /**
    * コンストラクタ
@@ -24,12 +24,12 @@ public abstract class AgregatedValueList<I, F> {
    */
   @SuppressWarnings("unchecked")
   public AgregatedValueList(List<I> sourceItems) {
-    List<AgregatedElement<F>> listElements = new ArrayList<AgregatedElement<F>>();
-    listElements.add(new AgregatedElement<F>("", null));// リストの先頭に空白値を置く
+    List<AgregatedElements<F>> listElements = new ArrayList<AgregatedElements<F>>();
+    listElements.add(new AgregatedElements<F>("", null));// リストの先頭に空白値を置く
     for (F field : getAgregateSet(sourceItems)) {
-      listElements.add(new AgregatedElement<F>(setFieldName(field), field));
+      listElements.add(new AgregatedElements<F>(setFieldName(field), field));
     }
-    elements = (AgregatedElement<F>[]) new AgregatedElement<?>[listElements.size()];
+    elements = (AgregatedElements<F>[]) new AgregatedElements<?>[listElements.size()];
     for (int i = 0; i < elements.length; i++) {
       elements[i] = listElements.get(i);
     }
@@ -40,7 +40,7 @@ public abstract class AgregatedValueList<I, F> {
    * 
    * @return
    */
-  public AgregatedElement<F>[] getElements() {
+  public AgregatedElements<F>[] getElements() {
     return elements;
   }
 

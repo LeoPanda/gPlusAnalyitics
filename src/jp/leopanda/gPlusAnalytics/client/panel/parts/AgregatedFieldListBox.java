@@ -1,9 +1,8 @@
-package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
+package jp.leopanda.gPlusAnalytics.client.panel.parts;
 
 import java.util.List;
 
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
-import jp.leopanda.gPlusAnalytics.client.panel.AgregatedElement;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.panelFrame.filedParts.EventAction;
 import jp.leopanda.panelFrame.filedParts.ListBoxField;
@@ -16,7 +15,7 @@ import jp.leopanda.panelFrame.filedParts.ListBoxField;
  */
 public abstract class AgregatedFieldListBox<I extends PlusItem> {
 
-  AgregatedElement<String>[] elementList;
+  AgregatedElements<String>[] elementList;
   ListBoxField listBox;
 
   /**
@@ -34,7 +33,7 @@ public abstract class AgregatedFieldListBox<I extends PlusItem> {
    * @param sourceItems
    * @return
    */
-  protected abstract AgregatedElement<String>[] getList(List<I> sourceItems);
+  protected abstract AgregatedElements<String>[] getList(List<I> sourceItems);
 
   /**
    * リストボックスイベントアクションの追加

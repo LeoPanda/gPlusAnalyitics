@@ -1,4 +1,4 @@
-package jp.leopanda.gPlusAnalytics.client.panel;
+package jp.leopanda.gPlusAnalytics.client.panel.parts;
 
 import java.util.Date;
 

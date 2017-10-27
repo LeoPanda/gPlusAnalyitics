@@ -1,4 +1,4 @@
-package jp.leopanda.gPlusAnalytics.client.panel;
+package jp.leopanda.gPlusAnalytics.client.panel.parts;
 
 import jp.leopanda.panelFrame.filedParts.ListElement;
 
@@ -7,7 +7,7 @@ import jp.leopanda.panelFrame.filedParts.ListElement;
  * @author LeoPanda
  *
  */
-public class AgregatedElement<V> implements ListElement{
+public class AgregatedElements<V> implements ListElement{
   String elementName;
   V elementValue;
   /**
@@ -15,7 +15,7 @@ public class AgregatedElement<V> implements ListElement{
    * @param elementName
    * @param elementValue
    */
-  public AgregatedElement(String elementName,V elementValue){
+  public AgregatedElements(String elementName,V elementValue){
     this.elementName = elementName;
     this.elementValue = elementValue;
   }

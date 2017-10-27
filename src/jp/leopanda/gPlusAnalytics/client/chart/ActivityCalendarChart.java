@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import jp.leopanda.gPlusAnalytics.client.chart.abstracts.SimpleChart;
 import jp.leopanda.gPlusAnalytics.client.enums.DateFormat;
-import jp.leopanda.gPlusAnalytics.client.panel.ActivityMiniTablePanel;
-import jp.leopanda.gPlusAnalytics.client.panel.abstracts.ItemListPopPanel;
+import jp.leopanda.gPlusAnalytics.client.panel.ActivityMiniTable;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.ItemListPopPanel;
 import jp.leopanda.gPlusAnalytics.client.util.Formatter;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
@@ -31,7 +31,7 @@ import com.googlecode.gwt.charts.client.event.SelectHandler;
  *
  */
 public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOptions> {
-  private ItemListPopPanel<PlusActivity, ActivityMiniTablePanel> activitySelectorPanel;
+  private ItemListPopPanel<PlusActivity, ActivityMiniTable> activitySelectorPanel;
 
   /**
    * コンストラクタ
@@ -92,9 +92,9 @@ public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOpt
    */
   private void popActivitySelectorPanel(Date selectedDate) {
     Optional.ofNullable(activitySelectorPanel).ifPresent(panel -> activitySelectorPanel.closePop());
-    activitySelectorPanel = new ItemListPopPanel<PlusActivity, ActivityMiniTablePanel>(
+    activitySelectorPanel = new ItemListPopPanel<PlusActivity, ActivityMiniTable>(
         Formatter.getYYMDString(selectedDate) + "のアクテビティ", 10,
-        new ActivityMiniTablePanel(getSourceData()));
+        new ActivityMiniTable(getSourceData()));
     activitySelectorPanel.show(item -> Formatter.getYYMDString(item.published)
         .equals(Formatter.getYYMDString(selectedDate)));
   }

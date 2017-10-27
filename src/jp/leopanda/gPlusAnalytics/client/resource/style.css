@@ -1,5 +1,19 @@
 .pageButton {
-	height: 25px;
+	height: 24px;
+	border: none;
+	padding: 6px 6px;
+	text-decoration: none;
+	background: none;
+	background-color: white;
+	color: white;
+}
+
+.messageLabel {
+	padding-top: 70px;
+	font-size: 24px;
+	font-weight: bold;
+	opacity: 0.7;
+	text-align: center;
 }
 
 .titleLabel {
@@ -25,15 +39,15 @@
 }
 
 .monthLabel {
-padding-top: 2px;
-    font-size: 16px;
-    font-style: italic;
-    border-left: solid;
-    border-right: 0;
-    border-color: #f59292;
-    font-family: inherit;
-    text-align: center;
-    color: #da1e1e;
+	padding-top: 2px;
+	font-size: 16px;
+	font-style: italic;
+	border-left: solid;
+	border-right: 0;
+	border-color: #f59292;
+	font-family: inherit;
+	text-align: center;
+	color: #da1e1e;
 }
 
 .photoCell {
@@ -124,6 +138,9 @@ padding-top: 2px;
 	background: none;
 	border-bottom: 1.5px solid #da1e1e;
 	border-radius: 0px;
+	border-top: none;
+	border-left: none;
+	border-right: none;
 }
 
 .tableText {

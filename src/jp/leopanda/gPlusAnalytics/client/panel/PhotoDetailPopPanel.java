@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import jp.leopanda.gPlusAnalytics.client.Statics;
+import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.util.Formatter;
 import jp.leopanda.gPlusAnalytics.client.util.PhotoCalcUtil;
@@ -91,16 +92,35 @@ public class PhotoDetailPopPanel extends PopupPanel {
     title.setText(activity.getTitle());
     numOfPlusOne.setText("+1:" + String.valueOf(activity.getNumOfPlusOners()));
     accessDescription.setText(activity.getAccessDescription());
-    HorizontalPanel publishedLine = new HorizontalPanel();
-    publishedLine.add(published);
-    publishedLine.add(new HTML("<BR>"));
-    publishedLine.add(numOfPlusOne);
+    
     VerticalPanel innerPanel = new VerticalPanel();
     innerPanel.add(getImage(activity));
-    innerPanel.add(publishedLine);
-    innerPanel.add(accessDescription);
-    innerPanel.add(title);
+    innerPanel.add(getTextInformationPanel());
     this.add(innerPanel);
+  }
+
+  /**
+   * 文字情報を表示するパネルを生成する
+   * @return
+   */
+  private VerticalPanel getTextInformationPanel(){
+    VerticalPanel informationPanel = new VerticalPanel();
+    informationPanel.add(getDisplayPublishedPanel());
+    informationPanel.add(accessDescription);
+    informationPanel.add(title);
+    return informationPanel;
+  }
+  
+  /**
+   * 投稿日を表示するパネルを生成する
+   * @return
+   */
+  private HorizontalPanel getDisplayPublishedPanel() {
+    HorizontalPanel publishedLine = new HorizontalPanel();
+    publishedLine.add(published);
+    publishedLine.add(new HTML(FixedString.BLANK_CELL.getValue()));
+    publishedLine.add(numOfPlusOne);
+    return publishedLine;
   }
 
   /**

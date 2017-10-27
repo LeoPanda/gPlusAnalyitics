@@ -1,4 +1,4 @@
-package jp.leopanda.gPlusAnalytics.client.panel;
+package jp.leopanda.gPlusAnalytics.client.panel.parts;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -10,6 +10,7 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import jp.leopanda.gPlusAnalytics.client.enums.CompOperator;
 import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
 import jp.leopanda.gPlusAnalytics.client.enums.Month;
+import jp.leopanda.gPlusAnalytics.client.panel.PublishedYearListBox;
 import jp.leopanda.gPlusAnalytics.client.util.NumOfPlusOneFilterKeyword;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.interFace.FilterRequestListener;
@@ -47,7 +48,7 @@ public class FilterInputPanelFields {
    * 
    * @param requestListener
    */
-  FilterInputPanelFields(FilterableSourceItems sourceItems) {
+  public FilterInputPanelFields(FilterableSourceItems sourceItems) {
     setEnterKeyPressHandler();
     postCategory = new PostCategoryListBox("投稿先:", sourceItems.getActivities());
     publishedYear = new PublishedYearListBox("投稿日付:", sourceItems.getActivities());

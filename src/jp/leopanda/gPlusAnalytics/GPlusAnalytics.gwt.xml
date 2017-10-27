@@ -29,9 +29,9 @@
 	<source path='client.chart.abstracts' />
 	<source path='client.enums' />
 	<source path='client.panel' />
-	<source path='client.panel.abstracts' />
+	<source path='client.panel.parts' />
 	<source path='client.util' />
-	<source path='client.cssResource' />
+	<source path='client.resource' />
 	<source path='interFace' />
 	<source path='dataObject' />
 

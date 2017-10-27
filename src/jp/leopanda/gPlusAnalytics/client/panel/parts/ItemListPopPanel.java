@@ -1,4 +1,4 @@
-package jp.leopanda.gPlusAnalytics.client.panel.abstracts;
+package jp.leopanda.gPlusAnalytics.client.panel.parts;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -16,7 +16,7 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
  * @author LeoPanda
  *
  */
-public class ItemListPopPanel<I extends PlusItem, T extends SimpleCellTablePanel<I>> extends
+public class ItemListPopPanel<I extends PlusItem, T extends SimpleCellTable<I>> extends
     PopupPanel {
 
   private VerticalPanel innerPanel = new VerticalPanel();// ポップアップ画面の内枠
@@ -26,13 +26,9 @@ public class ItemListPopPanel<I extends PlusItem, T extends SimpleCellTablePanel
    * コンストラクタ
    * 
    * @param titleName
-   *          画面のタイトル
    * @param pageSize
-   *          リストの最大行数
    * @param itemTable
-   *          表示するアイテムテーブル
    * @param predicate
-   *          フィルター条件式
    */
   public ItemListPopPanel(String titleName, int pageSize, T itemTable) {
     super(false, true);
@@ -75,7 +71,7 @@ public class ItemListPopPanel<I extends PlusItem, T extends SimpleCellTablePanel
    */
   public void show(Predicate<I> filterPredicate) {
     doFilterItemPanel(filterPredicate);
-    itemPanel.itemTable.setPageStart(0);
+    itemPanel.getItemTable().setPageStart(0);
     itemPanel.setDisplayCounter();
     super.show();
   }
@@ -86,7 +82,7 @@ public class ItemListPopPanel<I extends PlusItem, T extends SimpleCellTablePanel
    * @param itemTable
    */
   private void doFilterItemPanel(Predicate<I> predicate) {
-    List<I> displayList = itemPanel.itemTable.getDisplayList();
+    List<I> displayList = itemPanel.getItemTable().getDisplayList();
     List<I> filteredList = new ItemFilter<I>(displayList) {}.doFilter(predicate);
     displayList.clear();
     filteredList.forEach(item -> displayList.add(item));
