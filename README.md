@@ -7,6 +7,9 @@ google+ post data analyzer.
 * GWT SDK (uper 2.8).
 * JavaSE 1.8.
 * Google Cloud platform Web App library.
+* GoogleAuthorization https://github.com/LeoPanda/googleAuthorization
+* PanelFreme https://github.com/LeoPanda/panelFrame
+
 
 *And more*
 * Need Google Cloud App engine API service account Key file.
