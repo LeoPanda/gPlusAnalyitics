@@ -8,7 +8,7 @@ google+ post data analyzer.
 * JavaSE 1.8.
 * Google Cloud platform Web App library.
 * GoogleAuthorization https://github.com/LeoPanda/googleAuthorization
-* PanelFreme https://github.com/LeoPanda/panelFrame
+* PanelFrame https://github.com/LeoPanda/panelFrame
 
 
 *And more*
