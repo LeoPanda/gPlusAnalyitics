@@ -10,8 +10,6 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 
-import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
-import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
 import jp.leopanda.gPlusAnalytics.interFace.HostGateException;
 
 import com.google.appengine.api.datastore.Blob;
@@ -144,21 +142,6 @@ public abstract class Serializer<T> {
     public Type getOwnerType() {
       return null;
     }
-
-  }
-
-  /*
-   * 以下、削除予定旧メソッド
-   */
-  @Deprecated
-  public PlusActivity decodeAsPlusActivity(Blob blob) throws HostGateException {
-    return (PlusActivity) deSerialize(blob);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Deprecated
-  public List<PlusPeople> decodeAsPlusOners(Blob blob) throws HostGateException {
-    return (List<PlusPeople>) deSerialize(blob);
   }
 
 }

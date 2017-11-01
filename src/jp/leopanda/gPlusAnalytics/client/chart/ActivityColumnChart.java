@@ -60,15 +60,24 @@ public class ActivityColumnChart extends
    * @return
    */
   private ChartWrapper<ColumnChartOptions> getChart(ChartWrapper<ColumnChartOptions> chart) {
-    chart.addSelectHandler(new SelectHandler() {
+    chart.addSelectHandler(getSelectHandler(chart));
+    return chart;
+  }
+
+  /**
+   * チャートの行が選択された時の動作を設定する
+   * @param chart
+   * @return
+   */
+  private SelectHandler getSelectHandler(ChartWrapper<ColumnChartOptions> chart) {
+    return new SelectHandler() {
       @Override
       public void onSelect(SelectEvent event) {
         Integer selectedRow = (int) chart.getDataTable()
             .getValueNumber(chart.getSelection().get(0).getRow(), 0);
         Window.open(activityUrls.get(selectedRow), "", FixedString.WINDOW_OPTION.getValue());
       }
-    });
-    return chart;
+    };
   }
 
   /**

@@ -36,7 +36,7 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    */
   public String updateDataStore() throws Exception {
     storeHandlerStocker.clear();
-    return new CatchException<String>() {}.execute(() -> getDataConductor().updateDataStore(false));
+    return new CatchException<String>().execute(() -> getDataConductor().updateDataStore(false));
   }
 
   /**
@@ -46,7 +46,7 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * @throws Exception
    */
   public SourceItems getItems() throws Exception {
-    return new CatchException<SourceItems>() {}.execute(() -> getStoreHandler().getItems());
+    return new CatchException<SourceItems>().execute(() -> getStoreHandler().getItems());
   }
 
   /**
@@ -55,7 +55,7 @@ public class GoogleGateServiceImpl extends RemoteServiceServlet implements Googl
    * @throws Exception
    */
   public String clearItemsOnMemory() throws Exception {
-    return new CatchException<String>() {}.execute(() -> getStoreHandler().setItemsExpired());
+    return new CatchException<String>().execute(() -> getStoreHandler().setItemsExpired());
 
   }
 

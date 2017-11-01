@@ -133,11 +133,9 @@ public abstract class ChartBasePanel<I extends PlusItem, O extends Options> exte
    */
   @SuppressWarnings("unchecked")
   private O getChartOptions() {
-    if (chartOptions == null) {
-      chartOptions = (O) O.create();
-      chartOptions.setHeight(getChartHeight());
-      chartOptions.setWidth(getChartWidth());
-    }
+    chartOptions = Optional.ofNullable(chartOptions).orElse((O) O.create());
+    chartOptions.setHeight(getChartHeight());
+    chartOptions.setWidth(getChartWidth());
     return chartOptions;
   }
 

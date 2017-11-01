@@ -5,7 +5,6 @@ import jp.leopanda.gPlusAnalytics.client.enums.Images;
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.panel.MainPanel;
 import jp.leopanda.gPlusAnalytics.dataObject.SourceItems;
-import jp.leopanda.gPlusAnalytics.interFace.RpcGateListener;
 import jp.leopanda.googleAuthorization.client.Auth;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -31,18 +30,7 @@ public class GPlusAnalytics implements EntryPoint {
     outerPanel = new HorizontalPanel();
     outerPanel.add(getMessagePanel("Getting Authorize...", Images.GEARS));
     RootPanel.get(outerPanelName).add(outerPanel);
-
-    // oAuth2認証取得リクエスト
-    @SuppressWarnings("unused")
-    Auth auth = new Auth() {
-
-      @Override
-      public void onGetToken() {
-        // 認証取得後の処理
-        requestDataLoad();
-      }
-
-    };
+    new Auth(() -> requestDataLoad()).requestToken();
   }
 
   /**
@@ -50,21 +38,19 @@ public class GPlusAnalytics implements EntryPoint {
    */
   private void requestDataLoad() {
     outerPanel.clear();
-    outerPanel.add(getMessagePanel("loading Data...", Images.LOADING));
-
-    new RpcGate<SourceItems>(CallFunction.GET_STOREDITEMS, getOnDataLoad()) {}.request();
+    outerPanel.add(getMessagePanel("Loading Data...", Images.LOADING));
+    new RpcGate<SourceItems>(CallFunction.GET_STOREDITEMS, result -> loadMainPanel(result))
+        .request();
   }
 
   /**
-   * データロード後の処理
+   * データロード後にメインパネルを表示する
    * 
-   * @return
+   * @param result
    */
-  private RpcGateListener<SourceItems> getOnDataLoad() {
-    return result -> {
-      outerPanel.clear();
-      outerPanel.add(new MainPanel(result.activities, result.plusOners));
-    };
+  private void loadMainPanel(SourceItems result) {
+    outerPanel.clear();
+    outerPanel.add(new MainPanel(result.activities, result.plusOners));
   }
 
   /**
@@ -86,14 +72,15 @@ public class GPlusAnalytics implements EntryPoint {
 
   /**
    * 待機メッセージのアイコンイメージを生成する
+   * 
    * @param images
    * @return
    */
-  private Image getIconImage(Images images){
+  private Image getIconImage(Images images) {
     Image image = new Image(images.get());
     image.setWidth(Statics.getLengthWithUnit(60));
     image.setHeight(Statics.getLengthWithUnit(60));
     return image;
   }
-  
+
 }

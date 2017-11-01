@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.Window;
 
+import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
 import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusItem;
 import jp.leopanda.gPlusAnalytics.interFace.ItemClickListener;
@@ -42,9 +43,9 @@ public abstract class PlusItemTable<I extends PlusItem> extends SimpleCellTable<
    * アイテム表示行のボタンがクリックされた時のイベントを定義する
    * 呼び出されると、デフォルトの行選択アクションは一時的に無効になる
    */
-  public void setButtonClickEvent(I item) {
+  public void setButtonClickEvent(I item,FilterType filterType) {
     excludeSelectionChanged = true;
-    itemClickListener.onClick(item);
+    itemClickListener.onClick(item,filterType);
   }
 
   

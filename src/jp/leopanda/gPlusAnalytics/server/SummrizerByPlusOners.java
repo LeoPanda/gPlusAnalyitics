@@ -13,9 +13,6 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
  */
 public class SummrizerByPlusOners extends HashMap<String, Integer> {
 
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   /**
@@ -24,11 +21,8 @@ public class SummrizerByPlusOners extends HashMap<String, Integer> {
    * @param sourceActivities
    */
   public SummrizerByPlusOners aggregatePlusOneCount(List<PlusActivity> sourceActivities) {
-    for (PlusActivity activity : sourceActivities) {
-      for (String plusOnerId : activity.getPlusOnerIds()) {
-        countPlusOne(plusOnerId);
-      }
-    }
+    sourceActivities.stream().flatMap(activity -> activity.getPlusOnerIds().stream())
+    .forEach(plusOnerId -> countPlusOne(plusOnerId));
     return this;
   }
 
@@ -38,10 +32,10 @@ public class SummrizerByPlusOners extends HashMap<String, Integer> {
    * @param plusOnerId
    */
   private void countPlusOne(String plusOnerId) {
-    if (this.containsKey(plusOnerId)) {
-      this.put(plusOnerId, this.get(plusOnerId) + 1);
+    if (containsKey(plusOnerId)) {
+      put(plusOnerId, this.get(plusOnerId) + 1);
     } else {
-      this.put(plusOnerId, 1);
+      put(plusOnerId, 1);
     }
   }
 }

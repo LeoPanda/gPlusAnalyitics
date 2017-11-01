@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
-import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
+import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
 import jp.leopanda.gPlusAnalytics.client.panel.parts.ButtonColumn;
 import jp.leopanda.gPlusAnalytics.client.panel.parts.ImageColumn;
 import jp.leopanda.gPlusAnalytics.client.panel.parts.PlusItemTable;
@@ -19,6 +19,10 @@ import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
  */
 public class PlusOnersTablePanel extends PlusItemTable<PlusPeople> {
 
+  ImageColumn<PlusPeople> imageColumn; // 写真
+  StringColumn<PlusPeople> nameColumn; // ユーザー名
+  ButtonColumn<PlusPeople> filterButton; // +1erフィルターボタン
+
   /**
    * コンストラクタ
    * 
@@ -29,19 +33,16 @@ public class PlusOnersTablePanel extends PlusItemTable<PlusPeople> {
     setSrotHandler(handler -> setSortRequirement(handler));
   }
 
-  ImageColumn<PlusPeople> imageColumn; //写真
-  StringColumn<PlusPeople> nameColumn; //ユーザー名
-  ButtonColumn<PlusPeople> filterButton; //+1erフィルターボタン
-
+  /*
+   * 表示カラムをセットする
+   */
   @Override
   protected void setColumns() {
     imageColumn = new ImageColumn<PlusPeople>("50", "50", item -> item.getImageUrl());
-
     nameColumn = new StringColumn<PlusPeople>(item -> item.getDisplayName());
-    
     filterButton = new ButtonColumn<PlusPeople>(item -> String.valueOf(item.getNumOfPlusOne()));
-    filterButton.addClickEvent((index, item) -> setButtonClickEvent(item));
-    filterButton.setCellStyleNames(MyStyle.FILTER_LABEL.getStyle());
+    filterButton.addClickEvent(
+        (index, item) -> setButtonClickEvent(item, FilterType.ACTIVITIES_BY_PLUSONER));
 
     // カラム表示リストに登録
     addColumnSet("", imageColumn, 50, null);

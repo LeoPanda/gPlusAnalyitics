@@ -7,17 +7,17 @@ import jp.leopanda.gPlusAnalytics.client.util.Formatter;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 
 /**
- * アクテビティの投稿先を表示するリストボックスフィールド
+ * アクテビティの投稿年を表示するリストボックスフィールド
  * 
  * @author LeoPanda
  *
  */
-public class PostCategoryListBox extends AgregatedFieldListBox<PlusActivity> {
+public class PublishedYearListBox extends AgregatedFieldListBox<PlusActivity> {
 
   /**
    * コンストラクタ
    */
-  public PostCategoryListBox(String label, List<PlusActivity> sourceItems) {
+  public PublishedYearListBox(String label, List<PlusActivity> sourceItems) {
     super(label, sourceItems);
   }
 
@@ -30,9 +30,8 @@ public class PostCategoryListBox extends AgregatedFieldListBox<PlusActivity> {
   protected AgregatedElements<String>[] getList(
       List<PlusActivity> sourceItems) {
 
-    AgregatedElements<String>[] valueList =
-        new AgregatedValueList<PlusActivity>(sourceItems).getElements(
-            item -> Formatter.getBeforeBracket(item.getAccessDescription()), field -> field);
+    AgregatedElements<String>[] valueList = new AgregatedValueList<PlusActivity>(sourceItems)
+        .getElements(item -> Formatter.getYear(item.published), field -> field + "年");
 
     return valueList;
   }

@@ -1,5 +1,6 @@
 package jp.leopanda.gPlusAnalytics.client.chart.abstracts;
 
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 import com.googlecode.gwt.charts.client.ChartPackage;
@@ -68,15 +69,11 @@ public abstract class FilterdChart<I extends PlusItem, O extends Options, CO ext
   @Override
   void runDraw(ChartWrapper<O> chart, DataTable dataTable) {
     dashboard = getDashboardWidget();
-    controlFilter = getRangeFilter(controlType);
+    controlFilter = geControlFilter(controlType);
     // 要素を画面へ追加
     add(dashboard);
     add(chart);
     add(controlFilter);
-    // コントロールフィルターの設定
-    controlFilter = getRangeFilter(controlType);
-    controlFilter.setOptions(controlFilterOptionSetter.apply(controlFilterOptions));
-    controlFilter.setState(controlFilterStateSetter.apply(controlFilterState));
     // グラフ描画
     dashboard.bind(controlFilter, chart);
     dashboard.draw(dataTable);
@@ -86,24 +83,20 @@ public abstract class FilterdChart<I extends PlusItem, O extends Options, CO ext
    * ダッシュボードの作成
    */
   private Dashboard getDashboardWidget() {
-    if (dashboard == null) {
-      dashboard = new Dashboard();
-    }
-    return dashboard;
+    return Optional.ofNullable(dashboard).orElse(new Dashboard());
   }
 
   /**
-   * レンジフィルターの作成
+   * コントロールフィルターの作成
    * 
    * @param controlType
    * @return
    */
-  private ControlWrapper<CO, CS> getRangeFilter(
-      ControlType controlType) {
-    if (controlFilter == null) {
-      controlFilter = new ControlWrapper<CO, CS>();
-      controlFilter.setControlType(controlType);
-    }
+  private ControlWrapper<CO, CS> geControlFilter(ControlType controlType) {
+    controlFilter = Optional.ofNullable(controlFilter).orElse(new ControlWrapper<CO, CS>());
+    controlFilter.setControlType(controlType);
+    controlFilter.setOptions(controlFilterOptionSetter.apply(controlFilterOptions));
+    controlFilter.setState(controlFilterStateSetter.apply(controlFilterState));
     return controlFilter;
   }
 

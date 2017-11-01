@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
+import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.panel.parts.ButtonColumn;
 import jp.leopanda.gPlusAnalytics.client.panel.parts.ImageColumn;
@@ -55,8 +56,8 @@ public class ActivityTable extends PlusItemTable<PlusActivity> {
     accessColumn.setCellStyleNames(MyStyle.TABLE_TEXT.getStyle());
 
     filterButton = new ButtonColumn<PlusActivity>(item -> String.valueOf(item.getNumOfPlusOners()));
-    filterButton.addClickEvent((index, item) -> setButtonClickEvent(item));
-    filterButton.setCellStyleNames(MyStyle.FILTER_LABEL.getStyle());
+    filterButton.addClickEvent(
+        (index, item) -> setButtonClickEvent(item, FilterType.PLUSONERS_BY_ACTIVITY));
 
     // カラム表示リストに登録
     addColumnSet("投稿日", publishedColumn, 100, null);

@@ -62,9 +62,9 @@ public class FilterLogPanel extends HorizontalPanel {
   private FilterLogCard getCard(FilterType filterType, Object keyword, CheckBoxListener listener) {
     FilterLogCard card;
     if (keyword instanceof PlusActivity) {
-      card = new FilterLogCard(FilterType.PLUSONER_TABLE_ACTIVITY, (PlusActivity) keyword);
+      card = new FilterLogCard(filterType, (PlusActivity) keyword);
     } else if (keyword instanceof PlusPeople) {
-      card = new FilterLogCard(FilterType.ACTIVITY_TABLE_PLUSONER, (PlusPeople) keyword);
+      card = new FilterLogCard(filterType, (PlusPeople) keyword);
     } else if (keyword instanceof String) {
       card = new FilterLogCard(filterType, (String) keyword);
     } else if (keyword instanceof NumOfPlusOneFilterKeyword) {

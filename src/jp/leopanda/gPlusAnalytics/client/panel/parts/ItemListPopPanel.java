@@ -69,7 +69,7 @@ public class ItemListPopPanel<I extends PlusItem, T extends SimpleCellTable<I>> 
    * 
    * @param filterPredicate
    */
-  public void show(Predicate<I> filterPredicate) {
+  public void showWhen(Predicate<I> filterPredicate) {
     doFilterItemPanel(filterPredicate);
     itemPanel.getItemTable().setPageStart(0);
     itemPanel.setDisplayCounter();

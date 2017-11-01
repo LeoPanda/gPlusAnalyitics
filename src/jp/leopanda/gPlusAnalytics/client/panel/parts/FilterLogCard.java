@@ -1,7 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client.panel.parts;
 
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
+import java.util.Optional;
+
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -38,9 +38,7 @@ public class FilterLogCard extends HorizontalPanel {
    * @param listener
    */
   public void addCheckBoxListener(CheckBoxListener listener) {
-    if (this.checkBoxListener == null) {
-      this.checkBoxListener = listener;
-    }
+    checkBoxListener = Optional.ofNullable(checkBoxListener).orElse(listener);
   }
 
   /**
@@ -97,12 +95,12 @@ public class FilterLogCard extends HorizontalPanel {
    * @param filterType
    */
   public void setPanel(FilterType filterType) {
-    this.booleans = getBooleansField();
-    this.add(booleans);
-    this.enableCheck = getEnableCheckBox();
-    this.add(enableCheck);
-    this.add(new Label(setLabelString(filterType)));
-    this.setStyleName(MyStyle.FILTER_CARD.getStyle());
+    enableCheck = getEnableCheckBox();
+    booleans = getBooleansField();
+    add(enableCheck);
+    add(booleans);
+    add(new Label(setLabelString(filterType)));
+    setStyleName(MyStyle.FILTER_CARD.getStyle());
   }
 
   /**
@@ -113,12 +111,8 @@ public class FilterLogCard extends HorizontalPanel {
   private ListBoxField getBooleansField() {
     ListBoxField booleans = new ListBoxField("", null, FilterBooleans.values());
     booleans.getBasicField().addStyleName(MyStyle.FILTER_BOOLEAN.getStyle());
-    booleans.getBasicField().addChangeHandler(new ChangeHandler() {
-      @Override
-      public void onChange(ChangeEvent event) {
-        checkBoxListener.onValueChange(getEnableCheck());
-      }
-    });
+    booleans.getBasicField()
+        .addChangeHandler(event -> checkBoxListener.onValueChange(getEnableCheck()));
     return booleans;
 
   }
@@ -131,35 +125,48 @@ public class FilterLogCard extends HorizontalPanel {
   private String setLabelString(FilterType filterType) {
     String labelString = "";
     switch (filterType) {
-    case ACTIVITY_TABLE_PLUSONER:
-      labelString = "+1er=" + plusOner.getDisplayName();
-      break;
-    case ACTIVITIES_ACCESSDESCRIPTION:
-      labelString = "カテゴリ:" + keyword;
-      break;
-    case ACTIVITIES_PUBLISHED_YEAR:
-      labelString = keyword + "年";
-      break;
-    case ACTIVITIES_PUBLISHED_MONTH:
-      labelString = keyword + "月";
-      break;
-    case ACTIVITIES_KEYWORD:
-      labelString = "アクティビティ:" + keyword;
-      break;
-    case PLUSONER_TABLE_ACTIVITY:
-      labelString = "アクティビティ=" + activity.getTitle().substring(0, 6);
-      break;
-    case PLUSONER_KEYWORD:
-      labelString = "+1er:" + keyword;
-      break;
-    case PLUSONER_NUMOFPLUSONE:
-      labelString = "+1er:+1数" + numOfPlusOneKeyword.getComparator().getName()
-          + String.valueOf(numOfPlusOneKeyword.getNumOfPlusOne());
-      break;
-    default:
-      break;
+      case ACTIVITIES_BY_PLUSONER:
+        labelString = "+1er=" + plusOner.getDisplayName();
+        break;
+      case ACTIVITIES_BY_ACCESSDESCRIPTION:
+        labelString = "カテゴリ:" + keyword;
+        break;
+      case ACTIVITIES_BY_PUBLISHED_YEAR:
+        labelString = keyword + "年";
+        break;
+      case ACTIVITIES_BY_PUBLISHED_MONTH:
+        labelString = keyword + "月";
+        break;
+      case ACTIVITIES_BY_KEYWORD:
+        labelString = "アクティビティ:" + keyword;
+        break;
+      case PLUSONERS_BY_ACTIVITY:
+        labelString = "アクティビティ=" + activity.getTitle().substring(0, 6);
+        break;
+      case PLUSONERS_BY_KEYWORD:
+        labelString = "+1er:" + keyword;
+        break;
+      case PLUSONERS_BY_NUMOFPLUSONE:
+        labelString = getNumOfPlusOneLabel();
+        break;
+      case ACTIVITIES_BY_NUMOFPLUSONE:
+        labelString = getNumOfPlusOneLabel();
+        break;
+      default:
+        break;
     }
     return labelString;
+  }
+
+  /**
+   * +1数でのフィルターラベルを生成する
+   * 
+   * @return
+   */
+  private String getNumOfPlusOneLabel() {
+    return numOfPlusOneKeyword.getItemType().getName() + ":+1数"
+        + numOfPlusOneKeyword.getComparator().getName()
+        + String.valueOf(numOfPlusOneKeyword.getNumOfPlusOne());
   }
 
   /**
@@ -197,10 +204,11 @@ public class FilterLogCard extends HorizontalPanel {
   public void setBooleansVisible(boolean visible) {
     this.booleans.getBasicField().setVisible(visible);
   }
+
   /**
    * 論理和セッターの値をリセットする
    */
-  public void resetBooleans(){
+  public void resetBooleans() {
     this.booleans.reset();
   }
 

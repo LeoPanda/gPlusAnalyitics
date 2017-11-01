@@ -3,11 +3,12 @@ package jp.leopanda.gPlusAnalytics.client.panel;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
 
 import jp.leopanda.gPlusAnalytics.client.enums.MyStyle;
 import jp.leopanda.gPlusAnalytics.client.panel.parts.FilterInputPanelFields;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.NumOfPlusOneComboField;
 import jp.leopanda.gPlusAnalytics.client.panel.parts.PostCategoryListBox;
+import jp.leopanda.gPlusAnalytics.client.panel.parts.PublishedYearListBox;
 import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.interFace.FilterRequestListener;
@@ -41,17 +42,17 @@ public class FilterInputPanel extends PanelBase {
    */
   private void setUpFields() {
     TextBoxField plusOnerFilter = fields.getPlusOnerFilter();
-    ListBoxField compOperator = fields.getCompOperator();
-    TextBoxField numOfPlusOneFilter = fields.getNumOfPlusOneFilter();
     TextBoxField activityFilter = fields.getActivityFilter();
     PostCategoryListBox postCategory = fields.getPostCategory();
     PublishedYearListBox publishedYear = fields.getPublishedYear();
     ListBoxField publishedMonth = fields.getPublishedMonth();
+    NumOfPlusOneComboField plusOnerPlusOnes = fields.getPlusOnerPlusOnes();
+    NumOfPlusOneComboField activityPlusOnes = fields.getActivityPlusOnes();
 
     fieldMap.add(plusOnerFilter);
-    fieldMap.add(compOperator);
-    fieldMap.add(numOfPlusOneFilter);
+    fieldMap.add(plusOnerPlusOnes.getField());
     fieldMap.add(activityFilter);
+    fieldMap.add(activityPlusOnes.getField());
     fieldMap.add(postCategory.getField());
     fieldMap.add(publishedYear.getField());
     fieldMap.add(publishedMonth);
@@ -59,38 +60,21 @@ public class FilterInputPanel extends PanelBase {
     HorizontalPanel filterLine = new HorizontalPanel();
     filterLine.add(plusOnerFilter);
     filterLine.add(new HTML(FixedString.BLANK_CELL.getValue()));
-    filterLine.add(compOperator);
-    filterLine.add(numOfPlusOneFilter);
+    filterLine.add(plusOnerPlusOnes.getPanel());
     filterLine.add(new HTML(FixedString.BLANK_CELL.getValue()));
     filterLine.add(activityFilter);
+    filterLine.add(activityPlusOnes.getPanel());
     filterLine.add(new HTML(FixedString.BLANK_CELL.getValue()));
     filterLine.add(postCategory.getField());
     filterLine.add(new HTML(FixedString.BLANK_CELL.getValue()));
     filterLine.add(publishedYear.getField());
     filterLine.add(publishedMonth);
-    filterLine.add(new HTML(FixedString.BLANK_CELL.getValue()));
-    filterLine.add(getCheckBoxArea());
 
     this.add(filterLine);
 
-    numOfPlusOneFilter.addStyleName(MyStyle.FILTER_NUMERIC.getStyle());
     plusOnerFilter.addLabelStyle(MyStyle.FILTER_LABEL.getStyle());
     activityFilter.addLabelStyle(MyStyle.FILTER_LABEL.getStyle());
     plusOnerFilter.addLabelStyle(MyStyle.FILTER_LABEL.getStyle());
-  }
-
-  /**
-   * フィルター累積チェックボックスの入力領域を作成する
-   * 
-   * @return
-   */
-  private HorizontalPanel getCheckBoxArea() {
-    HorizontalPanel checkBoxPanel = new HorizontalPanel();
-    checkBoxPanel.add(incrementalFilterCheck);
-    Label title = new Label("フィルター累積");
-    title.addStyleName(MyStyle.CHECKBOX_LABEL.getStyle());
-    checkBoxPanel.add(title);
-    return checkBoxPanel;
   }
 
   /**
@@ -108,20 +92,4 @@ public class FilterInputPanel extends PanelBase {
   public void resetFields() {
     fieldMap.resetFields();
   }
-
-  /**
-   * 累積フィルターチェックをリセットする
-   */
-  public void resetIncrementalCheckBox() {
-    incrementalFilterCheck.setValue(false);
-  }
-
-  /**
-   * 累積フィルターチェックの有無を取得する
-   * 
-   * @return
-   */
-  public boolean isIncrimentalChecked() {
-    return incrementalFilterCheck.getValue();
-  }
-}
+ }

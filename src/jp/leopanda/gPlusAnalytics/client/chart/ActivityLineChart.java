@@ -52,6 +52,7 @@ public class ActivityLineChart extends
 
   /**
    * チャートの設定
+   * 
    * @param chart
    * @return
    */
@@ -59,16 +60,27 @@ public class ActivityLineChart extends
     chart.addSelectHandler(new SelectHandler() {
       @Override
       public void onSelect(SelectEvent event) {
-        Integer selectedRow = (int) chart.getDataTable()
-            .getValueNumber(chart.getSelection().get(0).getRow(), 0);
-        Window.open(activityUrls.get(selectedRow), "", FixedString.WINDOW_OPTION.getValue());
+        Window.open(activityUrls.get(getSelectedRowIndex(chart)), "",
+            FixedString.WINDOW_OPTION.getValue());
       }
     });
     return chart;
   }
 
   /**
+   * 選択された行のインデックスを取得する
+   * 
+   * @param chart
+   * @return
+   */
+  private int getSelectedRowIndex(ChartWrapper<LineChartOptions> chart) {
+    return (int) chart.getDataTable()
+        .getValueNumber(chart.getSelection().get(0).getRow(), 0);
+  }
+
+  /**
    * チャートオプションの設定
+   * 
    * @param chartOptions
    * @return
    */
@@ -82,12 +94,14 @@ public class ActivityLineChart extends
     return chartOptions;
 
   }
+
   /**
    * レンジフィルターUIを設定する
+   * 
    * @param rangeFilterUi
    * @return
    */
-  private ChartRangeFilterUi setRangeFilterUi(ChartRangeFilterUi rangeFilterUi){
+  private ChartRangeFilterUi setRangeFilterUi(ChartRangeFilterUi rangeFilterUi) {
     setRangeValues(5, getSourceData().size(), 50);
     rangeFilterUi.setChartType(ChartType.LINE);
     rangeFilterUi.setChartOptions(getFilterUiOptions());
@@ -96,6 +110,7 @@ public class ActivityLineChart extends
 
   /**
    * レンジフィルターUIのチャートオプションを設定する
+   * 
    * @return
    */
   private LineChartOptions getFilterUiOptions() {
@@ -110,6 +125,7 @@ public class ActivityLineChart extends
 
   /**
    * チャートのデータテーブルを設定する
+   * 
    * @param dataTable
    * @return
    */

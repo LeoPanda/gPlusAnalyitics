@@ -32,7 +32,7 @@ public class ItemListPanel<I, T extends SimpleCellTable<I>> extends
    * 
    * @param items 表示するデータのリスト
    * @param titleName パネルのタイトル名
-   * @param pageSize １ページに表示する行数
+   * @param getPageSize() １ページに表示する行数
    * @param itemTable 一覧表示するテーブルオブジェクト SimpleListTabaleを継承するクラスのインスタンス
    */
   public ItemListPanel(String titleName, int pageSize, T itemTable) {
@@ -57,18 +57,18 @@ public class ItemListPanel<I, T extends SimpleCellTable<I>> extends
       getItemTable().setPageStart(0);
     });
     controlButtons.addlastPageButtonClickHandler(event -> {
-      pageStart = getItemTable().getDisplayList().size() - pageSize;
+      pageStart = getItemTable().getDisplayList().size() - getPageSize();
       getItemTable().setPageStart(pageStart);
     });
     controlButtons.addPrevPageButtonClickHandler(event -> {
-      pageStart -= pageSize;
+      pageStart -= getPageSize();
       pageStart = pageStart < 0 ? 0 : pageStart;
       getItemTable().setPageStart(pageStart);
     });
     controlButtons.addNextPageButtonClickHandler(event -> {
-      pageStart += pageSize;
+      pageStart += getPageSize();
       int lastPage = getItemTable().getDisplayList().size();
-      pageStart = pageStart + 1 > lastPage ? pageStart - pageSize : pageStart;
+      pageStart = pageStart + 1 > lastPage ? pageStart - getPageSize() : pageStart;
       getItemTable().setPageStart(pageStart);
     });
     return controlButtons;

@@ -4,6 +4,8 @@ import jp.leopanda.gPlusAnalytics.client.RpcGate;
 import jp.leopanda.gPlusAnalytics.client.enums.CallFunction;
 import jp.leopanda.gPlusAnalytics.client.enums.FixedString;
 
+import java.util.Optional;
+
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
@@ -26,21 +28,19 @@ public class MaintenancePanel extends VerticalPanel {
    * コンストラクタ
    */
   public MaintenancePanel() {
-    this.add(getButtonPanel());
+    this.add(Optional.ofNullable(buttonPanel).orElse(getButtonPanel()));
   }
 
   /*
    * ボタン表示パネルの作成
    */
   private VerticalPanel getButtonPanel() {
-    if (buttonPanel == null) {
-      buttonPanel = new VerticalPanel();
-      buttonPanel.add(updateButton);
-      buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
-      buttonPanel.add(clearMemoryButton);
-      buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
-      addClickHandlers();
-    }
+    buttonPanel = new VerticalPanel();
+    buttonPanel.add(updateButton);
+    buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
+    buttonPanel.add(clearMemoryButton);
+    buttonPanel.add(new HTML(FixedString.BLANK_CELL.getValue()));
+    addClickHandlers();
     return buttonPanel;
   }
 
@@ -61,7 +61,7 @@ public class MaintenancePanel extends VerticalPanel {
       new RpcGate<String>(clicked, result -> {
         Window.alert("更新指示が完了しました。画面をリロードします。");
         Window.Location.reload();
-      }) {}.request();
+      }).request();
     }
   }
 

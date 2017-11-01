@@ -1,8 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client.util;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
@@ -82,13 +81,21 @@ public class FilteredActivities extends ItemFilter<PlusActivity> {
    * @return
    */
   public List<PlusActivity> byPlusOners(List<PlusPeople> plusOners) {
-    Set<String> activityIds = new HashSet<String>();
-    for (PlusPeople plusOner : plusOners) {
-      sourceItems.stream()
-          .filter(plusActivity -> plusActivity.getPlusOnerIds().contains(plusOner.getId()))
-          .forEach(plusActivity -> activityIds.add(plusActivity.getId()));
-    }
-    return doFilter(plusActivity -> activityIds.contains(plusActivity.getId()));
+     List<String> plusOnerIds =
+     plusOners.stream().map(PlusPeople::getId).collect(Collectors.toList());
+     return doFilter(plusActivity -> plusActivity.getPlusOnerIds().stream()
+     .anyMatch(id -> plusOnerIds.contains(id)));
+  }
+
+  /**
+   * +1数でフィルタする
+   * 
+   * @param plusActivity
+   * @param keyword
+   * @return
+   */
+  public List<PlusActivity> byNumOfPlusOne(NumOfPlusOneFilterKeyword keyword) {
+    return doFilterByNumOfPlusOne(keyword, PlusActivity::getNumOfPlusOners);
   }
 
 }

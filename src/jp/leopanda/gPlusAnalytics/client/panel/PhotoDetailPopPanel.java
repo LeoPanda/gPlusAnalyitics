@@ -1,9 +1,7 @@
 package jp.leopanda.gPlusAnalytics.client.panel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -49,36 +47,8 @@ public class PhotoDetailPopPanel extends PopupPanel {
     setStyle();
     sinkEvents(Event.ONCLICK);
     sinkEvents(Event.ONMOUSEOUT);
-    addDomHandler(setMouseOutHanlder(), MouseOutEvent.getType());
-    setClickHandler();
-  }
-
-  /**
-   * クリックハンドラの設定
-   * 
-   * @param activity
-   */
-  private void setClickHandler() {
-    this.addHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        hide();
-      }
-    }, ClickEvent.getType());
-  }
-
-  /**
-   * マウスアウト時ハンドラの設定
-   * 
-   * @return
-   */
-  private MouseOutHandler setMouseOutHanlder() {
-    return new MouseOutHandler() {
-      @Override
-      public void onMouseOut(MouseOutEvent event) {
-        hide();
-      }
-    };
+    addDomHandler(e -> hide(), MouseOutEvent.getType());
+    addHandler(e -> hide(), ClickEvent.getType());
   }
 
   /**
@@ -87,35 +57,38 @@ public class PhotoDetailPopPanel extends PopupPanel {
    * @param activity
    */
   private void setPanel(PlusActivity activity) {
-    this.clear();
-    published.setText(Formatter.getYYMDString(activity.getPublished()));
-    title.setText(activity.getTitle());
-    numOfPlusOne.setText("+1:" + String.valueOf(activity.getNumOfPlusOners()));
-    accessDescription.setText(activity.getAccessDescription());
-    
+    clear();
     VerticalPanel innerPanel = new VerticalPanel();
     innerPanel.add(getImage(activity));
-    innerPanel.add(getTextInformationPanel());
-    this.add(innerPanel);
+    innerPanel.add(getTextInformationPanel(activity));
+    add(innerPanel);
   }
 
   /**
    * 文字情報を表示するパネルを生成する
+   * 
    * @return
    */
-  private VerticalPanel getTextInformationPanel(){
+  private VerticalPanel getTextInformationPanel(PlusActivity activity) {
+    title.setText(activity.getTitle());
+    accessDescription.setText(activity.getAccessDescription());
+
     VerticalPanel informationPanel = new VerticalPanel();
-    informationPanel.add(getDisplayPublishedPanel());
+    informationPanel.add(getDisplayPublishedPanel(activity));
     informationPanel.add(accessDescription);
     informationPanel.add(title);
     return informationPanel;
   }
-  
+
   /**
    * 投稿日を表示するパネルを生成する
+   * 
    * @return
    */
-  private HorizontalPanel getDisplayPublishedPanel() {
+  private HorizontalPanel getDisplayPublishedPanel(PlusActivity activity) {
+    published.setText(Formatter.getYYMDString(activity.getPublished()));
+    numOfPlusOne.setText("+1:" + String.valueOf(activity.getNumOfPlusOners()));
+
     HorizontalPanel publishedLine = new HorizontalPanel();
     publishedLine.add(published);
     publishedLine.add(new HTML(FixedString.BLANK_CELL.getValue()));

@@ -9,7 +9,7 @@ import jp.leopanda.panelFrame.filedParts.ListElement;
  *
  */
 public enum CompOperator implements ListElement {
-  EQ("="), LT("<"), GT(">");
+  GT(">"), LT("<"), EQ("=");
   String name;
 
   CompOperator(String name) {

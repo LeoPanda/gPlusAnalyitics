@@ -70,8 +70,8 @@ public class TableLaunchPanel extends HorizontalPanel {
     activityTable = new ActivityTable(sourceItems.getActivities());
     plusOnersTable = new PlusOnersTablePanel(sourceItems.getPlusOners());
 
-    activityTable.addItemClickListener(item -> itemClickListener.onClick(item));
-    plusOnersTable.addItemClickListener(item -> itemClickListener.onClick(item));
+    activityTable.addItemClickListener((item,filterType) -> itemClickListener.onClick(item,filterType));
+    plusOnersTable.addItemClickListener((item,filterType) -> itemClickListener.onClick(item,filterType));
 
     activityTablePanel =
         new ItemListPanel<PlusActivity, ActivityTable>("アクティビティ一覧", 7, activityTable);

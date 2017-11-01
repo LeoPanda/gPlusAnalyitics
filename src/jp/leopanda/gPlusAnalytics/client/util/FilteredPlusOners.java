@@ -1,8 +1,8 @@
 package jp.leopanda.gPlusAnalytics.client.util;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jp.leopanda.gPlusAnalytics.dataObject.PlusActivity;
 import jp.leopanda.gPlusAnalytics.dataObject.PlusPeople;
@@ -54,10 +54,10 @@ public class FilteredPlusOners extends ItemFilter<PlusPeople> {
    * @return
    */
   public List<PlusPeople> byActivies(List<PlusActivity> plusActivities) {
-    Set<String> plusOnerIds = new HashSet<String>();
-    plusActivities.forEach(plusActiviy -> plusActiviy.getPlusOnerIds()
-        .forEach(plusOnerId -> plusOnerIds.add(plusOnerId)));
-    return doFilter(plusOner -> plusOnerIds.contains(plusOner.getId()));
+   Set<String> plusOnerIds =
+        plusActivities.stream().flatMap(activity -> activity.getPlusOnerIds().stream())
+            .collect(Collectors.toSet());
+    return doFilter(plusPeople -> plusOnerIds.contains(plusPeople.getId()));
   }
 
   /**
@@ -68,21 +68,6 @@ public class FilteredPlusOners extends ItemFilter<PlusPeople> {
    * @return
    */
   public List<PlusPeople> byNumOfPlusOne(NumOfPlusOneFilterKeyword keyword) {
-    return doFilter(plusPeople -> {
-      boolean checker = false;
-      switch (keyword.getComparator()) {
-      case EQ:
-        checker = plusPeople.getNumOfPlusOne() == keyword.getNumOfPlusOne();
-        break;
-      case LT:
-        checker = plusPeople.getNumOfPlusOne() < keyword.getNumOfPlusOne();
-        break;
-      case GT:
-        checker = plusPeople.getNumOfPlusOne() > keyword.getNumOfPlusOne();
-        break;
-      }
-      return checker;
-
-    });
+    return doFilterByNumOfPlusOne(keyword, PlusPeople::getNumOfPlusOne);
   }
 }

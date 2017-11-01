@@ -62,9 +62,6 @@ public class MainPanel extends VerticalPanel {
    */
   private FilterRequestListener getFilterInputPanelRequestListener() {
     return (filterType, keyword) -> {
-      if (!filterInputPanel.isIncrimentalChecked()) {
-        resetFilter();
-      }
       addFilterLog(filterType, keyword);
       reloadPanel();
     };
@@ -76,11 +73,8 @@ public class MainPanel extends VerticalPanel {
    * @return
    */
   private ItemClickListener<PlusItem> getTablePanelClickListener() {
-    return plusItem -> {
-      if (!filterInputPanel.isIncrimentalChecked()) {
-        resetFilter();
-      }
-      addFilterLog(null, plusItem);
+    return (plusItem,filterType) -> {
+      addFilterLog(filterType, plusItem);
       reloadPanel();
     };
   }
@@ -88,6 +82,7 @@ public class MainPanel extends VerticalPanel {
   /**
    * フィルターログにカードを追加する
    * 
+   * @param filterType
    * @param keyword
    */
   private void addFilterLog(FilterType filterType, Object keyword) {
@@ -114,7 +109,6 @@ public class MainPanel extends VerticalPanel {
   private void resetFilter() {
     sourceItems.resetItems();
     filterLogPanel.clear();
-    filterInputPanel.resetIncrementalCheckBox();
   }
 
   /**

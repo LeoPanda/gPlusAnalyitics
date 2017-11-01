@@ -7,10 +7,9 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 
-import jp.leopanda.gPlusAnalytics.client.enums.CompOperator;
 import jp.leopanda.gPlusAnalytics.client.enums.FilterType;
+import jp.leopanda.gPlusAnalytics.client.enums.ItemType;
 import jp.leopanda.gPlusAnalytics.client.enums.Month;
-import jp.leopanda.gPlusAnalytics.client.panel.PublishedYearListBox;
 import jp.leopanda.gPlusAnalytics.client.util.NumOfPlusOneFilterKeyword;
 import jp.leopanda.gPlusAnalytics.dataObject.FilterableSourceItems;
 import jp.leopanda.gPlusAnalytics.interFace.FilterRequestListener;
@@ -19,7 +18,6 @@ import jp.leopanda.panelFrame.filedParts.FieldCommon;
 import jp.leopanda.panelFrame.filedParts.ListBoxField;
 import jp.leopanda.panelFrame.filedParts.TextBoxField;
 import jp.leopanda.panelFrame.validate.BlankValidator;
-import jp.leopanda.panelFrame.validate.IntegerValidator;
 import jp.leopanda.panelFrame.validate.ValidateBase;
 
 /**
@@ -32,14 +30,13 @@ public class FilterInputPanelFields {
   // フィールド
   TextBoxField plusOnerFilter = new TextBoxField("+1er:",
       new ValidateBase[] { new BlankValidator() });
-  ListBoxField compOperator = new ListBoxField("", null, CompOperator.values());
-  TextBoxField numOfPlusOneFilter = new TextBoxField("",
-      new ValidateBase[] { new IntegerValidator(), new BlankValidator() });
   TextBoxField activityFilter = new TextBoxField("アクテビティ:",
       new ValidateBase[] { new BlankValidator() });
   PublishedYearListBox publishedYear;
   PostCategoryListBox postCategory;
   ListBoxField publishedMonth = new ListBoxField(" ", null, Month.values());
+  NumOfPlusOneComboField plusOnerPlusOnes = new NumOfPlusOneComboField();
+  NumOfPlusOneComboField activityPlusOnes = new NumOfPlusOneComboField();
   // リクエストリスナー
   FilterRequestListener requestListener;
 
@@ -52,9 +49,9 @@ public class FilterInputPanelFields {
     setEnterKeyPressHandler();
     postCategory = new PostCategoryListBox("投稿先:", sourceItems.getActivities());
     publishedYear = new PublishedYearListBox("投稿日付:", sourceItems.getActivities());
-    postCategory.addEventListener(getOnValueChange(FilterType.ACTIVITIES_ACCESSDESCRIPTION));
-    publishedYear.addEventListener(getOnValueChange(FilterType.ACTIVITIES_PUBLISHED_YEAR));
-    publishedMonth.addEventListener(getOnValueChange(FilterType.ACTIVITIES_PUBLISHED_MONTH));
+    postCategory.addEventListener(getOnValueChange(FilterType.ACTIVITIES_BY_ACCESSDESCRIPTION));
+    publishedYear.addEventListener(getOnValueChange(FilterType.ACTIVITIES_BY_PUBLISHED_YEAR));
+    publishedMonth.addEventListener(getOnValueChange(FilterType.ACTIVITIES_BY_PUBLISHED_MONTH));
   }
 
   /**
@@ -62,11 +59,11 @@ public class FilterInputPanelFields {
    */
   private void setEnterKeyPressHandler() {
     plusOnerFilter.getBasicField()
-        .addKeyPressHandler(getEnterKeyHandler(FilterType.PLUSONER_KEYWORD));
+        .addKeyPressHandler(getEnterKeyHandler(FilterType.PLUSONERS_BY_KEYWORD));
     activityFilter.getBasicField()
-        .addKeyPressHandler(getEnterKeyHandler(FilterType.ACTIVITIES_KEYWORD));
-    numOfPlusOneFilter.getBasicField()
-        .addKeyPressHandler(getEnterKeyHandler(FilterType.PLUSONER_NUMOFPLUSONE));
+        .addKeyPressHandler(getEnterKeyHandler(FilterType.ACTIVITIES_BY_KEYWORD));
+    plusOnerPlusOnes.addKeyPressHandler(getEnterKeyHandler(FilterType.PLUSONERS_BY_NUMOFPLUSONE));
+    activityPlusOnes.addKeyPressHandler(getEnterKeyHandler(FilterType.ACTIVITIES_BY_NUMOFPLUSONE));
   }
 
   /**
@@ -87,14 +84,6 @@ public class FilterInputPanelFields {
     return activityFilter;
   }
 
-  public TextBoxField getNumOfPlusOneFilter() {
-    return numOfPlusOneFilter;
-  }
-
-  public ListBoxField getCompOperator() {
-    return compOperator;
-  }
-
   public PublishedYearListBox getPublishedYear() {
     return publishedYear;
   }
@@ -105,6 +94,14 @@ public class FilterInputPanelFields {
 
   public ListBoxField getPublishedMonth() {
     return publishedMonth;
+  }
+
+  public NumOfPlusOneComboField getPlusOnerPlusOnes() {
+    return plusOnerPlusOnes;
+  }
+
+  public NumOfPlusOneComboField getActivityPlusOnes() {
+    return activityPlusOnes;
   }
 
   /**
@@ -134,22 +131,24 @@ public class FilterInputPanelFields {
 
   /**
    * キーワードを取得し選択されたフィルターをリクエストする
+   * 
    * @param filterType
    */
   private void requestFilter(final FilterType filterType) {
-    Optional<Object> keyword = Optional.ofNullable(getFilterKeyword(filterType));
-    keyword.ifPresent(value -> requestListener.request(filterType, value));
+    Optional<Object> keywordValue = Optional.ofNullable(getFilterKeyword(filterType));
+    keywordValue.ifPresent(keyword -> requestListener.request(filterType, keyword));
   }
 
   /**
    * 押されたキーのコードを取得する
+   * 
    * @param event
    * @return
    */
   private int getKeycode(KeyPressEvent event) {
     final int fireFoxKeyCode = 0;
     int keyCode = event.getUnicodeCharCode();
-    keyCode = (keyCode == fireFoxKeyCode) ? event.getNativeEvent().getKeyCode():keyCode;
+    keyCode = (keyCode == fireFoxKeyCode) ? event.getNativeEvent().getKeyCode() : keyCode;
     return keyCode;
   }
 
@@ -162,27 +161,33 @@ public class FilterInputPanelFields {
   private Object getFilterKeyword(FilterType filterType) {
     Object keyword = null;
     switch (filterType) {
-    case PLUSONER_KEYWORD:
-      keyword = validateAndGetKeyWord(plusOnerFilter, field -> field.getText());
-      break;
-    case ACTIVITIES_KEYWORD:
-      keyword = validateAndGetKeyWord(activityFilter, field -> field.getText());
-      break;
-    case ACTIVITIES_PUBLISHED_YEAR:
-      keyword = (String) publishedYear.getValue();
-      break;
-    case ACTIVITIES_PUBLISHED_MONTH:
-      keyword = (String) Month.values()[publishedMonth.getSelectedIndex()].getNumber();
-      break;
-    case ACTIVITIES_ACCESSDESCRIPTION:
-      keyword = (String) postCategory.getValue();
-      break;
-    case PLUSONER_NUMOFPLUSONE:
-      keyword = validateAndGetKeyWord(numOfPlusOneFilter,
-          field -> new NumOfPlusOneFilterKeyword(Integer.valueOf(field.getText()),
-              CompOperator.values()[compOperator.getSelectedIndex()]));
-    default:
-      break;
+      case PLUSONERS_BY_KEYWORD:
+        keyword = validateAndGetKeyWord(plusOnerFilter, field -> field.getText());
+        break;
+      case ACTIVITIES_BY_KEYWORD:
+        keyword = validateAndGetKeyWord(activityFilter, field -> field.getText());
+        break;
+      case ACTIVITIES_BY_PUBLISHED_YEAR:
+        keyword = (String) publishedYear.getValue();
+        break;
+      case ACTIVITIES_BY_PUBLISHED_MONTH:
+        keyword = (String) Month.values()[publishedMonth.getSelectedIndex()].getNumber();
+        break;
+      case ACTIVITIES_BY_ACCESSDESCRIPTION:
+        keyword = (String) postCategory.getValue();
+        break;
+      case PLUSONERS_BY_NUMOFPLUSONE:
+        keyword = validateAndGetKeyWord(plusOnerPlusOnes.getField(),
+            field -> new NumOfPlusOneFilterKeyword(plusOnerPlusOnes.getKeyWord(),
+                plusOnerPlusOnes.getcompOperator(), ItemType.PLUSONERS));
+        break;
+      case ACTIVITIES_BY_NUMOFPLUSONE:
+        keyword = validateAndGetKeyWord(activityPlusOnes.getField(),
+            field -> new NumOfPlusOneFilterKeyword(activityPlusOnes.getKeyWord(),
+                activityPlusOnes.getcompOperator(), ItemType.ACTIVITIES));
+        break;
+      default:
+        break;
     }
     return keyword;
   }

@@ -108,11 +108,11 @@
 }
 
 .filterBoolean {
-	background: #a0a099;
+	background: rgba(171, 72, 20, 0.07);
 	font-size: 8px;
 	font-family: "nyt-cheltenham-sh", georgia, "times new roman", times,
 		serif;
-	color: #eef8ff;
+	color: #515d65;
 	font-weight: bold;
 	border-color: #f5f5dc;
 	margin: 3px 0.5ex;

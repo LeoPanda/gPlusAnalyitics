@@ -91,12 +91,39 @@ public class ActivityCalendarChart extends SimpleChart<PlusActivity, CalendarOpt
    * @param selectedDate
    */
   private void popActivitySelectorPanel(Date selectedDate) {
-    Optional.ofNullable(activitySelectorPanel).ifPresent(panel -> activitySelectorPanel.closePop());
+    closeSelectorPanelIfAlreadyOpen();
     activitySelectorPanel = new ItemListPopPanel<PlusActivity, ActivityMiniTable>(
-        Formatter.getYYMDString(selectedDate) + "のアクテビティ", 10,
-        new ActivityMiniTable(getSourceData()));
-    activitySelectorPanel.show(item -> Formatter.getYYMDString(item.published)
-        .equals(Formatter.getYYMDString(selectedDate)));
+        getwindowTitle(selectedDate), 10, new ActivityMiniTable(getSourceData()));
+    activitySelectorPanel.showWhen(items -> pickupItemsBySelectedDate(selectedDate, items));
+  }
+
+  /**
+   * 選択パネルがすでに開いていれば閉じる
+   */
+  private void closeSelectorPanelIfAlreadyOpen() {
+    Optional.ofNullable(activitySelectorPanel).ifPresent(panel -> activitySelectorPanel.closePop());
+  }
+
+  /**
+   * 選択された日付と投稿日付が一致するアクテビティを検出する
+   * 
+   * @param selectedDate
+   * @param item
+   * @return
+   */
+  private boolean pickupItemsBySelectedDate(Date selectedDate, PlusActivity item) {
+    return Formatter.getYYMDString(item.getPublished())
+        .equals(Formatter.getYYMDString(selectedDate));
+  }
+
+  /**
+   * 選択パネルのタイトルを生成する
+   * 
+   * @param selectedDate
+   * @return
+   */
+  private String getwindowTitle(Date selectedDate) {
+    return Formatter.getYYMDString(selectedDate) + "のアクテビティ";
   }
 
   /**

@@ -19,9 +19,7 @@ public abstract class SimpleItemListPanel<I, T extends SimpleCellTable<I>> exten
   private Label titleLabel = new Label();// パネルのタイトル名を表示するラベル
   private String originalTitle;// 元のタイトル名
   private Label lineCountLabel = new Label();// アイテムの総数を表示するラベル
-  protected int pageSize = 0;// 表示するアイテムの行数
-  // フリースペース
-  protected HorizontalPanel spaceOfafterTitle = new HorizontalPanel();// タイトル行の後
+  private int pageSize = 0;// 表示するアイテムの行数
 
   /**
    * コンストラクタ
@@ -60,9 +58,7 @@ public abstract class SimpleItemListPanel<I, T extends SimpleCellTable<I>> exten
     this.originalTitle = titleName;
     HorizontalPanel headerLine = makeTitleLine();
     this.add(headerLine);
-    this.add(spaceOfafterTitle);
   }
-
   /**
    * itemTableを提供する
    * 
@@ -70,6 +66,15 @@ public abstract class SimpleItemListPanel<I, T extends SimpleCellTable<I>> exten
    */
   public SimpleCellTable<I> getItemTable() {
     return itemTable;
+  }
+
+  /**
+   * ページのサイズを提供する
+   * 
+   * @return
+   */
+  protected int getPageSize() {
+    return pageSize;
   }
 
   /*

@@ -18,21 +18,15 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class RpcGate<R> {
   CallFunction function; // 呼び出す機能の種類
   R resultClass; // 戻り値のクラス
-  // メソッド用パラメータ
-  // RPC 非同期通信用のインターフェース
   private GoogleGateServiceAsync googleAsync = GWT.create(GoogleGateService.class);
-  // イベントリスナー
   private RpcGateListener<R> listener;
 
   /**
    * コンストラクタ
    * 
    * @param function
-   *          呼び出すRPC機能
    * @param userId
-   *          Google ユーザーID
    * @param listener
-   *          完了通知処理記述用リスナー
    */
   public RpcGate(CallFunction function, RpcGateListener<R> listener) {
     this.function = function;

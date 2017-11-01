@@ -62,6 +62,7 @@ public class DataConductor {
       if (e instanceof DeadlineExceededException) {
         doInterrupt(newActivities, sourceItems, logger);
       } else {
+        e.printStackTrace();
         throw new Exception(e);
       }
     }
@@ -180,17 +181,13 @@ public class DataConductor {
    * 新しいスレッドを生成して継続ジョブを実行する
    */
   private void startNewThread() {
-    ThreadManager.createBackgroundThread(new Runnable() {
-
-      @Override
-      public void run() {
+    ThreadManager.createBackgroundThread(() ->{
         try {
           new DataConductor(storeHandler, apiService).updateDataStore(isCronBatch);
         } catch (Exception e) {
           e.printStackTrace();
         }
-      }
-    }).start();
+      }).start();
   };
 
   /**

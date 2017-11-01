@@ -1,8 +1,9 @@
 package jp.leopanda.gPlusAnalytics.client.util;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * セルテーブルの表示データをフィルタリングするための抽象クラス
@@ -10,7 +11,7 @@ import java.util.function.Predicate;
  * @author LeoPanda
  *
  */
-public abstract class ItemFilter<I> {
+public class ItemFilter<I> {
   List<I> sourceItems;
 
   public ItemFilter(List<I> sourceItems) {
@@ -24,9 +25,7 @@ public abstract class ItemFilter<I> {
    * @return List<I> フィルター後のアイテムリスト
    */
   public List<I> doFilter(Predicate<I> predicate) {
-    List<I> filterdItems = new ArrayList<I>();
-    sourceItems.stream().filter(predicate).forEach(item -> filterdItems.add(item));
-    return filterdItems;
+    return sourceItems.stream().filter(predicate).collect(Collectors.toList());
   }
 
   /**
@@ -36,7 +35,7 @@ public abstract class ItemFilter<I> {
    * @return
    */
   public List<I> combineOr(List<I> targetItems) {
-    geFreshItems(targetItems).forEach(item -> sourceItems.add(item));
+    sourceItems.addAll(getFreshItems(targetItems));
     return sourceItems;
   }
 
@@ -46,13 +45,34 @@ public abstract class ItemFilter<I> {
    * @param comparsionItems 比較対象リスト
    * @return
    */
-  private List<I> geFreshItems(List<I> comparsionItems) {
-    List<I> fleshItems = new ArrayList<I>();
-    comparsionItems.forEach(item -> {
-      if (!sourceItems.contains(item)) {
-        fleshItems.add(item);
-      }
-    });
-    return fleshItems;
+  private List<I> getFreshItems(List<I> comparsionItems) {
+    return comparsionItems.stream().filter(item -> !sourceItems.contains(item))
+        .collect(Collectors.toList());
   }
+
+  /**
+   * +1数でフィルタ
+   * @param keyword
+   * @param getter
+   * @return
+   */
+  protected List<I> doFilterByNumOfPlusOne(NumOfPlusOneFilterKeyword keyword,
+      Function<I, Integer> getter) {
+    return doFilter(item -> {
+      boolean checker = false;
+      switch (keyword.getComparator()) {
+        case EQ:
+          checker = keyword.getNumOfPlusOne() == getter.apply(item);
+          break;
+        case LT:
+          checker = keyword.getNumOfPlusOne() > getter.apply(item);
+          break;
+        case GT:
+          checker = keyword.getNumOfPlusOne() < getter.apply(item);
+          break;
+      }
+      return checker;
+    });
+  }
+
 }

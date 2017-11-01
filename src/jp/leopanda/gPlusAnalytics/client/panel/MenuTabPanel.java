@@ -27,7 +27,8 @@ public class MenuTabPanel extends TabPanel {
     photoPanel = new PhotoPanel(sourceItems);
     chartPanel = new ChartMenuPanel(sourceItems);
     mentePanel = new MaintenancePanel();
-    tablePanel.addItemEventListener(item -> itemClickListener.onClick(item));
+    tablePanel
+        .addItemEventListener((item, filterType) -> itemClickListener.onClick(item, filterType));
 
     this.add(tablePanel, "tables");
     this.add(photoPanel, "photos");
